@@ -1,0 +1,134 @@
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
+import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
+import Inventory2Icon from "@mui/icons-material/Inventory2";
+import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
+import BarChartIcon from "@mui/icons-material/BarChart";
+import LocalShippingIcon from "@mui/icons-material/LocalShipping";
+import SearchIcon from "@mui/icons-material/Search";
+import PaymentsIcon from "@mui/icons-material/Payments";
+import SupportAgentIcon from "@mui/icons-material/SupportAgent";
+import type { Role } from "../../app/routes/roles";
+
+export const sideBarLabels: Record<
+  Role,
+  { title: string; path: string; icon: React.ElementType }[]
+> = {
+  owner: [
+    {
+      title: "لوحة التحكم",
+      path: "/dashboard",
+      icon: DashboardIcon,
+    },
+    {
+      title: "المبيعات",
+      path: "/sales",
+      icon: PointOfSaleIcon,
+    },
+    {
+      title: "الفواتير",
+      path: "/invoices",
+      icon: ReceiptLongIcon,
+    },
+    {
+      title: "المخزون",
+      path: "/inventory",
+      icon: Inventory2Icon,
+    },
+    {
+      title: "الطلبات",
+      path: "/orders",
+      icon: ShoppingBagIcon,
+    },
+    {
+      title: "التقارير",
+      path: "/reports",
+      icon: BarChartIcon,
+    },
+    {
+      title: "الموردين",
+      path: "/suppliers",
+      icon: LocalShippingIcon,
+    },
+    {
+      title: "استكشاف الأدوية",
+      path: "/medicine-search",
+      icon: SearchIcon,
+    },
+    {
+      title: "اشتراكي",
+      path: "/subscription",
+      icon: PaymentsIcon,
+    },
+    {
+      title: "الدعم الفني",
+      path: "/support",
+      icon: SupportAgentIcon,
+    },
+  ],
+  pharmacist: [
+    // {
+    //   title: "لوحة التحكم",
+    //   path: "/dashboard",
+    //   icon: DashboardIcon,
+    // },
+    {
+      title: "المبيعات",
+      path: "/sales",
+      icon: PointOfSaleIcon,
+    },
+    {
+      title: "الفواتير",
+      path: "/invoices",
+      icon: ReceiptLongIcon,
+    },
+    {
+      title: "المخزون",
+      path: "/inventory",
+      icon: Inventory2Icon,
+    },
+    {
+      title: "الطلبات",
+      path: "/orders",
+      icon: ShoppingBagIcon,
+    },
+    // {
+    //   title: "التقارير",
+    //   path: "/reports",
+    //   icon: BarChartIcon,
+    // },
+    // {
+    //   title: "الموردين",
+    //   path: "/suppliers",
+    //   icon: LocalShippingIcon,
+    // },
+    {
+      title: "استكشاف الأدوية",
+      path: "/medicine-search",
+      icon: SearchIcon,
+    },
+    {
+      title: "الدعم الفني",
+      path: "/support",
+      icon: SupportAgentIcon,
+    },
+  ],
+  admin: [
+    {
+      title: "إنشاء حساب",
+      path: "/create-account",
+      icon: DashboardIcon,
+    },
+    {
+      title: "إدارة الصيدليات",
+      path: "/pharmacies",
+      icon: Inventory2Icon,
+    },
+    {
+      title: "الدعم الفني",
+      path: "/support",
+      icon: SupportAgentIcon,
+    },
+  ],
+  medical_team: [],
+};
