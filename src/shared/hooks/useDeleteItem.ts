@@ -11,3 +11,8 @@ export const useDeleteItem = <TData>(endpoint: string) => {
 };
 
 export default useDeleteItem;
+
+/*   
+  USAGE EXAMPLE:
+  later
+*/

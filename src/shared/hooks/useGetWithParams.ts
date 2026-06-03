@@ -31,3 +31,31 @@ export const useGetWithParams = <TData>(
 };
 
 export default useGetWithParams;
+
+
+/*
+  USAGE EXAMPLE:
+
+   const {
+    data: complaintsResponse,
+    isLoading,
+    queryParams,
+    setQueryParams,
+    refetch,
+  } = useFetchDataWithParams<ComplaintsPaginationResponse>(
+    "/complaints/all-complaints",
+    { page: 1, limit: 10, status: "", governmentId: "" }
+  );
+
+  const handleGovernmentChange = (governmentId: string) => {
+    // map special ids to empty string (no filter)
+    const mappedId =
+      governmentId === "all" || governmentId === "none" ? "" : governmentId;
+    setQueryParams((prev) => ({
+      ...prev,
+      governmentId: mappedId,
+      page: 1,
+    }));
+  };
+
+*/

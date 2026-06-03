@@ -15,3 +15,28 @@ export const usePatchData = <TData,>(endpoint: string, data?: unknown) => {
 };
 
 export default usePatchData;
+
+/*
+  USAGE EXAMPLE:  
+
+    const { mutate: changeStatus } = usePatchData(
+    `/complaints/change-status/${complaintId}`
+  );
+
+  const exec = (statusValue: string) => {
+    changeStatus(
+      { status: statusValue },
+      {
+        onSuccess: (response) => {
+          showSnackbar(response.message, "success");
+          closeMenu();
+        },
+        onError: (error) => {
+          console.error("change status error", error);
+          showSnackbar(error.message, "error");
+        },
+      }
+    );
+  };
+  
+*/

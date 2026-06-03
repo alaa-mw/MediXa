@@ -16,3 +16,7 @@ export const usePostDataNoToken = <TData> ( endpoint: string , data?: unknown ) 
   };    
 
 export default usePostDataNoToken;
+
+/*
+  same usage as usePostData but without token in the request header. This is useful for endpoints that do not require authentication, such as login or registration endpoints.
+*/

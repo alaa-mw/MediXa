@@ -30,3 +30,8 @@ export const useLazyGet = <TData>(endpoint: string, options = {}) => {
     fetchWithParams
   };
 };
+
+/*   
+  USAGE EXAMPLE:
+  later
+*/

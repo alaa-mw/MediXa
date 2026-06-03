@@ -1,7 +1,7 @@
 import { createTheme } from '@mui/material/styles';
-import mainThem from './mainThem';
+import mainTheme from './mainTheme';
 
-const theme = createTheme(mainThem,{
+const theme = createTheme(mainTheme,{
   components: {
     MuiCssBaseline: {
       styleOverrides: {
@@ -17,7 +17,7 @@ const theme = createTheme(mainThem,{
           '&.MuiTableCell-head': { // For header cells
             fontWeight: 'bold',
             color:"white",
-            backgroundColor: mainThem.palette.primary.main // fix
+            backgroundColor: mainTheme.palette.primary.main // fix
           },
           '&.MuiTableCell-body': { // For body cells
             direction: 'rtl',

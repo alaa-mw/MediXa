@@ -16,3 +16,8 @@ export const usePostDataWithParams = <TData>(endpoint: string) => {
 };
 
 export default usePostDataWithParams;
+
+/*   
+  USAGE EXAMPLE:
+  later
+*/

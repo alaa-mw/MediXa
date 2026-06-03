@@ -14,3 +14,10 @@ export const usePostFile = <TData>(endpoint: string, data?: unknown) => {
 };
 
 export default usePostFile;
+
+/*
+  is specified just for blob data, it uses the postBolob method in the APIClient 
+  which is specifically designed to handle file uploads.
+  The usage is similar to usePostData, 
+  but you would pass a FormData object containing the file(s) you want to upload as the bodyData parameter when calling the mutate function.
+*/

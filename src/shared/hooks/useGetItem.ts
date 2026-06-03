@@ -13,3 +13,8 @@ export const useGetItem = <TData>(endpoint: string, id?: string) => {
 };
 
 export default useGetItem;
+
+/*   
+  USAGE EXAMPLE:
+  later
+*/

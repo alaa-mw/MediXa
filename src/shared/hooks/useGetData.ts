@@ -11,3 +11,13 @@ export const useGetData = <TData>(endpoint: string) => {
 };
 
 export default useGetData;
+
+/*
+  USAGE EXAMPLE:
+
+   const { data, isLoading, isError } = useGetData<ProfileData>(
+    "/authentication/profile"
+  );
+
+*/
+ 

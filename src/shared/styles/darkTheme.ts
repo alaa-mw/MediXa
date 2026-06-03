@@ -1,7 +1,7 @@
-import arabicThem from "./arabicThem";
+import arabicTheme from "./arabicTheme";
 import { createTheme } from "@mui/material/styles";
 
-const darkTheme = createTheme(arabicThem, {
+const darkTheme = createTheme(arabicTheme, {
   direction: "rtl",
   palette: {
     mode: "dark",
