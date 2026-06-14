@@ -14,7 +14,7 @@ export const sideBarLabels: Record<
   Role,
   { title: string; path: string; icon: React.ElementType }[]
 > = {
-  owner: [
+  PHARMACY_OWNER: [
     {
       title: "لوحة التحكم",
       path: "/dashboard",
@@ -66,7 +66,7 @@ export const sideBarLabels: Record<
       icon: SupportAgentIcon,
     },
   ],
-  pharmacist: [
+  PHARMACY: [
     // {
     //   title: "لوحة التحكم",
     //   path: "/dashboard",
@@ -113,7 +113,7 @@ export const sideBarLabels: Record<
       icon: SupportAgentIcon,
     },
   ],
-  admin: [
+  ADMIN: [
     {
       title: "إنشاء حساب",
       path: "/create-account",
@@ -130,5 +130,11 @@ export const sideBarLabels: Record<
       icon: SupportAgentIcon,
     },
   ],
-  medical_team: [],
+  MEDICAL_TEAM: [
+     {
+      title: "later ",
+      path: "/later",
+      icon: DashboardIcon,
+    },
+  ],
 };

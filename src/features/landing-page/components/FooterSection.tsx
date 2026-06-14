@@ -35,7 +35,7 @@ const renderFooterLink = (item: FooterLink) => {
 
 const FooterSection = () => {
   return (
-    <Box sx={{ bgcolor: "#0F172A", color: "#CBD5E1", pt: 6, pb: 3 }}>
+    <Box sx={{ bgcolor: "tertiary.main", color: "#CBD5E1", pt: 6, pb: 3 }}>
       <Container>
         <Box
           sx={{
@@ -50,7 +50,7 @@ const FooterSection = () => {
               spacing={1}
               sx={{ alignItems: "center", mb: 1.5 }}
             >
-              <LocalPharmacyIcon sx={{ color: "#38BDF8" }} />
+              <LocalPharmacyIcon sx={{ color: "primary.light" }} />
               <Typography color="#E2E8F0" sx={{ fontWeight: 800 }}>
                 MediXa AI
               </Typography>

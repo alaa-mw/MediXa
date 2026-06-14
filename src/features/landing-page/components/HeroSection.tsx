@@ -15,8 +15,6 @@ const HeroSection = () => {
     <Box
       id="hero"
       sx={{
-        background:
-          "radial-gradient(circle at top, #E6F4FB 0%, #F4F8FB 45%, #F4F8FB 100%)",
         pt: { xs: 8, md: 10 },
         pb: 8,
       }}
@@ -30,7 +28,11 @@ const HeroSection = () => {
           />
           <Typography
             variant="h1"
-            sx={{ fontSize: { xs: "2rem", md: "3.2rem" }, maxWidth: 900 }}
+            sx={{
+              fontSize: { xs: "2rem", md: "3.2rem" },
+              maxWidth: 900,
+              fontWeight: 800,
+            }}
           >
             منظومة ذكية تجعل إدارة الصيدلية أسرع، أدق، وأكثر ربحية
           </Typography>

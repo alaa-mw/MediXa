@@ -3,6 +3,16 @@ import { CssBaseline } from "@mui/material";
 import { Routes, Route } from "react-router-dom";
 import arabicTheme from "./shared/styles/arabicTheme";
 import { LandingPage } from "./dashboards/LandingPage";
+import UserRegister from "./features/auth/components/UserRegister";
+import UserLogin from "./features/auth/components/UserLogin";
+import PharmacyRegister from "./features/auth/components/PharmacyRegister";
+import PharmacyLogin from "./features/auth/components/PharmacyLogin";
+import ProtectedRoute from "./app/routes/ProtectedRoute";
+import { roleLabels } from "./app/routes/roles";
+import DashboardTemplate from "./dashboards/DashboardTemplate";
+import AuthGateway from "./features/auth/components/AuthGateway";
+import SuppliersList from "./features/suppliers/components/SuppliersList";
+import AddSupplier from "./features/suppliers/components/AddSupplier";
 
 function App() {
   return (
@@ -12,18 +22,89 @@ function App() {
         <Routes>
           {/* Public routes */}
           <Route path="/" element={<LandingPage />} />
+          <Route path="/private-register" element={<UserRegister />} />
+          <Route path="/private-login" element={<UserLogin />} />
+          <Route path="/auth" element={<AuthGateway />} />
+          <Route path="/owner-register" element={<UserRegister ownerMode />} />
+          <Route path="/owner-login" element={<UserLogin />} />
+          <Route path="/pharmacy-register" element={<PharmacyRegister />} />
+          <Route path="/pharmacy-login" element={<PharmacyLogin />} />
 
-          هاد الباث مؤقت، ممكن نستخدمه لصفحة تجريبية أو صفحة تحت الإنشاء
-          <Route path="/test" element={<>put here what design</>} />
-          
-          {/* <Route path="/register" element={<RegisterStepper />} />
-
-          <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
-            <Route path="/admin" element={<AdminDashboard />}>
+          {/* Admin routes */}
+          <Route element={<ProtectedRoute allowedRoles={[roleLabels.ADMIN]} />}>
+            <Route path="/admin" element={<DashboardTemplate />}>
               <Route path="*" element={<div>later</div>} />
-              <Route index element={<HomePage />} />
+              <Route index element={<div>hello</div>} />
+
+              <Route
+                path="create-account"
+                element={<div>create-account</div>}
+              />
+              <Route path="pharmacies" element={<div>pharmacies</div>} />
+              <Route path="support" element={<div>support</div>} />
             </Route>
-          </Route> */}
+          </Route>
+
+          {/* Medical Team routes */}
+          <Route
+            element={
+              <ProtectedRoute allowedRoles={[roleLabels.MEDICAL_TEAM]} />
+            }
+          >
+            <Route path="/medical_team" element={<DashboardTemplate />}>
+              <Route path="*" element={<div>later</div>} />
+              <Route index element={<div>hello</div>} />
+            </Route>
+          </Route>
+
+          {/* Pharmacy Owner routes */}
+          <Route
+            element={
+              <ProtectedRoute allowedRoles={[roleLabels.PHARMACY_OWNER]} />
+            }
+          >
+            <Route path="/pharmacy_owner" element={<DashboardTemplate />}>
+              <Route path="*" element={<div>later</div>} />
+              <Route index element={<div>hello</div>} />
+
+              <Route path="dashboard" element={<div>dashboard</div>} />
+
+              <Route path="reports" element={<div>reports</div>} />
+
+              <Route path="suppliers" element={<SuppliersList />} />
+              <Route path="suppliers/add" element={<AddSupplier />} />
+
+              <Route path="subscription" element={<div>subscription</div>} />
+            </Route>
+          </Route>
+          
+          {/* Pharmacy routes */}
+          <Route
+            element={
+              <ProtectedRoute
+                allowedRoles={[roleLabels.PHARMACY, roleLabels.PHARMACY_OWNER]}
+              />
+            }
+          >
+            <Route path="/pharmacy" element={<DashboardTemplate />}>
+              <Route path="*" element={<div>later</div>} />
+              <Route index element={<div>hello</div>} />
+
+              <Route path="sales" element={<div>sales</div>} />
+
+              <Route path="invoices" element={<div>invoices</div>} />
+
+              <Route path="inventory" element={<div>inventory</div>} />
+
+              <Route path="orders" element={<div>orders</div>} />
+              <Route
+                path="medicine-search"
+                element={<div>medicine-search</div>}
+              />
+
+              <Route path="support" element={<div>support</div>} />
+            </Route>
+          </Route>
         </Routes>
       </ThemeProvider>
     </>

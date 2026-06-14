@@ -7,7 +7,10 @@ declare module '@mui/material/styles' {
       secondary: string;
       tertiary: string;
     };
-    tertiary?: Palette['primary']; // Add tertiary to main palette
+    tertiary: {
+      main: string;
+      light: string;
+    };
     snackbar: { 
       success: string;
       error: string;
@@ -15,13 +18,17 @@ declare module '@mui/material/styles' {
       info: string;
     };
   }
+
   interface PaletteOptions {
     gradient?: {
       primary?: string;
       secondary?: string;
       tertiary?: string;
     };
-    tertiary?: Palette['primary']; // Add tertiary to main palette
+     tertiary?: {
+      main?: string;
+      light?: string;
+    };
     snackbar?: { 
       success: string;
       error: string;
@@ -29,14 +36,13 @@ declare module '@mui/material/styles' {
       info: string;
     };
   }
-  interface BreakpointOverrides {
-    xs: true;
-    s: true;  // Add custom breakpoint
-    sm: true;
-    md: true;
-    lg: true;
-    xl: true;
-  }
+  // interface BreakpointOverrides { defualt
+  //   xs: true; 0 px and up (mobile)
+  //   sm: true; 600px and up (tablets)
+  //   md: true; 900px and up (laptops)
+  //   lg: true; 1200px and up (desktops)
+  //   xl: true; 1536px and up (large screens)
+  // }
 }
 
 const theme = createTheme({
@@ -55,36 +61,29 @@ const theme = createTheme({
   },
   palette: {
     primary: {
-      main: '#46847C',    // Dark blue
-      light: '#2A4B7C',   // Lighter blue
-      dark: '#0F1A33',    // Darker blue
-      contrastText: '#ffffff',
+      main: '#5a3c62',  // Dark purple
+      light: '#9d7ea6',   // Lighter purple
     },
     secondary: {
-      main: '#8b9494ff',    // Purple/mauve
-      light: '#c97cb6ff',   // Light purple
-      dark: '#7A5E73',    // Dark purple
-      contrastText: '#ffffff',
+      main: '#3a6a6c',    // Dark teal
+      light: '#78bfc1',   // Lighter teal
     },
-    tertiary: {           // New color group
-      main: '#76C0CF',    // Light blue
-      light:'#e0f5fa',   // Lighter blue
-      dark: '#4A8B9D',    // Darker light blue
-      contrastText: '#1e2524',
+    tertiary: {
+      main: '#374466',    // Dark blue
+      light: '#5a6a8c',   // Lighter blue
     },
     gradient: {
-      primary: 'linear-gradient(135deg, #17284B 0%,#213d83 100%)',
-      secondary: 'linear-gradient(135deg, #A38097 0%,#604a5b 100%)',
-      tertiary: 'linear-gradient(135deg, rgb(213, 229, 231) 0%,#e0f5fa 100%)',
+      primary: 'linear-gradient(135deg, #5a3c62 0%,#caafd1 100%)',
+      secondary: 'linear-gradient(135deg, #3a6a6c 0%,#78bfc1 100%)',
+      tertiary: 'linear-gradient(135deg, #374466 0%,#5a6a8c 100%)',
     },
     background: {
-       default:'#f0f0f0',
-      // default: '#f8f9f9',
+      default:'#F4F8FB',
       paper: '#ffffff',
     },
     text: {
-      primary: '#1e2524',
-      secondary: '#5a6369',
+      primary: '#000000',
+      secondary: '#ffffff',
     },
     snackbar: {  // Define your snackbar colors
       success:'#76bb7d', // Green
@@ -93,23 +92,14 @@ const theme = createTheme({
       info:'#21bff3'     // Blue
     },
     success: {
-      main: '#74d17dff', // Default green
+      main: 'hsl(170, 51%, 53%)', // Default green
        contrastText: '#fff',
     }
   },
   typography: {
     fontFamily: "'Cairo', sans-serif",
   },
-  breakpoints: {
-    values: {
-      xs: 0,
-      s: 500, //how add new
-      sm: 800,
-      md: 900,
-      lg: 1200,
-      xl: 1536
-    }
-  },
+
 });
 
 export default theme;

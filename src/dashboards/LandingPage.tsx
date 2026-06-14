@@ -1,4 +1,4 @@
-import { Box, CssBaseline, ThemeProvider } from "@mui/material";
+import { Box, CssBaseline } from "@mui/material";
 import NavBar from "../features/landing-page/components/NavBar";
 import HeroSection from "../features/landing-page/components/HeroSection";
 import ProblemsSection from "../features/landing-page/components/ProblemsSection";
@@ -11,11 +11,10 @@ import TestimonialsSection from "../features/landing-page/components/Testimonial
 import FaqSection from "../features/landing-page/components/FaqSection";
 import CtaSection from "../features/landing-page/components/CtaSection";
 import FooterSection from "../features/landing-page/components/FooterSection";
-import { landingTheme } from "../features/landing-page/constants/theme";
 
 export const LandingPage = () => {
   return (
-    <ThemeProvider theme={landingTheme}>
+    <>
       <CssBaseline />
       <Box sx={{ bgcolor: "background.default", color: "#0F172A" }}>
         <NavBar />
@@ -31,6 +30,6 @@ export const LandingPage = () => {
         <CtaSection />
         <FooterSection />
       </Box>
-    </ThemeProvider>
+    </>
   );
 };

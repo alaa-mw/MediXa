@@ -1,5 +1,6 @@
 import { Button, Card, Container, Stack, Typography } from "@mui/material";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
+import theme from "../../../shared/styles/mainTheme";
 
 const CtaSection = () => {
   return (
@@ -9,7 +10,7 @@ const CtaSection = () => {
           borderRadius: 4,
           p: { xs: 3, md: 5 },
           textAlign: "center",
-          background: "linear-gradient(140deg, #0A84C6 0%, #14B8A6 100%)",
+          background: `${theme.palette.gradient.primary}`,
           color: "#fff",
         }}
       >
@@ -30,7 +31,7 @@ const CtaSection = () => {
               href="#pricing"
               sx={{
                 bgcolor: "#fff",
-                color: "#0A84C6",
+                color: "text.primary",
                 "&:hover": { bgcolor: "#E2E8F0" },
               }}
             >

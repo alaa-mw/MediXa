@@ -57,9 +57,15 @@ const NavBar = () => {
           ))}
         </Stack>
 
-        <Button variant="contained" href="#pricing" sx={{ borderRadius: 2 }}>
-          ابدأ الاشتراك الآن
-        </Button>
+        <Stack direction="row" spacing={2}>
+          <Button variant="outlined" href="/auth" sx={{ borderRadius: 2 }}>
+            تسجيل الدخول
+          </Button>
+
+          <Button variant="contained" href="#pricing" sx={{ borderRadius: 2 }}>
+            ابدأ الاشتراك الآن
+          </Button>
+        </Stack>
       </Toolbar>
     </AppBar>
   );

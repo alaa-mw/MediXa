@@ -51,7 +51,7 @@ const theme = createTheme(mainTheme,{
     MuiInputLabel: {
       styleOverrides: {
         root: {
-          right: 30,
+          right: 10,
           left: 'auto',
           transformOrigin: 'top right',
           '&.Mui-focused': {

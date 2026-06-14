@@ -12,6 +12,7 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import { pricingData } from "../constants/pricing";
 import { sectionTitleSx } from "../constants/sectionStyles";
+import theme from "../../../shared/styles/mainTheme";
 
 const PricingSection = () => {
   return (
@@ -51,10 +52,10 @@ const PricingSection = () => {
                 position: "relative",
                 borderRadius: 3,
                 border: tier.isPopular
-                  ? "2px solid #0A84C6"
+                  ? `2px solid ${theme.palette.primary.main}`
                   : "1px solid #E2E8F0",
                 boxShadow: tier.isPopular
-                  ? "0 10px 24px rgba(10, 132, 198, 0.12)"
+                  ? `0 10px 24px ${theme.palette.primary.main}`
                   : "none",
               }}
             >
@@ -84,15 +85,16 @@ const PricingSection = () => {
 
                 <Stack spacing={1} sx={{ mb: 3 }}>
                   {tier.features.map((feature) => (
-                    <Stack
-                      key={feature}
-                      direction="row"
-                      spacing={1}
-                      sx={{ alignItems: "center" }}
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                      }}
                     >
                       <CheckCircleIcon color="primary" sx={{ fontSize: 18 }} />
                       <Typography variant="body2">{feature}</Typography>
-                    </Stack>
+                    </Box>
                   ))}
                 </Stack>
 
