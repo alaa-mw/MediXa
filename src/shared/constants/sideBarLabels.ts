@@ -129,6 +129,11 @@ export const sideBarLabels: Record<
       path: "/support",
       icon: SupportAgentIcon,
     },
+    {
+      title: "المالية",
+      path: "/finance",
+      icon: SupportAgentIcon,
+    },
   ],
   MEDICAL_TEAM: [
      {

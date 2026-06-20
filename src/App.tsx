@@ -13,6 +13,8 @@ import DashboardTemplate from "./dashboards/DashboardTemplate";
 import AuthGateway from "./features/auth/components/AuthGateway";
 import SuppliersList from "./features/suppliers/components/SuppliersList";
 import AddSupplier from "./features/suppliers/components/AddSupplier";
+import PharmacyManagement from "./features/pharma_account/pages/pharamcy-account-management";
+import { CreatePharmacyAccount } from "./features/pharma_account/pages/CreatePharmacyAccount";
 
 function App() {
   return (
@@ -38,10 +40,11 @@ function App() {
 
               <Route
                 path="create-account"
-                element={<div>create-account</div>}
+                element={<CreatePharmacyAccount />}
               />
-              <Route path="pharmacies" element={<div>pharmacies</div>} />
+              <Route path="pharmacies" element={<PharmacyManagement />} />
               <Route path="support" element={<div>support</div>} />
+              <Route path="finance" element={<div>finance</div>} />
             </Route>
           </Route>
 
@@ -77,7 +80,7 @@ function App() {
               <Route path="subscription" element={<div>subscription</div>} />
             </Route>
           </Route>
-          
+
           {/* Pharmacy routes */}
           <Route
             element={

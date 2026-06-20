@@ -21,7 +21,7 @@ import { useNavigate } from "react-router-dom";
 const UserLogin = () => {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-  
+
   const { mutate: loginUser, isPending } = usePostDataNoToken<LoginResponse>(
     "/authentication/sign-in-user",
   );
@@ -30,6 +30,7 @@ const UserLogin = () => {
     email: "",
     password: "",
   });
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -46,7 +47,7 @@ const UserLogin = () => {
     loginUser(formData, {
       onSuccess: (response) => {
         console.log("response", response);
-        
+
         TokenService.setUserRole(response?.data?.accountType); // change later
         TokenService.setTokens(response?.data?.tokens);
 
@@ -142,15 +143,9 @@ const UserLogin = () => {
                 <InputAdornment position="end">
                   <IconButton
                     edge="end"
-                    onClick={() =>
-                      setShowPassword((prev) => !prev)
-                    }
+                    onClick={() => setShowPassword((prev) => !prev)}
                   >
-                    {showPassword ? (
-                      <VisibilityOff />
-                    ) : (
-                      <Visibility />
-                    )}
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
                   </IconButton>
                 </InputAdornment>
               ),
@@ -171,10 +166,7 @@ const UserLogin = () => {
           }}
         >
           {isPending ? (
-            <CircularProgress
-              size={24}
-              color="inherit"
-            />
+            <CircularProgress size={24} color="inherit" />
           ) : (
             "تسجيل الدخول"
           )}
