@@ -15,6 +15,8 @@ import SuppliersList from "./features/suppliers/components/SuppliersList";
 import AddSupplier from "./features/suppliers/components/AddSupplier";
 import PharmacyManagement from "./features/pharma_account/pages/pharamcy-account-management";
 import { CreatePharmacyAccount } from "./features/pharma_account/pages/CreatePharmacyAccount";
+import InventoryPage from "./features/inventory/pages/InventoryPage";
+import AddMedicinePage from "./features/inventory/pages/AddMedicinePage";
 
 function App() {
   return (
@@ -97,7 +99,8 @@ function App() {
 
               <Route path="invoices" element={<div>invoices</div>} />
 
-              <Route path="inventory" element={<div>inventory</div>} />
+              <Route path="inventory" element={<InventoryPage />} />
+              <Route path="inventory/add" element={<AddMedicinePage />} />
 
               <Route path="orders" element={<div>orders</div>} />
               <Route
