@@ -16,9 +16,11 @@ import AddSupplier from "./features/suppliers/components/AddSupplier";
 import PurchaseInvoiceDetails from "./features/invoices/purchase/components/PurchaseInvoiceDetails";
 import PurchaseInvoiceList from "./features/invoices/purchase/components/PurchaseInvoiceList";
 import InvoiceLayout from "./features/invoices/InvoiceLayout";
-import PurchaseInvoiceStepper from "./features/invoices/purchase/components/PurchaseInvoiceStepper";
-import NewPurchaseInvoice from "./features/invoices/purchase/components/NewPurchaseInvoice";
 import InvoiceWizard from "./features/invoices/purchase/components/InvoiceWizard";
+import PharmacyManagement from "./features/pharma_account/pages/pharamcy-account-management";
+import { CreatePharmacyAccount } from "./features/pharma_account/pages/CreatePharmacyAccount";
+import InventoryPage from "./features/inventory/pages/InventoryPage";
+import AddMedicinePage from "./features/inventory/pages/AddMedicinePage";
 
 function App() {
   const pharmacyPaths = ["/pharmacy", "/pharmacy_owner"];
@@ -28,7 +30,6 @@ function App() {
         <CssBaseline />
 
         <Routes>
-
           {/* Public routes */}
           <Route path="/" element={<LandingPage />} />
           <Route path="/private-register" element={<UserRegister />} />
@@ -47,10 +48,11 @@ function App() {
 
               <Route
                 path="create-account"
-                element={<div>create-account</div>}
+                element={<CreatePharmacyAccount />}
               />
-              <Route path="pharmacies" element={<div>pharmacies</div>} />
+              <Route path="pharmacies" element={<PharmacyManagement />} />
               <Route path="support" element={<div>support</div>} />
+              <Route path="finance" element={<div>finance</div>} />
             </Route>
           </Route>
 
@@ -125,7 +127,8 @@ function App() {
                 />
 
                 {/* inventory */}
-                <Route path="inventory" element={<div>inventory</div>} />
+                <Route path="inventory" element={<InventoryPage />} />
+                <Route path="inventory/add" element={<AddMedicinePage />} />
 
                 <Route path="orders" element={<div>orders</div>} />
                 <Route

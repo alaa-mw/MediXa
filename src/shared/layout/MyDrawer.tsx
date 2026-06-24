@@ -16,6 +16,8 @@ import { sideBarLabels } from "../constants/sideBarLabels";
 import NavItem from "./NavItem";
 import type { Role } from "../../app/routes/roles";
 import logonobg from "../../assets/logonobg.png";
+import logoWhite from "../../assets/logo_white.png";
+
 interface MyDrawerProps {
   handleDrawerClose?: () => void;
 }
@@ -56,21 +58,29 @@ const MyDrawer = ({ handleDrawerClose }: MyDrawerProps) => {
       }}
     >
       {/* Header */}
-      <Toolbar sx={{ fontWeight: "bold" }}>
-        <Avatar
-          src={logonobg}
-          alt="logo"
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          pt: 3,
+          pb: 1,
+          pl: 3,
+        }}
+      >
+        {" "}
+        <Box
+          component="img"
+          src={logoWhite}
+          alt="Logo"
+          width={120}
           sx={{
-            bgcolor: "#fff",
-            ml: 2,
+            height: "auto",
+            objectFit: "contain",
+            scale: "1.2",
           }}
         />
-        <Typography variant="h6" sx={{ fontWeight: "bold", color: "#fff" }}>
-          MediXa
-        </Typography>
-      </Toolbar>
-      <Divider sx={{ bgcolor: "#fff" }} />
-      {/* Main Navigation */}
+      </Box>
       <List sx={{ flexGrow: 1 }}>
         {sideBarLabels?.[role]?.map((item, index) => {
           return (
