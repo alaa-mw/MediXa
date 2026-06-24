@@ -63,6 +63,7 @@ const UserLogin = () => {
     <Paper
       elevation={3}
       sx={{
+        alignSelf: "center",
         maxWidth: 400,
         width: "100%",
         pb: 2,

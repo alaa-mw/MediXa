@@ -5,7 +5,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import { Drawer, IconButton } from "@mui/material";
-import MyDrawer from "./MyDrawer";
+import MyDrawer from './MyDrawer';
 
 export const drawerWidth = 240;
 
@@ -36,8 +36,8 @@ const ResponsiveDrawer = ({ container }: ResponsiveDrawerProps) => {
       <AppBar
         position="fixed"
         sx={{
-          display: { xs: "block", sm: "none" },
-          width: { sm: `calc(100% - ${drawerWidth}px)` },
+          display: { xs: "block", md: "none" }, 
+          width: { md: `calc(100% - ${drawerWidth}px)` },
           // ml: { sm: `${drawerWidth}px` },
         }}
       >
@@ -47,24 +47,24 @@ const ResponsiveDrawer = ({ container }: ResponsiveDrawerProps) => {
             aria-label="open drawer"
             edge="start"
             onClick={handleDrawerToggle}
-            sx={{ mx: 1, display: { sm: "none" } }}
+            sx={{ mx: 1, display: { md: "none" } }} 
           >
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" sx={{ my: 1 }}>
-            نظام الشكاوي
+            MediXa
           </Typography>
         </Toolbar>
       </AppBar>
       <Box
         component="nav"
         sx={{
-          width: { sm: drawerWidth },
-          flexShrink: { sm: 0 },
+          width: { md: drawerWidth },
+          flexShrink: { md: 0  }, // (md) ويجعلها لا تتقلص عند تغيير حجم الشاشة
         }}
         aria-label="mailbox folders"
       >
-        {/* mobile view */}
+        {/* mobile view for xs and sm */}
         <Drawer
           container={container}
           variant="temporary"
@@ -72,7 +72,7 @@ const ResponsiveDrawer = ({ container }: ResponsiveDrawerProps) => {
           onTransitionEnd={handleDrawerTransitionEnd}
           onClose={handleDrawerClose}
           sx={{
-            display: { xs: "block", sm: "none" },
+            display: { xs: "block", md: "none" }, //sm
 
             "& .MuiDrawer-paper": {
               boxSizing: "border-box",
@@ -88,12 +88,12 @@ const ResponsiveDrawer = ({ container }: ResponsiveDrawerProps) => {
           <MyDrawer handleDrawerClose={handleDrawerClose} />
         </Drawer>
 
-        {/* laptop view*/}
+        {/* laptop view for md and above */}
         <Drawer
           container={container}
           variant="permanent"
           sx={{
-            display: { xs: "none", sm: "block" },
+            display: { xs: "none", sm: "none", md: "block" },
             "& .MuiDrawer-paper": {
               boxSizing: "border-box",
               width: drawerWidth,

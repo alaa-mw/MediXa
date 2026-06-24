@@ -1,38 +1,40 @@
-import { createTheme } from '@mui/material/styles';
-import mainTheme from './mainTheme';
+import { createTheme } from "@mui/material/styles";
+import mainTheme from "./mainTheme";
 
-const theme = createTheme(mainTheme,{
+const theme = createTheme(mainTheme, {
   components: {
     MuiCssBaseline: {
       styleOverrides: {
         body: {
-          direction: 'rtl', // Ensure RTL is applied to the body
+          direction: "rtl", // Ensure RTL is applied to the body
         },
       },
     },
-     MuiTableCell: {
+    MuiTableCell: {
       styleOverrides: {
         root: {
-          textAlign: 'right',
-          '&.MuiTableCell-head': { // For header cells
-            fontWeight: 'bold',
-            color:"white",
-            backgroundColor: mainTheme.palette.primary.main // fix
+          textAlign: "right",
+          "&.MuiTableCell-head": {
+            // For header cells
+            fontWeight: "bold",
+            color: "white",
+            backgroundColor: mainTheme.palette.primary.main, // fix
           },
-          '&.MuiTableCell-body': { // For body cells
-            direction: 'rtl',
+          "&.MuiTableCell-body": {
+            // For body cells
+            direction: "rtl",
           },
         },
       },
     },
-  MuiStepLabel: {
+    MuiStepLabel: {
       styleOverrides: {
         root: {
-          textAlign: 'right',
+          textAlign: "right",
         },
-      }
+      },
     },
-  // إعدادات مخصصة لحقول النص
+    // إعدادات مخصصة لحقول النص
     // MuiTextField: {
     //   defaultProps: {
     //     dir: 'rtl',
@@ -52,10 +54,10 @@ const theme = createTheme(mainTheme,{
       styleOverrides: {
         root: {
           right: 10,
-          left: 'auto',
-          transformOrigin: 'top right',
-          '&.Mui-focused': {
-            transformOrigin: 'top right',
+          left: "auto",
+          transformOrigin: "top right",
+          "&.Mui-focused": {
+            transformOrigin: "top right",
           },
         },
       },
@@ -63,10 +65,10 @@ const theme = createTheme(mainTheme,{
     MuiOutlinedInput: {
       styleOverrides: {
         input: {
-          textAlign: 'right',
+          textAlign: "right",
         },
         notchedOutline: {
-          textAlign: 'right',
+          textAlign: "right",
         },
       },
     },
@@ -78,47 +80,51 @@ const theme = createTheme(mainTheme,{
     //   },
     // },
     //--------
-     MuiDrawer: {
+    MuiDrawer: {
       styleOverrides: {
         paper: {
           // Force RTL positioning
           right: 0,
-          left: 'auto !important',
+          left: "auto !important",
           // For permanent drawers
-          borderRight: 'none',
-          borderLeft: '1px solid rgba(0, 0, 0, 0.12)'
+          borderRight: "none",
+          borderLeft: "1px solid rgba(0, 0, 0, 0.12)",
         },
         paperAnchorDockedRight: {
-          borderLeft: '1px solid rgba(0, 0, 0, 0.12)',
-          borderRight: 'none'
-        }
-      }
+          borderLeft: "1px solid rgba(0, 0, 0, 0.12)",
+          borderRight: "none",
+        },
+      },
     },
-  
-   MuiListItemText: {
+
+    MuiListItemText: {
       styleOverrides: {
         root: {
-          textAlign: 'right', // محاذاة افتراضية لليمين
-          '& .MuiTypography-root': {
-            textAlign: 'inherit', // يرث المحاذاة من العنصر الأب
-          }
+          textAlign: "right", // محاذاة افتراضية لليمين
+          "& .MuiTypography-root": {
+            textAlign: "inherit", // يرث المحاذاة من العنصر الأب
+          },
         },
-      }
+      },
+    },
+    MuiButton: {
+      styleOverrides: {
+         startIcon: {
+          marginRight: -4,
+          marginLeft:8
+        },
+      },
     },
   },
-   MuiDatePicker: {
-      styleOverrides: {
-        root: {
-          color: '#bbdefb',
-          borderRadius: '11px',
-          borderWidth: '0px',
-          borderColor: '#2196f3',
-          border: '0px solid',
-          backgroundColor: '#0d47a1',
-        }
-      }
+  MuiDatePicker: {
+    styleOverrides: {
+      root: {
+        borderRadius: "11px",
+        borderWidth: "0px",
+        border: "0px solid",
+      },
     },
-     
+  },
 });
 
 export default theme;
