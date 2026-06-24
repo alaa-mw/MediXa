@@ -1,6 +1,6 @@
 import { ThemeProvider } from "@mui/material/styles";
 import { CssBaseline } from "@mui/material";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import arabicTheme from "./shared/styles/arabicTheme";
 import { LandingPage } from "./dashboards/LandingPage";
 import UserRegister from "./features/auth/components/UserRegister";
@@ -13,16 +13,22 @@ import DashboardTemplate from "./dashboards/DashboardTemplate";
 import AuthGateway from "./features/auth/components/AuthGateway";
 import SuppliersList from "./features/suppliers/components/SuppliersList";
 import AddSupplier from "./features/suppliers/components/AddSupplier";
+import PurchaseInvoiceDetails from "./features/invoices/purchase/components/PurchaseInvoiceDetails";
+import PurchaseInvoiceList from "./features/invoices/purchase/components/PurchaseInvoiceList";
+import InvoiceLayout from "./features/invoices/InvoiceLayout";
+import InvoiceWizard from "./features/invoices/purchase/components/InvoiceWizard";
 import PharmacyManagement from "./features/pharma_account/pages/pharamcy-account-management";
 import { CreatePharmacyAccount } from "./features/pharma_account/pages/CreatePharmacyAccount";
 import InventoryPage from "./features/inventory/pages/InventoryPage";
 import AddMedicinePage from "./features/inventory/pages/AddMedicinePage";
 
 function App() {
+  const pharmacyPaths = ["/pharmacy", "/pharmacy_owner"];
   return (
     <>
       <ThemeProvider theme={arabicTheme}>
         <CssBaseline />
+
         <Routes>
           {/* Public routes */}
           <Route path="/" element={<LandingPage />} />
@@ -68,7 +74,7 @@ function App() {
               <ProtectedRoute allowedRoles={[roleLabels.PHARMACY_OWNER]} />
             }
           >
-            <Route path="/pharmacy_owner" element={<DashboardTemplate />}>
+            <Route path={"/pharmacy_owner"} element={<DashboardTemplate />}>
               <Route path="*" element={<div>later</div>} />
               <Route index element={<div>hello</div>} />
 
@@ -91,25 +97,48 @@ function App() {
               />
             }
           >
-            <Route path="/pharmacy" element={<DashboardTemplate />}>
-              <Route path="*" element={<div>later</div>} />
-              <Route index element={<div>hello</div>} />
+            {pharmacyPaths.map((path) => (
+              <Route path={path} key={path} element={<DashboardTemplate />}>
+                <Route path="*" element={<div>later</div>} />
+                <Route index element={<div>hello</div>} />
 
-              <Route path="sales" element={<div>sales</div>} />
+                <Route path="sales" element={<div>sales</div>} />
 
-              <Route path="invoices" element={<div>invoices</div>} />
+                <Route path="invoices" element={<InvoiceLayout />}>
+                  {/* Redirect from /invoices to /invoices/purchase */}
+                  <Route index element={<Navigate to="purchase" replace />} />
+                  {/* purchase */}
+                  <Route path="purchase" element={<PurchaseInvoiceList />} />
+                  {/* remove */}
+                  <Route path="remove" element={<div>remove invoices</div>} />
+                  <Route
+                    path="remove/details"
+                    element={<div>remove invoice details</div>}
+                  />
+                </Route>
 
-              <Route path="inventory" element={<InventoryPage />} />
-              <Route path="inventory/add" element={<AddMedicinePage />} />
+                <Route
+                  path="invoices/purchase/details"
+                  element={<PurchaseInvoiceDetails />}
+                />
+                <Route
+                  path="invoices/purchase/add"
+                  element={<InvoiceWizard />}
+                />
 
-              <Route path="orders" element={<div>orders</div>} />
-              <Route
-                path="medicine-search"
-                element={<div>medicine-search</div>}
-              />
+                {/* inventory */}
+                <Route path="inventory" element={<InventoryPage />} />
+                <Route path="inventory/add" element={<AddMedicinePage />} />
 
-              <Route path="support" element={<div>support</div>} />
-            </Route>
+                <Route path="orders" element={<div>orders</div>} />
+                <Route
+                  path="medicine-search"
+                  element={<div>medicine-search</div>}
+                />
+
+                <Route path="support" element={<div>support</div>} />
+              </Route>
+            ))}
           </Route>
         </Routes>
       </ThemeProvider>

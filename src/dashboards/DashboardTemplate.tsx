@@ -1,8 +1,9 @@
+//  export default DashboardTemplate;
 import { useState, useCallback } from "react";
 import { Box } from "@mui/material";
 import { Outlet } from "react-router-dom";
 import ResponsiveDrawer, {
-  drawerWidth,
+  // drawerWidth,
 } from "../shared/layout/ResponsiveDrawer";
 
 const DashboardTemplate = () => {
@@ -19,34 +20,39 @@ const DashboardTemplate = () => {
   }, []);
 
   return (
-    <>
+    <Box
+      ref={containerRef}
+      sx={{
+        display: "flex", // 👈 التعديل الاحترافي لترتيب الـ Drawer والمحتوى بجانب بعضهما
+        width: "100vw",
+        height: "100vh",
+      }}
+    >
+      <ResponsiveDrawer container={containerNode} />
+
       <Box
-        ref={containerRef}
-        sx={{ display: "flex", width: "100%", minHeight: "100vh" }}
+        component="main"
+        sx={{
+          flexGrow: 1,
+          height: "100%",
+          overflowY: "auto",
+          p: {
+            xs: 1,
+            sm: 3,
+            md: 3,
+            lg: 3,
+            xl: 3,
+          },
+          pt: { xs: 8, sm: 9 }, // زيادة طفيفة لضمان عدم اختفاء المحتوى تحت الـ Navbar العلوي
+          // الحفاظ على الحسبة الخاصة بها للموقع العربي
+
+          //  width: { sm: `calc(100vw - ${drawerWidth}px - 32px)` },
+          //  marginRight: { sm: `${drawerWidth}px` },
+        }}
       >
-        {/* الآن نمرر الـ node المخزن في الـ state بأمان والـ Drawer سيتعرف عليه فوراً */}
-        <ResponsiveDrawer container={containerNode} />
-        <Box
-          component="main"
-          sx={{
-            flexGrow: 1,
-            // p: {
-            //   xs: 1,
-            //   sm: 3,
-            //   md: 3,
-            //   lg: 3,
-            //   xl: 3,
-            // },
-            p: { xs: 2, sm: 3 },
-            pt: { xs: 7, sm: 5 },
-            width: { sm: `calc(100% - ${drawerWidth}px)` },
-            //            marginRight: { sm: `${drawerWidth}px` },
-          }}
-        >
-          <Outlet />
-        </Box>
+        <Outlet />
       </Box>
-    </>
+    </Box>
   );
 };
 

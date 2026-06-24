@@ -84,6 +84,7 @@ const UserRegister = ({ ownerMode = false }: UserRegisterProps) => {
     <Paper
       elevation={3}
       sx={{
+        alignSelf: "center",
         maxWidth: 400,
         pb: 2,
         px: 4,
