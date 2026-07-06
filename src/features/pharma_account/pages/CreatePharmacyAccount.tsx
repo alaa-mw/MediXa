@@ -1,13 +1,14 @@
 import { ThemeProvider } from "@emotion/react";
 import theme from "../../../shared/styles/arabicTheme";
 import { Box, CssBaseline, Stack, Typography } from "@mui/material";
-import InfoStatus from "../components/info-section";
-import OwnerAccountCard from "../components/owner_card";
-import PharmacyAccountCard from "../components/pharamcy-card";
-import CreateAccountButton from "../components/createAccountButton";
 import { useState } from "react";
 import usePostData from "../../../shared/hooks/usePostData";
 import type { AllOwnersResponse } from "../types/allOwnersResponse";
+import InfoStatus from "../components/InfoSection";
+import OwnerAccountCard from "../components/OwnerCard";
+import PharmacyAccountCard from "../components/PharamcyCard";
+import CreateAccountButton from "../components/CreateAccountButton";
+import { useQueryClient } from "@tanstack/react-query";
 
 export interface OwnerForm {
   id?: number;
@@ -58,6 +59,7 @@ export const INITIAL_FORM: PharmacyRegistrationForm = {
 };
 
 export const CreatePharmacyAccount = () => {
+  const queryClient = useQueryClient();
   const [formData, setFormData] =
     useState<PharmacyRegistrationForm>(INITIAL_FORM);
 
@@ -79,12 +81,6 @@ export const CreatePharmacyAccount = () => {
         addressText: formData.pharmacy.addressText,
         openingDate: today,
       },
-      // owner: {
-      //   name: formData.newOwner.ownerName,
-      //   email: formData.newOwner.email,
-      //   mobile: formData.newOwner.mobile,
-      //   nationalId: formData.newOwner.nationalId,
-      // },
     };
     if (formData.ownerMode === "EXISTING") {
       finalPayload.existingOwnerId = Number(formData.newOwner.id);
@@ -101,6 +97,10 @@ export const CreatePharmacyAccount = () => {
     createPharmacy(finalPayload, {
       onSuccess: (response) => {
         console.log("Success : Create pharmacy response", response);
+        //  refetch();
+        queryClient.invalidateQueries({
+          queryKey: ["/pharmacy-owners"],
+        });
         setFormData(INITIAL_FORM);
       },
       onError: (error) => {

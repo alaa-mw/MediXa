@@ -112,6 +112,11 @@ export const sideBarLabels: Record<
       path: "/support",
       icon: SupportAgentIcon,
     },
+    {
+      title: "تفاصيل فاتورة",
+      path: "/sales-details",
+      icon: SupportAgentIcon,
+    },
   ],
   ADMIN: [
     {
@@ -136,10 +141,15 @@ export const sideBarLabels: Record<
     },
   ],
   MEDICAL_TEAM: [
-     {
-      title: "later ",
-      path: "/later",
+    {
+      title: "إضافة دواء",
+      path: "/CDB/addDrug",
       icon: DashboardIcon,
+    },
+    {
+      title: "إدارة الأدوية",
+      path: "/CDB/allDrugs",
+      icon: Inventory2Icon,
     },
   ],
 };

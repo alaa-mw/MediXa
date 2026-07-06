@@ -6,8 +6,14 @@ interface StatsCardProps {
   shadowColor: string;
   bgColor: string;
 }
-
-const PharmaStatsCards = () => {
+interface PharmaStatsCardsProps {
+  numberOfPharmacies: number;
+  numberOfActiveSubscriptions: number;
+}
+const PharmaStatsCards = ({
+  numberOfPharmacies,
+  numberOfActiveSubscriptions,
+}: PharmaStatsCardsProps) => {
   return (
     <Box
       sx={{
@@ -20,7 +26,7 @@ const PharmaStatsCards = () => {
       {/* الكارد الأول: عدد الصيدليات المسجلة (بظل رمادي خفيف) */}
       <StatsCard
         title="عدد الصيدليات المسجلة"
-        value={10}
+        value={numberOfPharmacies}
         shadowColor="rgba(214, 81, 231, 0.15)"
         bgColor="#e7e7e7"
       />
@@ -28,7 +34,7 @@ const PharmaStatsCards = () => {
       {/* الكارد الثاني: الاشتراكات النشطة (بظل أخضر خفيف) */}
       <StatsCard
         title="الاشتراكات النشطة"
-        value={8}
+        value={numberOfActiveSubscriptions}
         shadowColor="rgba(99, 235, 151, 0.15)"
         bgColor="#cdffd9"
       />
@@ -81,34 +87,3 @@ const StatsCard = ({ title, value, shadowColor, bgColor }: StatsCardProps) => {
     </Paper>
   );
 };
-{
-  /* <Grid container sx={{ spacing: 3, mb: 4, mt: 1 }}>
-      <Grid sx={{ width: 200 }}>
-        <Card sx={{ p: 2 }}>
-          <Typography>عدد الصيدليات المسجلة</Typography>
-
-          <Typography
-            color="success.main"
-            variant="h5"
-            sx={{ fontWeight: "bold" }}
-          >
-            10
-          </Typography>
-        </Card>
-      </Grid>
-
-      <Grid sx={{ width: 200 }}>
-        <Card sx={{ p: 2 }}>
-          <Typography>الاشتراكات النشطة</Typography>
-
-          <Typography
-            color="success.main"
-            variant="h5"
-            sx={{ fontWeight: "bold" }}
-          >
-            8
-          </Typography>
-        </Card>
-      </Grid>
-    </Grid> */
-}

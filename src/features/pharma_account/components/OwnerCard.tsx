@@ -7,10 +7,9 @@ import type {
   PharmacyRegistrationForm,
 } from "../pages/CreatePharmacyAccount";
 
-// استيراد المكونات الفرعية
-import { OwnerActionButtons } from "./ownerActionButtons";
-import { OwnerSearchDialog } from "./ownerSearchDialog";
 import type { PharmacyOwnersPaginationData } from "../types/allOwnersResponse";
+import OwnerActionButtons from "./OwnerActionButtons";
+import OwnerSearchDialog from "./OwnerSearchDialog";
 
 interface OwnerCardProps {
   ownerData: OwnerForm;

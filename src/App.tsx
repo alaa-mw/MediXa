@@ -17,10 +17,13 @@ import PurchaseInvoiceDetails from "./features/invoices/purchase/components/Purc
 import PurchaseInvoiceList from "./features/invoices/purchase/components/PurchaseInvoiceList";
 import InvoiceLayout from "./features/invoices/InvoiceLayout";
 import InvoiceWizard from "./features/invoices/purchase/components/InvoiceWizard";
-import PharmacyManagement from "./features/pharma_account/pages/pharamcy-account-management";
 import { CreatePharmacyAccount } from "./features/pharma_account/pages/CreatePharmacyAccount";
 import InventoryPage from "./features/inventory/pages/InventoryPage";
 import AddMedicinePage from "./features/inventory/pages/AddMedicinePage";
+import PharmacyManagement from "./features/pharma_account/pages/PharamcyAccountManagement";
+import AddGeneralDrug from "./features/medteam_cdb/pages/AddGeneralDrug";
+import AllGeneralDrug from "./features/medteam_cdb/pages/AllGeneralDrug";
+import SaleInvoiceDetails from "./features/SUB_invoice/SalesInvoiceDetailsPage";
 
 function App() {
   const pharmacyPaths = ["/pharmacy", "/pharmacy_owner"];
@@ -65,6 +68,8 @@ function App() {
             <Route path="/medical_team" element={<DashboardTemplate />}>
               <Route path="*" element={<div>later</div>} />
               <Route index element={<div>hello</div>} />
+              <Route path="CDB/addDrug" element={<AddGeneralDrug />} />
+              <Route path="CDB/allDrugs" element={<AllGeneralDrug />} />
             </Route>
           </Route>
 
@@ -137,6 +142,7 @@ function App() {
                 />
 
                 <Route path="support" element={<div>support</div>} />
+                <Route path="sales-details" element={<SaleInvoiceDetails />} />
               </Route>
             ))}
           </Route>

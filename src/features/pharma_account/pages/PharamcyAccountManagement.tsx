@@ -7,53 +7,41 @@ import {
   MenuItem,
   Stack,
   InputAdornment,
+  Pagination,
 } from "@mui/material";
-import PharmaciesTable from "../components/pharmacies_table";
-import PharmaInfoCard from "../components/pharma_info_card";
 import { useState } from "react";
-import PharmaStatsCards from "../components/pharma_stats";
 import { SearchOutlined } from "@mui/icons-material";
-
-const allPharmacies = [
-  {
-    id: 1,
-    name: "صيدلية النور",
-    email: "alnoor@pharmacy.com",
-    owner: "محمد أحمد",
-    status: "نشط",
-    subscription: "جاري",
-    date: "2026-04-01",
-  },
-  {
-    id: 2,
-    name: "صيدلية الشفاء",
-    email: "alshifa@pharmacy.com",
-    owner: "أحمد محمود",
-    status: "معطل",
-    subscription: "جاري",
-    date: "2026-04-01",
-  },
-  {
-    id: 3,
-    name: "صيدلية الحياة",
-    email: "life@pharmacy.com",
-    owner: "سارة النجار",
-    status: "نشط",
-    subscription: "منتهي",
-    date: "2026-04-01",
-  },
-  {
-    id: 4,
-    name: "صيدلية الأمل",
-    email: "amal@pharmacy.com",
-    owner: "خالد سعيد",
-    status: "معطل",
-    subscription: "جاري",
-    date: "2026-04-01",
-  },
-];
+import useGetWithParams from "../../../shared/hooks/useGetWithParams";
+import type {
+  AllPharmaciesResponse,
+  Pharmacy,
+} from "../types/allPharmaciesResponse";
+import PharmaStatsCards from "../components/PharmaStats";
+import PharmaciesTable from "../components/PharmaciesTable";
+import PharmaInfoCard from "../components/PharmaInfoCard";
 export const PharmacyManagement = () => {
-  const [isOpenDetails, setIsOpenDetails] = useState(true);
+  const {
+    data,
+    isLoading,
+    refetch,
+    setQueryParams,
+  } = useGetWithParams<AllPharmaciesResponse>("/pharmacy/get-all", {
+    page: 1,
+    limit: 10,
+  });
+
+  const allPharmacies = data?.data.data ?? [];
+  const paginationMeta = data?.data.meta;
+
+  const [selectedPharmacy, setSelectedPharmacy] = useState<Pharmacy | null>(
+    null,
+  );
+  const [isOpenDetails, setIsOpenDetails] = useState(false);
+
+  const handleShowDetails = (pharmacy: Pharmacy) => {
+    setSelectedPharmacy(pharmacy);
+    setIsOpenDetails(true);
+  };
 
   // 💡 States للفلترة والبحث
   const [searchQuery, setSearchQuery] = useState("");
@@ -63,18 +51,35 @@ export const PharmacyManagement = () => {
   // 💡 منطق الفلترة الديناميكي
   const filteredPharmacies = allPharmacies.filter((pharma) => {
     const matchesSearch =
-      pharma.name.includes(searchQuery) || pharma.owner.includes(searchQuery);
+      pharma.pharmacyName.includes(searchQuery) ||
+      pharma.pharmacyOwner.user.fullName.includes(searchQuery);
     const matchesStatus = statusFilter === "" || pharma.status === statusFilter;
-    const matchesSub = subFilter === "" || pharma.subscription === subFilter;
+    //  const matchesSub = subFilter === "" || pharma.subscription === subFilter;
 
-    return matchesSearch && matchesStatus && matchesSub;
+    return matchesSearch && matchesStatus;
   });
 
   const textFieldStyles = {
     bgcolor: "#ffffff",
     borderRadius: 1,
-    "& .MuiInputLabel-root:not(.MuiInputLabel-shrink)": {
-      right: 50,
+    "& .MuiInputBase-input": {
+      color: "#0F172A",
+      textAlign: "right",
+    },
+    "& .MuiInputLabel-root": {
+      right: 30,
+      left: "auto",
+      transformOrigin: "right",
+      bottom: 20,
+      color: "#8b6c64",
+    },
+    "& .MuiInputLabel-shrink": {
+      right: 30,
+      left: "auto",
+    },
+    "& .MuiSelect-icon": {
+      right: "auto",
+      left: 8,
     },
   };
   return (
@@ -82,7 +87,14 @@ export const PharmacyManagement = () => {
       <Box>
         {/* Header */}
         <Stack direction={"row"} sx={{ justifyContent: "space-between" }}>
-          <Box sx={{ mb: 4, textAlign: "right" }}>
+          <Box
+            sx={{
+              mb: 4,
+              textAlign: "right",
+              // display: "flex",
+              // justifyContent: "space-between",
+            }}
+          >
             <Typography
               variant="h4"
               sx={{ fontWeight: "bold", color: "#0F172A" }}
@@ -94,7 +106,10 @@ export const PharmacyManagement = () => {
             </Typography>
           </Box>
           <Box>
-            <PharmaStatsCards />
+            <PharmaStatsCards
+              numberOfPharmacies={paginationMeta?.total ?? 0}
+              numberOfActiveSubscriptions={0}
+            />
           </Box>
         </Stack>
 
@@ -129,8 +144,10 @@ export const PharmacyManagement = () => {
           >
             {/* المطلب 4: وضعنا value حقيقية لكي تعمل الفلترة */}
             <MenuItem value="">الكل</MenuItem>
-            <MenuItem value="نشط">نشط</MenuItem>
-            <MenuItem value="معطل">معطل</MenuItem>
+            <MenuItem value="ACTIVE">نشط</MenuItem>
+            <MenuItem value="PENDING">قيد الانتظار</MenuItem>
+            <MenuItem value="SUSPENDED">معلق</MenuItem>
+            <MenuItem value="REJECTED">مرفوض</MenuItem>
           </TextField>
 
           <TextField
@@ -159,12 +176,39 @@ export const PharmacyManagement = () => {
               elevation={0}
               sx={{ border: "1px solid #E2E8F0", borderRadius: "8px" }}
             >
-              <PharmaciesTable data={filteredPharmacies} />
+              <PharmaciesTable
+                data={filteredPharmacies}
+                onShowDetails={handleShowDetails}
+                refetch={refetch}
+                isLoading={isLoading}
+              />
             </Paper>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                py: 2,
+              }}
+            >
+              <Pagination
+                page={paginationMeta?.page ?? 1}
+                count={paginationMeta?.totalPages ?? 1}
+                color="primary"
+                onChange={(_, page) => {
+                  setQueryParams((prev) => ({
+                    ...prev,
+                    page,
+                  }));
+                }}
+              />
+            </Box>
           </Grid>
-          {isOpenDetails && (
+          {isOpenDetails && selectedPharmacy && (
             <Grid sx={{ flex: 1 }}>
-              <PharmaInfoCard />
+              <PharmaInfoCard
+                pharmacy={selectedPharmacy}
+                onClose={() => setIsOpenDetails(false)}
+              />
             </Grid>
           )}
         </Grid>
