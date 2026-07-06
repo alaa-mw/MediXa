@@ -3,7 +3,6 @@ import {
   Container,
   Paper,
   Typography,
-  TextField,
   Button,
   Box,
   Grid,
@@ -13,64 +12,59 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import SaveIcon from "@mui/icons-material/Save";
-import BusinessIcon from "@mui/icons-material/Business";
-import PersonIcon from "@mui/icons-material/Person";
-import EmailIcon from "@mui/icons-material/Email";
-import PhoneIcon from "@mui/icons-material/Phone";
-import LocationCityIcon from "@mui/icons-material/LocationCity";
-import NoteAddIcon from "@mui/icons-material/NoteAdd";
-
-interface SupplierFormData {
-  fullName: string;
-  companyName: string;
-  email: string;
-  phone: string;
-  city: string;
-  additionalNotes: string;
-}
+import { CustomTextField } from "../../../shared/layout/CustomTextField";
+import usePostData from "../../../shared/hooks/usePostData";
+import { useSnackbar } from "../../../shared/providers/useSnackbar";
 
 const AddSupplier: React.FC = () => {
   const theme = useTheme();
+  const { showSnackbar } = useSnackbar();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const [formData, setFormData] = useState<SupplierFormData>({
-    fullName: "",
-    companyName: "",
-    email: "",
+  const [formData, setFormData] = useState({
+    supplierName: "",
     phone: "",
-    city: "",
-    additionalNotes: "",
+    address: "",
+    notes: "",
   });
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    const { name, value } = e.target;
+  console.log("formData:", !formData.address);
+  const { mutate } = usePostData("/supplier/create");
+  const handleChange = (key: string, value: string) => {
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [key]: value,
     }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission logic here
-    console.log("Form submitted:", formData);
-    // You can add API call or state management logic
+    // validation if all fields are empty
+    if (
+      !formData.supplierName &&
+      !formData.phone &&
+      !formData.address &&
+      !formData.notes
+    ) {
+      showSnackbar("يرجى ملء جميع الحقول المطلوبة", "warning");
+      return;
+    }
+
+    mutate(formData, {
+      onSuccess: () => showSnackbar("تم إضافة المورد بنجاح", "success"),
+      onError: () => showSnackbar("حدث خطأ أثناء إضافة المورد", "error"),
+    });
   };
 
   const handleReset = () => {
     setFormData({
-      fullName: "",
-      companyName: "",
-      email: "",
+      supplierName: "",
       phone: "",
-      city: "",
-      additionalNotes: "",
+      address: "",
+      notes: "",
     });
   };
 
   return (
-    <Container maxWidth="md" sx={{ py: { xs: 3, sm: 4, md: 5 } }}>
+    <Container maxWidth="md">
       <Paper
         elevation={3}
         sx={{
@@ -115,117 +109,28 @@ const AddSupplier: React.FC = () => {
               المعلومات الأساسية
             </Typography>
             <Grid container spacing={3}>
-              <Grid sx={{ xs: 12, sm: 6 }}>
-                <TextField
-                  fullWidth
-                  required
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <CustomTextField
                   label="اسم المورد الكامل"
-                  name="fullName"
-                  value={formData.fullName}
-                  onChange={handleChange}
-                  placeholder="مثال: محمد السعيدي"
-                  slotProps={{
-                    input: {
-                      startAdornment: (
-                        <PersonIcon sx={{ color: "action.active", mr: 1 }} />
-                      ),
-                    },
-                  }}
-                  helperText="الاسم الرباعي أو الاسم التجاري للمورد"
+                  value={formData.supplierName}
+                  onChange={(value) => handleChange("supplierName", value)}
                 />
               </Grid>
-              <Grid sx={{ xs: 12, sm: 6 }}>
-                <TextField
-                  fullWidth
-                  required
-                  label="اسم الشركة / المؤسسة"
-                  name="companyName"
-                  value={formData.companyName}
-                  onChange={handleChange}
-                  placeholder="مثال: شركة التجهيزات الطبية العالمية"
-                  slotProps={{
-                    input: {
-                      startAdornment: (
-                        <BusinessIcon sx={{ color: "action.active", mr: 1 }} />
-                      ),
-                    },
-                  }}
-                />
-              </Grid>
-              <Grid sx={{ xs: 12, sm: 6 }}>
-                <TextField
-                  fullWidth
-                  required
-                  type="email"
-                  label="البريد الإلكتروني"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="example@company.com"
-                  slotProps={{
-                    input: {
-                      startAdornment: (
-                        <EmailIcon sx={{ color: "action.active", mr: 1 }} />
-                      ),
-                    },
-                  }}
-                />
-              </Grid>
-              <Grid sx={{ xs: 12, sm: 6 }}>
-                <TextField
-                  fullWidth
-                  required
-                  label="رقم الهاتف"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  placeholder="+966 5X XXX XXXX"
-                  slotProps={{
-                    input: {
-                      startAdornment: (
-                        <PhoneIcon sx={{ color: "action.active", mr: 1 }} />
-                      ),
-                    },
-                  }}
-                />
-              </Grid>
-            </Grid>
-          </Box>
 
-          {/* City Section */}
-          <Box sx={{ mb: 4 }}>
-            <Typography
-              variant="h6"
-              sx={{
-                fontWeight: 600,
-                mb: 2,
-                display: "flex",
-                alignItems: "center",
-                gap: 1,
-              }}
-            >
-              المدينة
-            </Typography>
-            <Grid container spacing={3}>
-              <Grid sx={{ xs: 12, sm: 8, md: 6 }}>
-                <TextField
-                  fullWidth
-                  required
-                  label="اسم المدينة"
-                  name="city"
-                  value={formData.city}
-                  onChange={handleChange}
-                  placeholder="مثال: الرياض، جدة، الدمام..."
-                  slotProps={{
-                    input: {
-                      startAdornment: (
-                        <LocationCityIcon
-                          sx={{ color: "action.active", mr: 1 }}
-                        />
-                      ),
-                    },
-                  }}
-                  helperText="الموقع الجغرافي للمورد أو مكتبه الرئيسي"
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <CustomTextField
+                  label="العنوان"
+                  value={formData.address}
+                  onChange={(value) => handleChange("address", value)}
+                />
+              </Grid>
+
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <CustomTextField
+                  label="رقم الهاتف"
+                  value={formData.phone}
+                  onChange={(value) => handleChange("phone", value)}
+                  placeholder="+966 5X XXX XXXX"
                 />
               </Grid>
             </Grid>
@@ -252,30 +157,11 @@ const AddSupplier: React.FC = () => {
                 (اختياري)
               </Typography>
             </Typography>
-            <TextField
-              fullWidth
-              multiline
-              rows={4}
+            <CustomTextField
               label="ملاحظات إضافية"
-              name="additionalNotes"
-              value={formData.additionalNotes}
-              onChange={handleChange}
+              value={formData.notes}
+              onChange={(value) => handleChange("notes", value)}
               placeholder="أية تفاصيل إضافية حول شروط التوريد أو التصنيفات..."
-              slotProps={{
-                input: {
-                  startAdornment: (
-                    <NoteAddIcon
-                      sx={{
-                        color: "action.active",
-                        mr: 1,
-                        alignSelf: "flex-start",
-                        mt: 1.5,
-                      }}
-                    />
-                  ),
-                },
-              }}
-              helperText="يمكنك إضافة شروط التوريد، التصنيفات، أو أي معلومات إضافية"
             />
           </Box>
 
@@ -285,7 +171,7 @@ const AddSupplier: React.FC = () => {
           <Stack
             direction={{ xs: "column", sm: "row" }}
             spacing={2}
-            sx={{ mt: 2, justifyContent: "flex-end" }}
+            sx={{ mt: 2, justifyContent: "flex-end", gap: 1 }}
           >
             <Button
               variant="outlined"

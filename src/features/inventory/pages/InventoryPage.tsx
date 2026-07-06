@@ -1,46 +1,36 @@
-// src/features/inventory/pages/InventoryPage.tsx
-import React, { useState } from "react";
-import { Box, Grid, CircularProgress, Alert, Pagination } from "@mui/material";
+import React from "react";
+import {
+  Box,
+  Grid,
+  CircularProgress,
+  Alert,
+  Pagination,
+  Typography,
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { useGetWithParams } from "../../../shared/hooks/useGetWithParams";
 import { InventoryHeader } from "../components/InventoryHeader";
-import { MedicineCard } from "../components/inventory/MedicineCard";
-import type {
-  PharmacyDrug,
-  PharmacyDrugsResponse,
-} from "../types/inventory.types";
+import { useInventoryData } from "../hooks/useInventoryData";
 import { EmptyInventory } from "../components/inventory/EmptyInventory";
+import { MedicineCard } from "../components/inventory/MedicineCard";
 
 export const InventoryPage: React.FC = () => {
-  const [searchValue, setSearchValue] = useState("");
-  const [activeTab, setActiveTab] = useState("الكل");
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const itemsPerPage = 20;
-
   const navigate = useNavigate();
+  const {
+    searchValue,
+    activeTab,
+    setActiveTab,
+    currentPage,
+    pharmacyDrugsList,
+    totalPages,
+    isLoading,
+    isError,
+    error,
+    isInventoryEmpty,
+    handleSearch,
+    handlePageChange,
+  } = useInventoryData(20);
 
-  const { data, isLoading, isError, error } =
-    useGetWithParams<PharmacyDrugsResponse>(
-      "/pharmacy-drugs/get-all-pharmacy-drugs",
-      {
-        page: currentPage,
-        limit: itemsPerPage,
-        name: searchValue.trim() || undefined,
-      },
-    );
-
-  const apiResponse = data as unknown as PharmacyDrugsResponse;
-  const pharmacyDrugsList: PharmacyDrug[] =
-    apiResponse?.data?.pharmacyDrugs || [];
-  const totalPages: number = apiResponse?.data?.pages || 1;
-
-  const handlePageChange = (
-    event: React.ChangeEvent<unknown>,
-    value: number,
-  ) => {
-    setCurrentPage(value);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+  const handleNavigateToAdd = () => navigate("/pharmacy/inventory/add");
 
   if (isLoading) {
     return (
@@ -52,7 +42,7 @@ export const InventoryPage: React.FC = () => {
           minHeight: "60vh",
         }}
       >
-        <CircularProgress color="primary" />
+        <CircularProgress />
       </Box>
     );
   }
@@ -67,46 +57,28 @@ export const InventoryPage: React.FC = () => {
     );
   }
 
-  // 🟢 حالة الشرط: إذا كان المخزن فارغاً حقيقةً وليس بسبب نص كتابة في البحث
-  const isInventoryEmpty =
-    pharmacyDrugsList.length === 0 && !searchValue.trim();
-
   if (isInventoryEmpty) {
-    return (
-      <EmptyInventory onAddClick={() => navigate("/pharmacy/inventory/add")} />
-    );
+    return <EmptyInventory onAddClick={handleNavigateToAdd} />;
   }
 
-  // 🟢 في حال وجود بيانات (أو وجود نص بحث لم يجد نتائج)، يظهر الهيدر والجدول الطبيعي
   return (
-    <Box
-      sx={{
-        flexGrow: 1,
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        overflow: "hidden",
-        backgroundColor: "#f3fbfb",
-      }}
-    >
-      <Box sx={{ p: 4, pb: 2, zIndex: 10 }}>
+    <Box sx={{ p: 3 }}>
+      {" "}
+      <Box>
         <InventoryHeader
-          onAddClick={() => navigate("/pharmacy/inventory/add")}
+          onAddClick={handleNavigateToAdd}
           searchValue={searchValue}
-          onSearchChange={(value) => {
-            setSearchValue(value);
-            setCurrentPage(1);
-          }}
+          onSearchChange={handleSearch}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
         />
       </Box>
-
-      <Box sx={{ flexGrow: 1, overflowY: "auto", px: 4, pb: 2 }}>
+      <Box>
         {pharmacyDrugsList.length === 0 ? (
-          // هذه تظهر فقط إذا كان المستخدم "يبحث عن دواء معين" ولم يجد نتائج
           <Box sx={{ textAlign: "center", mt: 8, color: "#64748b" }}>
-            لا توجد أدوية مطابقة لبحثك الحالي.
+            <Typography variant="body1">
+              لا توجد أدوية مطابقة لبحثك الحالي.
+            </Typography>
           </Box>
         ) : (
           <Grid container spacing={3} sx={{ direction: "rtl" }}>
@@ -118,7 +90,6 @@ export const InventoryPage: React.FC = () => {
           </Grid>
         )}
       </Box>
-
       {totalPages > 1 && (
         <Box
           sx={{

@@ -34,6 +34,7 @@ export const SnackbarProvider: React.FC<{ children: React.ReactNode }> = ({
           severity={severity}
           variant="filled"
           sx={{
+            fontFamily: theme.typography.fontFamily,
             width: "100%",
             backgroundColor:
               severity === "success"

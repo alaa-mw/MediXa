@@ -6,13 +6,14 @@ import QrCodeScannerIcon from "@mui/icons-material/QrCodeScanner";
 interface SearchBarProps {
   value: string;
   onChange: (value: string) => void;
+  placeholder: string;
 }
 
-export const SearchBar: React.FC<SearchBarProps> = ({ value, onChange }) => {
+export const SearchBar: React.FC<SearchBarProps> = ({ value, onChange, placeholder }) => {
   return (
     <TextField
        variant="outlined" 
-      placeholder="ابحث عن الدواء أو امسح الباركود"
+      placeholder={placeholder}
       value={value}
       onChange={(e) => onChange(e.target.value)}
       fullWidth

@@ -1,8 +1,6 @@
-// features/inventory/components/AddMedicineSearchBar.tsx
 import React from "react";
-import { Box, Typography, TextField, InputAdornment } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
-import QrCodeScannerIcon from "@mui/icons-material/QrCodeScanner";
+import { Box, Typography } from "@mui/material";
+import { SearchBar } from "../SearchBar";
 
 interface AddMedicineSearchBarProps {
   searchQuery: string;
@@ -16,8 +14,8 @@ export const AddMedicineSearchBar: React.FC<AddMedicineSearchBarProps> = ({
   onSubmit,
 }) => {
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: 2, alignItems: "flex-start", width: "100%" }}>
-      <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
+    <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
         <Typography variant="h5" sx={{ fontWeight: 800, color: "#0f172a" }}>
           إستيراد الأدوية للمخزون
         </Typography>
@@ -26,39 +24,15 @@ export const AddMedicineSearchBar: React.FC<AddMedicineSearchBarProps> = ({
         </Typography>
       </Box>
 
-      <form onSubmit={onSubmit} style={{ width: "100%", maxWidth: "800px" }}>
-        <TextField
-          fullWidth
-          placeholder="ابحث باسم الدواء أو امسح الباركود..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          slotProps={{
-            input: {
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon sx={{ color: "#94a3b8" }} />
-                </InputAdornment>
-              ),
-              endAdornment: (
-                <InputAdornment position="end">
-                  <QrCodeScannerIcon sx={{ color: "#94a3b8", cursor: "pointer" }} />
-                </InputAdornment>
-              ),
-            },
-          }}
-          sx={{
-            "& .MuiOutlinedInput-root": {
-              borderRadius: "26px",
-              backgroundColor: "#ffffff",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.02)",
-              px: 2,
-              "& fieldset": { borderColor: "#e2e8f0" },
-              "&:hover fieldset": { borderColor: "#cbd5e1" },
-              "&.Mui-focused fieldset": { borderColor: "primary.main" },
-            },
-          }}
-        />
-      </form>
+      <Box sx={{ mt: 3, width: "100%", maxWidth: "1200px" }}>
+        <form onSubmit={onSubmit} style={{ width: "100%" }}>
+          <SearchBar
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder="ابحث باسم الدواء أو امسح الباركود من هنا..."
+          />
+        </form>
+      </Box>
     </Box>
   );
 };

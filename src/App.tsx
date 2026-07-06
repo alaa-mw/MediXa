@@ -13,17 +13,18 @@ import DashboardTemplate from "./dashboards/DashboardTemplate";
 import AuthGateway from "./features/auth/components/AuthGateway";
 import SuppliersList from "./features/suppliers/components/SuppliersList";
 import AddSupplier from "./features/suppliers/components/AddSupplier";
-import PurchaseInvoiceDetails from "./features/invoices/purchase/components/PurchaseInvoiceDetails";
-import PurchaseInvoiceList from "./features/invoices/purchase/components/PurchaseInvoiceList";
 import InvoiceLayout from "./features/invoices/InvoiceLayout";
-import InvoiceWizard from "./features/invoices/purchase/components/InvoiceWizard";
+import PharmacyManagement from "./features/pharma_account/pages/pharamcy-account-management";
 import { CreatePharmacyAccount } from "./features/pharma_account/pages/CreatePharmacyAccount";
 import InventoryPage from "./features/inventory/pages/InventoryPage";
 import AddMedicinePage from "./features/inventory/pages/AddMedicinePage";
-import PharmacyManagement from "./features/pharma_account/pages/PharamcyAccountManagement";
-import AddGeneralDrug from "./features/medteam_cdb/pages/AddGeneralDrug";
-import AllGeneralDrug from "./features/medteam_cdb/pages/AllGeneralDrug";
-import SaleInvoiceDetails from "./features/SUB_invoice/SalesInvoiceDetailsPage";
+import PurchaseInvoiceWizard from "./features/purchase_invoices/components/add_purchase_invoice/PurchaseInvoiceWizard";
+import PurchaseInvoiceGrid from "./features/purchase_invoices/components/PurchaseInvoiceGrid";
+import SalesLayout from "./features/sales-and-return/pages/SalesReturnLayout";
+import { SaleInvoicesPage } from "./features/sales-and-return/pages/SaleInvoicesPage";
+import { ReturnInvoicesPage } from "./features/sales-and-return/pages/ReturnInvoicePage";
+import { DrugBatchesPage } from "./features/inventory/pages/DrugBatchesPage";
+import PurchaseInvoiceDetails from "./features/purchase_invoices/components/PurchaseInvoiceDetails";
 
 function App() {
   const pharmacyPaths = ["/pharmacy", "/pharmacy_owner"];
@@ -87,9 +88,6 @@ function App() {
 
               <Route path="reports" element={<div>reports</div>} />
 
-              <Route path="suppliers" element={<SuppliersList />} />
-              <Route path="suppliers/add" element={<AddSupplier />} />
-
               <Route path="subscription" element={<div>subscription</div>} />
             </Route>
           </Route>
@@ -107,35 +105,50 @@ function App() {
                 <Route path="*" element={<div>later</div>} />
                 <Route index element={<div>hello</div>} />
 
-                <Route path="sales" element={<div>sales</div>} />
+                <Route path="sales" element={<SalesLayout />}>
+                  <Route index element={<Navigate to="sales" replace />} />
+                  <Route path="sales" element={<SaleInvoicesPage />} />
+                  <Route path="return" element={<ReturnInvoicesPage />} />
+                </Route>
 
                 <Route path="invoices" element={<InvoiceLayout />}>
                   {/* Redirect from /invoices to /invoices/purchase */}
                   <Route index element={<Navigate to="purchase" replace />} />
                   {/* purchase */}
-                  <Route path="purchase" element={<PurchaseInvoiceList />} />
-                  {/* remove */}
-                  <Route path="remove" element={<div>remove invoices</div>} />
+                  <Route path="purchase" element={<PurchaseInvoiceGrid />} />
+                  {/* damage */}
+                  <Route path="damage" element={<div>damage invoices</div>} />
                   <Route
-                    path="remove/details"
-                    element={<div>remove invoice details</div>}
+                    path="damage/details"
+                    element={<div>damage invoice details</div>}
                   />
                 </Route>
 
                 <Route
-                  path="invoices/purchase/details"
+                  path="invoices/purchase/details/:invoiceId"
                   element={<PurchaseInvoiceDetails />}
                 />
                 <Route
                   path="invoices/purchase/add"
-                  element={<InvoiceWizard />}
+                  element={<PurchaseInvoiceWizard />}
+                />
+                <Route
+                  path="invoices/purchase/edit/:invoiceId"
+                  element={<PurchaseInvoiceWizard />}
                 />
 
                 {/* inventory */}
                 <Route path="inventory" element={<InventoryPage />} />
                 <Route path="inventory/add" element={<AddMedicinePage />} />
+                <Route
+                  path="inventory/batches/:drugId"
+                  element={<DrugBatchesPage />}
+                />
 
                 <Route path="orders" element={<div>orders</div>} />
+
+                <Route path="suppliers" element={<SuppliersList />} />
+                <Route path="suppliers/add" element={<AddSupplier />} />
                 <Route
                   path="medicine-search"
                   element={<div>medicine-search</div>}

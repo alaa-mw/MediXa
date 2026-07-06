@@ -1,6 +1,7 @@
+// features/inventory/types/inventory.types.ts
 export interface BatchRow {
   id: string;
-  batchNumber: string;
   quantity: number | string;
+  receivingDate: string; // تم الاستبدال هنا
   expiryDate: string;
 }

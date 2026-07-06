@@ -6,39 +6,43 @@ import QrCodeScannerIcon from "@mui/icons-material/QrCodeScanner";
 interface SearchBarProps {
   value: string;
   onChange: (value: string) => void;
+  placeholder?: string;
 }
 
-export const SearchBar: React.FC<SearchBarProps> = ({ value, onChange }) => {
+export const SearchBar: React.FC<SearchBarProps> = ({
+  value,
+  onChange,
+  placeholder = "ابحث عن الدواء أو امسح الباركود...",
+}) => {
   return (
     <TextField
-       variant="outlined" 
-      placeholder="ابحث عن الدواء أو امسح الباركود"
+      variant="outlined"
+      placeholder={placeholder}
       value={value}
       onChange={(e) => onChange(e.target.value)}
       fullWidth
       slotProps={{
         input: {
           startAdornment: (
-            <InputAdornment position="start">
+            <InputAdornment position="start" sx={{ ml: 1.5 }}>
               <SearchIcon sx={{ color: "#757575" }} />
             </InputAdornment>
           ),
           endAdornment: (
-            <InputAdornment position="end">
-                      <QrCodeScannerIcon sx={{ color: "#1e2524", cursor: "pointer" }} />
+            <InputAdornment position="end" sx={{ mr: 0.5 }}>
+              <QrCodeScannerIcon sx={{ color: "#1e2524", cursor: "pointer" }} />
             </InputAdornment>
           ),
         },
-
       }}
       sx={{
-        
         "& .MuiOutlinedInput-root": {
-          
-          borderRadius: "12px",
-          backgroundColor: "#f5f8fa",
-          "& fieldset": { borderColor: "primaary" },
-          "&:hover fieldset": { borderColor: "#e0e0e0" },
+          borderRadius: "25px", // 🟢 تم زيادة الدوران هنا لشكل عصري (Pill Shape)
+          paddingLeft: "16px", // إضافة حشو داخلي جانبي ليتناسق مع الحواف الدائرية
+          paddingRight: "16px",
+          backgroundColor: "#ffffff",
+          "& fieldset": { borderColor: "#cbd5e1" },
+          "&:hover fieldset": { borderColor: "#cbd5e1" },
           "&.Mui-focused fieldset": { borderColor: "primary.main" },
         },
       }}
