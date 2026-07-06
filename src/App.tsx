@@ -18,9 +18,13 @@ import PharmacyManagement from "./features/pharma_account/pages/pharamcy-account
 import { CreatePharmacyAccount } from "./features/pharma_account/pages/CreatePharmacyAccount";
 import InventoryPage from "./features/inventory/pages/InventoryPage";
 import AddMedicinePage from "./features/inventory/pages/AddMedicinePage";
-import PurchaseInvoiceDetails from "./features/purchase_invoices/components/PurchaseInvoiceDetails";
 import PurchaseInvoiceWizard from "./features/purchase_invoices/components/add_purchase_invoice/PurchaseInvoiceWizard";
 import PurchaseInvoiceGrid from "./features/purchase_invoices/components/PurchaseInvoiceGrid";
+import SalesLayout from "./features/sales-and-return/pages/SalesReturnLayout";
+import { SaleInvoicesPage } from "./features/sales-and-return/pages/SaleInvoicesPage";
+import { ReturnInvoicesPage } from "./features/sales-and-return/pages/ReturnInvoicePage";
+import { DrugBatchesPage } from "./features/inventory/pages/DrugBatchesPage";
+import PurchaseInvoiceDetails from "./features/purchase_invoices/components/PurchaseInvoiceDetails";
 
 function App() {
   const pharmacyPaths = ["/pharmacy", "/pharmacy_owner"];
@@ -99,7 +103,11 @@ function App() {
                 <Route path="*" element={<div>later</div>} />
                 <Route index element={<div>hello</div>} />
 
-                <Route path="sales" element={<div>sales</div>} />
+                <Route path="sales" element={<SalesLayout />}>
+                  <Route index element={<Navigate to="sales" replace />} />
+                  <Route path="sales" element={<SaleInvoicesPage />} />
+                  <Route path="return" element={<ReturnInvoicesPage />} />
+                </Route>
 
                 <Route path="invoices" element={<InvoiceLayout />}>
                   {/* Redirect from /invoices to /invoices/purchase */}
@@ -126,10 +134,14 @@ function App() {
                   path="invoices/purchase/edit/:invoiceId"
                   element={<PurchaseInvoiceWizard />}
                 />
-                
+
                 {/* inventory */}
                 <Route path="inventory" element={<InventoryPage />} />
                 <Route path="inventory/add" element={<AddMedicinePage />} />
+                <Route
+                  path="inventory/batches/:drugId"
+                  element={<DrugBatchesPage />}
+                />
 
                 <Route path="orders" element={<div>orders</div>} />
 

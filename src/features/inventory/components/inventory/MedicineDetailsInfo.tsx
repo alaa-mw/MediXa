@@ -1,74 +1,40 @@
-// features/inventory/components/MedicineDetailsInfo.tsx
+
 import React from "react";
 import { Box, Typography } from "@mui/material";
-import EditIcon from "@mui/icons-material/Edit";
 
 interface MedicineDetailsInfoProps {
   type: string;
-  quantity: number;
-  alertLimit: number;
+  quantityText: string;
   isLowStock: boolean;
+  location: string;
 }
 
 export const MedicineDetailsInfo: React.FC<MedicineDetailsInfoProps> = ({
   type,
-  quantity,
-  alertLimit,
+  quantityText,
   isLowStock,
+  location,
 }) => {
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        gap: 1,
-        borderBottom: "1px dashed #eef2f5",
-        pb: 2,
-      }}
-    >
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 1, borderBottom: "1px dashed #e2e8f0", pb: 2 }}>
+      {/* النوع */}
       <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-        <Typography variant="body2" color="#7a868f">
-          النوع:
-        </Typography>
-        <Typography
-          variant="body2"
-          sx={{ fontWeight: "bold", color: "#1e2524" }}
-        >
-          {type}
+        <Typography variant="body2" sx={{ color: "#7a868f", fontSize: "0.825rem" }}>النوع:</Typography>
+        <Typography variant="body2" sx={{ fontWeight: "600", color: "#334155" }}>{type}</Typography>
+      </Box>
+
+      {/* الكمية المتاحة */}
+      <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+        <Typography variant="body2" sx={{ color: "#7a868f", fontSize: "0.825rem" }}>الكمية المتاحة:</Typography>
+        <Typography variant="body2" sx={{ fontWeight: "700", color: isLowStock ? "#ef4444" : "#16a34a" }}>
+          {quantityText}
         </Typography>
       </Box>
+
+      {/* الموقع بديل حد التنبيه */}
       <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-        <Typography variant="body2" color="#7a868f">
-          الكمية المتاحة:
-        </Typography>
-        <Typography
-          variant="body2"
-          sx={{ fontWeight: "bold", color: isLowStock ? "#d32f2f" : "#2e7d32" }}
-        >
-          {quantity} عبوة
-        </Typography>
-      </Box>
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <Typography variant="body2" color="#7a868f">
-          حد التنبيه/صفر المادة:
-        </Typography>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-          <EditIcon
-            sx={{ fontSize: "14px", color: "#aeb6bb", cursor: "pointer" }}
-          />
-          <Typography
-            variant="body2"
-            sx={{ fontWeight: "bold", color: "#1e2524" }}
-          >
-            {alertLimit}
-          </Typography>
-        </Box>
+        <Typography variant="body2" sx={{ color: "#7a868f", fontSize: "0.825rem" }}>الموقع المخصص:</Typography>
+        <Typography variant="body2" sx={{ fontWeight: "600", color: "#334155" }}>{location}</Typography>
       </Box>
     </Box>
   );

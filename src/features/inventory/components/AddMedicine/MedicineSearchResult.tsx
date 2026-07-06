@@ -5,6 +5,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
 import { ImportMedicineCard } from "./ImportMedicineCard";
 import type { CentralDrugData } from "../../types/centralDrug";
+import theme from "../../../../shared/styles/mainTheme";
 
 interface MedicineSearchResultProps {
   hasSearched: boolean;
@@ -24,10 +25,10 @@ export const MedicineSearchResult: React.FC<MedicineSearchResultProps> = ({
   if (!hasSearched) {
     return (
       <Box sx={{ textAlign: "center", margin: "auto", py: 6 }}>
-        <PageviewIcon sx={{ fontSize: "100px", color: "#cbd5e1", mb: 1.5 }} />
+        <PageviewIcon sx={{ fontSize: "100px", color: theme.palette?.primary?.light, mb: 2 }} />
         <Typography
           variant="body2"
-          sx={{ color: "#94a3b8", maxWidth: "360px", margin: "0 auto" }}
+          sx={{ color: "#94a3b8", maxWidth: "350px", margin: "0 auto",lineHeight: 2 }}
         >
           أدخل الكلمات المفتاحية في شريط البحث العلوي لبدء فحص السجلات المركزية.
         </Typography>
@@ -135,8 +136,8 @@ export const MedicineSearchResult: React.FC<MedicineSearchResultProps> = ({
           onClick={onOpenNotFound}
           startIcon={<AddIcon />}
           sx={{
-            backgroundColor: "#0f172a",
-            "&:hover": { backgroundColor: "#1e293b" },
+            backgroundColor: theme.palette?.secondary?.main,
+            "&:hover": { backgroundColor: theme.palette?.secondary?.light },
             borderRadius: "12px",
             px: 4,
             py: 1.4,

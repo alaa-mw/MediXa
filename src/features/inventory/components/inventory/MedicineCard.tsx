@@ -1,261 +1,3 @@
-// // features/inventory/components/MedicineCard.tsx
-// import React from "react";
-// import { Card, Box, Typography, Button } from "@mui/material";
-// import { CardBadges } from "./CardBadges";
-// import { MedicineDetailsInfo } from "./MedicineDetailsInfo";
-// import { PriceBox } from "./PriceBox";
-// import type { Medicine } from "../../apis/inventory.types";
-
-// interface MedicineCardProps {
-//   medicine: Medicine;
-// }
-
-// const actionButtonStyles = {
-//   backgroundColor: "#f0f4f8",
-//   color: "#5a6369",
-//   borderRadius: "10px",
-//   boxShadow: "none",
-//   fontWeight: "bold",
-//   whiteSpace: "nowrap",
-//   "&:hover": { backgroundColor: "#e2ecf5" }
-// };
-
-// export const MedicineCard: React.FC<MedicineCardProps> = ({ medicine }) => {
-//   const isLowStock = medicine.quantity <= medicine.alert_limit;
-
-//   return (
-//     <Card
-//       sx={{
-//         borderRadius: "16px",
-//         p: 3,
-//         boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.02)",
-//         backgroundColor: "#ffffff",
-//         display: "flex",
-//         flexDirection: "column",
-//         gap: 2,
-//         border: "1px solid #eef2f5",
-//         borderRight: isLowStock ? "5px solid #ff9695" : "1px solid #eef2f5",
-
-//         transition: "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out",
-//         "&:hover": {
-//           transform: "translateY(-5px)",
-//           boxShadow: "0px 10px 25px rgba(0, 0, 0, 0.08)",
-//         },
-//       }}
-//     >
-//       <CardBadges category={medicine.category} isLowStock={isLowStock} />
-
-//       <Box sx={{ textAlign: "start", my: 1 }}>
-//         <Typography variant="h6" sx={{ fontWeight: "bold", color: "#1e2524" }}>
-//           {medicine.trade_name}
-//         </Typography>
-//         <Typography variant="caption" sx={{ color: "#7a868f", display: "block" }}>
-//           {medicine.scientific_name}
-//         </Typography>
-//       </Box>
-
-//       <MedicineDetailsInfo
-//         type={medicine.type}
-//         quantity={medicine.quantity}
-//         alertLimit={medicine.alert_limit}
-//         isLowStock={isLowStock}
-//       />
-
-//       <Box sx={{ display: "flex", gap: 2 }}>
-//         <PriceBox label="سعر الشراء" price={medicine.purchase_price} />
-//         <PriceBox label="سعر المستهلك" price={medicine.consumer_price} isConsumer />
-//       </Box>
-
-//       <Box sx={{ display: "flex", gap: 1.5, mt: "auto" }}>
-//         <Button fullWidth variant="contained" sx={actionButtonStyles}>
-//           عرض الدفعات
-//         </Button>
-
-//         <Button fullWidth variant="contained" sx={actionButtonStyles}>
-//           المعلومات الطبية
-//         </Button>
-//       </Box>
-//     </Card>
-//   );
-// };
-// features/inventory/components/MedicineCard.tsx
-
-// features/inventory/components/MedicineCard.tsx
-
-
-
-// import React, { useState } from "react";
-// import {
-//   Card,
-//   Box,
-//   Typography,
-//   Button,
-//   Menu,
-//   MenuItem,
-//   ListItemText,
-// } from "@mui/material";
-
-// import { CardBadges } from "./CardBadges";
-// import { MedicineDetailsInfo } from "./MedicineDetailsInfo";
-// import { PriceBox } from "./PriceBox";
-// import type { Medicine } from "../../apis/inventory.types";
-// import { EditMedicineDialog } from "./EditMedicineDialog"; // 👈 استيراد نافذة التعديل الجديدة
-
-// interface MedicineCardProps {
-//   medicine: Medicine;
-// }
-
-// const actionButtonStyles = {
-//   backgroundColor: "#f0f4f8",
-//   color: "#5a6369",
-//   borderRadius: "10px",
-//   boxShadow: "none",
-//   fontWeight: "bold",
-//   whiteSpace: "nowrap",
-//   "&:hover": {
-//     backgroundColor: "#e2ecf5",
-//   },
-// };
-
-// export const MedicineCard: React.FC<MedicineCardProps> = ({ medicine }) => {
-//   const isLowStock = medicine.quantity <= medicine.alert_limit;
-
-//   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-//   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false); // 👈 حالة التحكم بفتح نافذة التعديل
-
-//   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-//     setAnchorEl(event.currentTarget);
-//   };
-
-//   const handleMenuClose = () => {
-//     setAnchorEl(null);
-//   };
-
-//   const handleEdit = () => {
-//     handleMenuClose();
-//     setIsEditDialogOpen(true); // 👈 فتح الـ Dialog عند الضغط على تعديل
-//   };
-
-//   const handleArchive = () => {
-//     handleMenuClose();
-//     console.log("Archive");
-//   };
-
-//   // دالة تُستدعى بعد الضغط على حفظ التغييرات لمعالجة البيانات المعدلة
-//   const handleSaveMedicineUpdate = (updatedFields: Partial<Medicine>) => {
-//     console.log("البيانات الجديدة المحدثة للدواء:", updatedFields);
-//     // هنا يمكنك استدعاء دالة الـ API مثل mutate من RTK Query أو Axios لتحديث البيانات بالـ Backend
-//   };
-
-//   return (
-//     <Card
-//       sx={{
-//         borderRadius: "16px",
-//         p: 3,
-//         boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.02)",
-//         backgroundColor: "#ffffff",
-//         display: "flex",
-//         flexDirection: "column",
-//         gap: 2,
-//         border: "1px solid #eef2f5",
-//         borderRight: isLowStock ? "5px solid #ff9695" : "1px solid #eef2f5",
-//         transition: "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out",
-//         "&:hover": {
-//           transform: "translateY(-5px)",
-//           boxShadow: "0px 10px 25px rgba(0, 0, 0, 0.08)",
-//         },
-//       }}
-//     >
-//       <CardBadges
-//         category={medicine.category}
-//         isLowStock={isLowStock}
-//         onMenuClick={handleMenuOpen}
-//       />
-
-//       <Menu
-//         anchorEl={anchorEl}
-//         open={Boolean(anchorEl)}
-//         onClose={handleMenuClose}
-//       >
-//         <MenuItem onClick={handleEdit}>
-//           <ListItemText>تعديل</ListItemText>
-//         </MenuItem>
-
-//         <MenuItem onClick={handleArchive}>
-//           <ListItemText>أرشفة</ListItemText>
-//         </MenuItem>
-//       </Menu>
-
-//       <Box sx={{ textAlign: "start", my: 1 }}>
-//         <Typography
-//           variant="h6"
-//           sx={{
-//             fontWeight: "bold",
-//             color: "#1e2524",
-//           }}
-//         >
-//           {medicine.trade_name}
-//         </Typography>
-
-//         <Typography
-//           variant="caption"
-//           sx={{
-//             color: "#7a868f",
-//             display: "block",
-//           }}
-//         >
-//           {medicine.scientific_name}
-//         </Typography>
-//       </Box>
-
-//       <MedicineDetailsInfo
-//         type={medicine.type}
-//         quantity={medicine.quantity}
-//         alertLimit={medicine.alert_limit}
-//         isLowStock={isLowStock}
-//       />
-
-//       <Box sx={{ display: "flex", gap: 2 }}>
-//         <PriceBox label="سعر الشراء" price={medicine.purchase_price} />
-
-//         <PriceBox
-//           label="سعر المستهلك"
-//           price={medicine.consumer_price}
-//           isConsumer
-//         />
-//       </Box>
-
-//       <Box
-//         sx={{
-//           display: "flex",
-//           gap: 1.5,
-//           mt: "auto",
-//         }}
-//       >
-//         <Button fullWidth variant="contained" sx={actionButtonStyles}>
-//           عرض الدفعات
-//         </Button>
-
-//         <Button fullWidth variant="contained" sx={actionButtonStyles}>
-//           المعلومات الطبية
-//         </Button>
-//       </Box>
-
-//       {/* 👈 دمج واستدعاء المكون الجديد هنا ليعمل في الخلفية */}
-//       <EditMedicineDialog
-//         open={isEditDialogOpen}
-//         onClose={() => setIsEditDialogOpen(false)}
-//         medicine={medicine}
-//         onSave={handleSaveMedicineUpdate}
-//       />
-//     </Card>
-//   );
-// };
-
-
-
-
-
 import React, { useState } from "react";
 import {
   Card,
@@ -265,162 +7,200 @@ import {
   Menu,
   MenuItem,
   ListItemText,
+  Chip,
 } from "@mui/material";
-
 import { CardBadges } from "./CardBadges";
 import { MedicineDetailsInfo } from "./MedicineDetailsInfo";
 import { PriceBox } from "./PriceBox";
-// import { EditMedicineDialog } from "./EditMedicineDialog"; 
-import type { PharmacyDrug } from "../../types/inventory.types";
+import type { PharmacyDrug } from "../../types/inventory";
+import { MedicalDetailsDialog } from "./MedicalDetailsDialog";
 
-interface MedicineCardProps {
-  medicine: PharmacyDrug; // 🟢 الاعتماد على الهيكل الحقيقي الجديد
-}
+import { EditGlobalMedicineDialog } from "./EditGlobalMedicineDialog";
+import { EditPrivateMedicineDialog } from "./EditPrivateMedicineDialog";
+import { useNavigate } from "react-router-dom";
 
-const actionButtonStyles = {
-  backgroundColor: "#f0f4f8",
-  color: "#5a6369",
-  borderRadius: "10px",
-  boxShadow: "none",
-  fontWeight: "bold",
-  whiteSpace: "nowrap",
-  "&:hover": {
-    backgroundColor: "#e2ecf5",
-  },
-};
-
-export const MedicineCard: React.FC<MedicineCardProps> = ({ medicine }) => {
-  // 🟢 استخراج الكمية والحد الأدنى (بشكل مرن وافتراضي لحين اكتمال الـ Populate)
-  const currentQuantity = medicine.quantity ?? 12; // كمية افتراضية مؤقتة
-  const isLowStock = currentQuantity <= medicine.minStockAlert;
-
+export const MedicineCard: React.FC<{ medicine: PharmacyDrug }> = ({
+  medicine,
+}) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false); 
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false); // نافذة تفاصيل أخرى
+  const [isEditOpen, setIsEditOpen] = useState(false); // نافذة التعديل الشرطية
 
-  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
+  const categoryName = medicine.categories[0]?.categoryName || "عام";
+  const isLowStock = medicine.stock.isLowStock || medicine.stock.isOutOfStock;
+  const storageLoc = medicine.locations[0]?.storageLocation || "غير محدد";
 
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
-
-  const handleEdit = () => {
-    handleMenuClose();
-    setIsEditDialogOpen(true); 
-  };
-
-  const handleArchive = () => {
-    handleMenuClose();
-    console.log("Archive ID:", medicine.pharmacyDrugId);
-  };
-
-  const handleSaveMedicineUpdate = (updatedFields: Partial<PharmacyDrug>) => {
-    console.log("البيانات الجديدة المحدثة للدواء:", updatedFields);
-  };
-
+  // الفحص الشرطي لمصدر الدواء (تعديل "GLOBAL" إذا كان الباكند يرسلها بصيغة أخرى)
+  const isGlobalMedicine = medicine.source === "GENERAL";
+  const navigate = useNavigate();
   return (
     <Card
       sx={{
         borderRadius: "16px",
-        p: 3,
-        boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.02)",
+        p: 2.5,
+        boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.01)",
         backgroundColor: "#ffffff",
         display: "flex",
         flexDirection: "column",
         gap: 2,
         border: "1px solid #eef2f5",
-        borderRight: isLowStock ? "5px solid #ff9695" : "1px solid #eef2f5",
-        transition: "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out",
+        borderRight: isLowStock ? "4px solid #f43f5e" : "1px solid #eef2f5",
+        transition: "all 0.2s ease-in-out",
         "&:hover": {
-          transform: "translateY(-5px)",
-          boxShadow: "0px 10px 25px rgba(0, 0, 0, 0.08)",
+          transform: "translateY(-4px)",
+          boxShadow: "0px 10px 25px rgba(0, 0, 0, 0.05)",
         },
       }}
     >
+      {/* القسم العلوي المبسط */}
       <CardBadges
-        category={medicine.category || "الكل"}
+        category={categoryName}
         isLowStock={isLowStock}
-        onMenuClick={handleMenuOpen}
+        notes={medicine.pharmacyDrugDetails.notes}
+        onMenuClick={(e) => setAnchorEl(e.currentTarget)}
       />
 
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
-        onClose={handleMenuClose}
+        onClose={() => setAnchorEl(null)}
       >
-        <MenuItem onClick={handleEdit}>
+        <MenuItem
+          onClick={() => {
+            setIsEditOpen(true);
+            setAnchorEl(null);
+          }}
+        >
           <ListItemText>تعديل</ListItemText>
         </MenuItem>
-
-        <MenuItem onClick={handleArchive}>
+        <MenuItem onClick={() => setAnchorEl(null)}>
           <ListItemText>أرشفة</ListItemText>
         </MenuItem>
       </Menu>
 
-      <Box sx={{ textAlign: "start", my: 1 }}>
-        <Typography
-          variant="h6"
+      {/* الأسماء والعناوين مع إضافة شارة "وصفة طبية" بالجهة المقابلة لاسم الدواء */}
+      <Box sx={{ textAlign: "start" }}>
+        <Box
           sx={{
-            fontWeight: "bold",
-            color: "#1e2524",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            width: "100%",
           }}
         >
-          {/* 🟢 عرض الملاحظات أو الاسم التجاري المتاح */}
-          {medicine.trade_name || medicine.notes || "دواء بدون اسم تجاري"}
-        </Typography>
+          <Typography
+            variant="h6"
+            sx={{ fontWeight: "700", color: "#1e293b", fontSize: "1.05rem" }}
+          >
+            {medicine.tradeName}
+          </Typography>
 
+          {/* شارة "وصفة طبية" الهادئة تظهر في الجهة الأخرى لاسم الدواء مباشرة */}
+          {medicine.isRx && (
+            <Chip
+              label="وصفة طبية"
+              size="small"
+              sx={{
+                backgroundColor: "#f8cf7688",
+                color: "#475569",
+                fontWeight: "600",
+                borderRadius: "6px",
+                fontSize: "0.725rem",
+              }}
+            />
+          )}
+        </Box>
         <Typography
           variant="caption"
-          sx={{
-            color: "#7a868f",
-            display: "block",
-          }}
+          sx={{ color: "#94a3b8", display: "block", mt: 0.5 }}
         >
-          {medicine.scientific_name || "المادة الفعالة"}
+          {medicine.subtitle || "لم يتم إضافة أي مادة فعالة"}
         </Typography>
       </Box>
 
+      {/* تفاصيل المخزون والموقع */}
       <MedicineDetailsInfo
-        type={medicine.type || (medicine.sellPart ? "أقراص (جزئي)" : "عبوة كاملة")}
-        quantity={currentQuantity}
-        alertLimit={medicine.minStockAlert}
+        type={medicine.dosageForm.displayText}
+        quantityText={medicine.stock.availableQuantityText}
         isLowStock={isLowStock}
+        location={storageLoc}
       />
 
-      <Box sx={{ display: "flex", gap: 2 }}>
-        {/* 🟢 تحويل نصوص الأسعار الجاية من الباك إند إلى أرقام parseFloat بشكل آمن */}
-        <PriceBox label="سعر الشراء" price={parseFloat(medicine.netPrice || "0")} />
-
+      {/* الأسعار */}
+      <Box sx={{ display: "flex", gap: 1.5 }}>
+        <PriceBox
+          label="سعر الشراء"
+          price={medicine.pharmacyDrugDetails.netPrice}
+        />
         <PriceBox
           label="سعر المستهلك"
-          price={parseFloat(medicine.consumerPrice || "0")}
+          price={medicine.pharmacyDrugDetails.consumerPrice}
           isConsumer
         />
       </Box>
 
-      <Box
-        sx={{
-          display: "flex",
-          gap: 1.5,
-          mt: "auto",
-        }}
-      >
-        <Button fullWidth variant="contained" sx={actionButtonStyles}>
-          عرض الدفعات
+      {/* الأزرار السفلية */}
+      <Box sx={{ display: "flex", gap: 1.5, mt: "auto" }}>
+        <Button
+          fullWidth
+          variant="outlined"
+          sx={actionButtonStyles}
+          onClick={()=> { 
+            navigate(`batches/${medicine.pharmacyDrugId}`, {
+              state: {
+                drugName: medicine.tradeName,
+                activeIngredient:
+                  medicine.subtitle || "لم يتم إضافة أي مادة فعالة",
+              },
+            })}
+           
+          }
+        >
+          عرض الدفعات ({medicine.stock.batchesCount})
         </Button>
-
-        <Button fullWidth variant="contained" sx={actionButtonStyles}>
-          المعلومات الطبية
+        <Button
+          fullWidth
+          variant="outlined"
+          sx={actionButtonStyles}
+          onClick={() => setIsDetailsOpen(true)}
+        >
+          تفاصيل آخرى
         </Button>
       </Box>
 
-      {/* <EditMedicineDialog
-        open={isEditDialogOpen}
-        onClose={() => setIsEditDialogOpen(false)}
-        medicine={medicine as any}
-        onSave={handleSaveMedicineUpdate}
-      /> */}
+      {/* نافذة التفاصيل الاحترافية */}
+      <MedicalDetailsDialog
+        open={isDetailsOpen}
+        onClose={() => setIsDetailsOpen(false)}
+        medicine={medicine}
+      />
+
+      {/* التوجيه الذكي والمبني على معمارية فصل الواجهات والـ APIs */}
+      {isGlobalMedicine ? (
+        <EditGlobalMedicineDialog
+          open={isEditOpen}
+          onClose={() => setIsEditOpen(false)}
+          medicine={medicine}
+        />
+      ) : (
+        <EditPrivateMedicineDialog
+          open={isEditOpen}
+          onClose={() => setIsEditOpen(false)}
+          medicine={medicine}
+        />
+      )}
     </Card>
   );
+};
+
+const actionButtonStyles = {
+  backgroundColor: "#f8fafc",
+  color: "",
+  borderRadius: "10px",
+  boxShadow: "none",
+  fontWeight: "600",
+  fontSize: "0.8rem",
+  border: "1px solid #e2e8f0",
+  textTransform: "none",
+  "&:hover": { backgroundColor: "#f1f5f9", borderColor: "#cbd5e1" },
 };

@@ -1,13 +1,13 @@
 // features/inventory/hooks/useMedicineBatches.ts
 import { useState, useMemo } from "react";
-import type { BatchRow } from "../AddMedicine/BatchTable";
+import type { BatchRow } from "../types/batchRow";
 
 export const initialBatchesState: BatchRow[] = [
   {
     id: "initial-batch-1",
-    batchNumber: "B-00000-X",
     quantity: 1,
-    expiryDate: "yyyy-dd-mm",
+    receivingDate: "yyyy-mm-dd", // القيمة الابتدائية لتاريخ الاستلام
+    expiryDate: "yyyy-mm-dd",
   },
 ];
 
@@ -16,14 +16,13 @@ export const useMedicineBatches = () => {
 
   const addNewBatchRow = () => {
     const uniqueId = `batch-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    const defaultBatchNumber = "B-00000-X";
 
     setBatches((prev) => [
       ...prev,
       {
         id: uniqueId,
-        batchNumber: defaultBatchNumber,
         quantity: "",
+        receivingDate: "",
         expiryDate: "",
       },
     ]);

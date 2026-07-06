@@ -1,6 +1,6 @@
 import { useState } from "react";
-import type { CentralDrugData } from "../../types/centralDrug";
-import APIClient from "../../../../shared/api/api-client";
+import type { CentralDrugData } from "../types/centralDrug";
+import APIClient from "../../../shared/api/api-client";
 
 export const useSearchCentralDrug = () => {
   const [loading, setLoading] = useState(false);
@@ -12,31 +12,34 @@ export const useSearchCentralDrug = () => {
     const trimmedBarcode = barcode.trim();
     if (!trimmedBarcode) return;
 
+    // 1. إعادة تهيئة الحالات قبل بدء البحث الجديد
     setLoading(true);
     setError(null);
     setFoundDrug(null);
+    setSearchResult(null);
 
     try {
-      // 1. إنشاء نسخة من الـ APIClient وتمرير الرابط الديناميكي
       const client = new APIClient<CentralDrugData>(`/general-drugs/barcode/${trimmedBarcode}`);
-      
-      // 2. استدعاء دالة الـ get (التي ترجع التغليف الموحد FetchResponse<CentralDrugData>)
-      const response = await client.get();
+      const response = await client.get(); 
 
-      // 3. التحقق من نجاح العملية ووجود البيانات داخل المغلف التابع للـ APIClient
+      // [حالة الـ 200]: الدواء موجود في السجلات المركزية
       if (response && response.success && response.data) {
         setFoundDrug(response.data);
         setSearchResult("found");
-      } else {
-        setFoundDrug(null);
-        setSearchResult("not_found");
-      }
+        setError(null);
+      } 
     } catch (err: any) {
-      console.error("Error fetching drug from CDB:", err);
-      // الباك إند يرجع خطأ أو 404 في حال لم يعثر على الباركود
       setFoundDrug(null);
-      setSearchResult("not_found");
-      setError(err?.message || "حدث خطأ أثناء الاتصال بالقاعدة المركزية");
+
+      const statusCode = err?.statusCode || err?.response?.status;
+
+      if (statusCode === 404) {
+        setSearchResult("not_found"); 
+        setError(null); 
+      } else {
+        setSearchResult(null);
+        setError(err?.message || "حدث خطأ غير متوقع أثناء الاتصال بالقاعدة المركزية");
+      }
     } finally {
       setLoading(false);
     }
@@ -53,7 +56,7 @@ export const useSearchCentralDrug = () => {
     loading,
     foundDrug,
     searchResult,
-    error,
+    error, 
     resetSearch
   };
 };

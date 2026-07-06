@@ -4,14 +4,15 @@ import AddIcon from "@mui/icons-material/Add";
 
 interface AddMedicineButtonProps {
   onClick: () => void;
+  label: string; // أصبحت إجبارية تماماً هنا
 }
 
-export const AddMedicineButton: React.FC<AddMedicineButtonProps> = ({ onClick }) => {
+export const AddMedicineButton: React.FC<AddMedicineButtonProps> = ({ onClick, label }) => {
   return (
     <Button
       variant="contained"
       color="primary"
-      startIcon={<AddIcon sx={{ ml: 1, mr: -0.5 }} />}
+      startIcon={<AddIcon sx={{ ml: 0, mr: 0 }} />}
       onClick={onClick}
       sx={{
         borderRadius: "10px",
@@ -19,9 +20,10 @@ export const AddMedicineButton: React.FC<AddMedicineButtonProps> = ({ onClick })
         py: 1.2,
         fontWeight: "bold",
         whiteSpace: "nowrap",
+        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.05)",
       }}
     >
-      إضافة دواء جديد
+      {label}
     </Button>
   );
 };

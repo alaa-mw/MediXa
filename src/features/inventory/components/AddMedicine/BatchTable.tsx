@@ -11,13 +11,8 @@ import {
   IconButton,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
-// features/inventory/types/inventory.types.ts
-export interface BatchRow {
-  id: string;
-  batchNumber: string;
-  quantity: number | string;
-  expiryDate: string;
-}
+import type { BatchRow } from "../../types/batchRow";
+
 interface BatchesTableProps {
   batches: BatchRow[];
   onUpdateField: (
@@ -45,8 +40,8 @@ export const BatchesTable: React.FC<BatchesTableProps> = ({
       <Table>
         <TableHead sx={{ backgroundColor: "#f8fafc" }}>
           <TableRow>
-            <TableCell align="center">رقم التشغيلة (Batch)</TableCell>
             <TableCell align="center">الكمية (علبة)</TableCell>
+            <TableCell align="center">تاريخ الاستلام</TableCell>
             <TableCell align="center">تاريخ الانتهاء</TableCell>
             <TableCell align="center">الإجراءات</TableCell>
           </TableRow>
@@ -60,23 +55,7 @@ export const BatchesTable: React.FC<BatchesTableProps> = ({
                 "&:hover": { backgroundColor: "#f8fafc" },
               }}
             >
-              <TableCell align="center" sx={{ py: 1 }}>
-                <TextField
-                  size="small"
-                  value={batch.batchNumber}
-                  onChange={(e) =>
-                    onUpdateField(batch.id, "batchNumber", e.target.value)
-                  }
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      backgroundColor: "#ffffff",
-                      borderRadius: "10px",
-                      "& fieldset": { borderColor: "#cbd5e1" },
-                    },
-                    width: "150px",
-                  }}
-                />
-              </TableCell>
+              {/* العمود الأول: الكمية */}
               <TableCell align="center" sx={{ py: 1 }}>
                 <TextField
                   size="small"
@@ -96,6 +75,29 @@ export const BatchesTable: React.FC<BatchesTableProps> = ({
                   }}
                 />
               </TableCell>
+
+              {/* العمود الثاني: تاريخ الاستلام */}
+              <TableCell align="center" sx={{ py: 1 }}>
+                <TextField
+                  size="small"
+                  type="date"
+                  value={batch.receivingDate}
+                  onChange={(e) =>
+                    onUpdateField(batch.id, "receivingDate", e.target.value)
+                  }
+                  slotProps={{ inputLabel: { shrink: true } }}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      backgroundColor: "#ffffff",
+                      borderRadius: "10px",
+                      "& fieldset": { borderColor: "#cbd5e1" },
+                    },
+                    width: "160px",
+                  }}
+                />
+              </TableCell>
+
+              {/* العمود الثالث: تاريخ الانتهاء */}
               <TableCell align="center" sx={{ py: 1 }}>
                 <TextField
                   size="small"
@@ -115,6 +117,8 @@ export const BatchesTable: React.FC<BatchesTableProps> = ({
                   }}
                 />
               </TableCell>
+
+              {/* العمود الرابع: الإجراءات */}
               <TableCell align="center" sx={{ py: 1 }}>
                 <IconButton
                   onClick={() => onDeleteRow(batch.id)}

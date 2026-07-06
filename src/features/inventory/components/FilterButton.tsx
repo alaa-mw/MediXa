@@ -2,19 +2,32 @@ import React from "react";
 import { Button } from "@mui/material";
 import TuneIcon from "@mui/icons-material/Tune";
 
-export const FilterButton: React.FC = () => {
+interface FilterButtonProps {
+  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  ariaDescribedBy?: string;
+}
+
+export const FilterButton: React.FC<FilterButtonProps> = ({ onClick, ariaDescribedBy }) => {
   return (
     <Button
+      id={ariaDescribedBy}
       variant="outlined"
-      startIcon={<TuneIcon sx={{ ml: 1, mr: -0.5 }} />}
+      onClick={onClick}
+      startIcon={<TuneIcon sx={{ ml: 0, mr: 0 }} />} 
       sx={{
-        borderRadius: "10px",
-        borderColor: "#e0e0e0",
+        borderRadius: "25px",      
+        borderColor: "#cbd5e1",      
+        backgroundColor: "#ffffff", 
         color: "#1e2524",
-        px: 2,
-        py: 1.2,
         fontWeight: "bold",
-        "&:hover": { borderColor: "#b0b0b0", backgroundColor: "#f5f5f5" },
+        height: "56px",             
+        px: 3,                      
+        textTransform: "none",      
+        fontFamily: "inherit",
+        "&:hover": { 
+          borderColor: "#cbd5e1",   
+          backgroundColor: "#f8fafc"
+        },
       }}
     >
       تصفية

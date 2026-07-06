@@ -1,130 +1,312 @@
-// features/inventory/components/FoundMedicineDialog.tsx
-import React from "react";
-import { Dialog, DialogContent, Box, Typography, Button, Stack } from "@mui/material";
+
+import React, { useState, useEffect } from "react";
+import {
+  Dialog,
+  DialogContent,
+  Box,
+  Typography,
+  Button,
+  Stack,
+  FormControlLabel,
+  Checkbox,
+  Divider,
+  CircularProgress,
+} from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
 import { CloseButton } from "../CloseButton";
-import { MedicineStockForm } from "./MedicineStockForm";
-import type { BatchRow } from "./BatchTable";
+import { NumberSpinner } from "./NumberSpinner";
+import { CustomTextField } from "../CustomTextField";
+import type { CentralDrugData } from "../../types/centralDrug";
+import { BatchesTable } from "./BatchTable";
+import { useCreatePharmacyDrug } from "../../hooks/useCreatePharmacyDrug";
+import { useSnackbar } from "../../../../shared/providers/useSnackbar";
+import { useMedicineBatches } from "../../hooks/useAddMedicineBatche";
 
 interface FoundMedicineDialogProps {
   open: boolean;
   onClose: () => void;
-  alertLimit: number;
-  setAlertLimit: (val: number) => void;
-  expiryAlertMonths: number;
-  setExpiryAlertMonths: (val: number) => void;
-  allowRetail: boolean;
-  setAllowRetail: (val: boolean) => void;
-  batches: BatchRow[];
-  onAddNewBatch: () => void;
-  onDeleteBatch: (id: string) => void;
-  onUpdateBatchField: (
-    id: string,
-    field: keyof BatchRow,
-    value: string | number
-  ) => void;
-  totalQuantity: number;
+  foundDrug: CentralDrugData | null;
 }
 
-export const FoundMedicineDialog: React.FC<FoundMedicineDialogProps> = (props) => {
-  const { open, onClose, totalQuantity } = props;
+export const FoundMedicineDialog: React.FC<FoundMedicineDialogProps> = ({
+  open,
+  onClose,
+  foundDrug,
+}) => {
+  const [alertLimit, setAlertLimit] = useState<number>(10);
+  const [expiryAlertMonths, setExpiryAlertMonths] = useState<number>(3);
+  const [allowRetail, setAllowRetail] = useState(false);
+
+  const [purchasePrice, setPurchasePrice] = useState("");
+  const [salePrice, setSalePrice] = useState("");
+  const [location, setLocation] = useState("");
+  const [note, setNote] = useState("");
+
+  const { showSnackbar } = useSnackbar();
+
+  const { createPharmacyDrug, loading, error, success } =
+    useCreatePharmacyDrug();
+
+  const {
+    batches,
+    addNewBatchRow,
+    deleteBatchRow,
+    updateBatchField,
+    totalQuantity,
+    resetBatches,
+  } = useMedicineBatches();
+
+  useEffect(() => {
+    if (success) {
+      showSnackbar("تمت إضافة الدواء إلى مخزون الصيدلية بنجاح!", "success");
+      handleClose();      
+    }
+  }, [success]);
+
+  useEffect(() => {
+    if (error) {
+      showSnackbar(error, "error");
+    }
+  }, [error]);
+
+  const handleClose = () => {
+    resetBatches();
+    setPurchasePrice("");
+    setSalePrice("");
+    setLocation("");
+    setNote("");
+    setAllowRetail(false);
+    onClose();
+  };
+
+  const handleSubmitSave = async () => {
+    if (!foundDrug?.generalDrugId) {
+      showSnackbar("عذراً، معرّف الدواء غير موجود.", "error");
+      return;
+    }
+
+    // if (!purchasePrice || !salePrice) {
+    //   showSnackbar("يرجى إدخال أسعار الشراء والبيع أولاً.", "warning");
+    //   return;
+    // }
+
+    const formattedBatches = batches.map((b) => ({
+      initialQuantity: Number(b.quantity || 0),
+      expiryDate:
+        b.expiryDate === "yyyy-mm-dd" || !b.expiryDate
+          ? new Date().toISOString().split("T")[0]
+          : b.expiryDate,
+      receivedDate:
+        b.receivingDate === "yyyy-mm-dd" || !b.receivingDate
+          ? new Date().toISOString().split("T")[0]
+          : b.receivingDate,
+    }));
+
+    const payload = {
+      generalDrugId: foundDrug.generalDrugId,
+      minStockAlert: Number(alertLimit),
+      sellPart: allowRetail,
+      netPrice: Number(purchasePrice || 0),
+      consumerPrice: Number(salePrice || 0),
+      expiryDateAlarm: Number(expiryAlertMonths),
+      notes: note,
+      storageLocation: location,
+      batches: formattedBatches,
+    };
+
+    try {
+      await createPharmacyDrug(payload);
+    } catch (err) {
+      console.error("طلب الـ POST واجه مشكلة:", err);
+    }
+  };
 
   return (
-    <Dialog
-      open={open}
-      onClose={onClose}
-      maxWidth="md"
-      fullWidth
-      slotProps={{
-        paper: {
-          sx: {
-            borderRadius: "24px",
-            p: 1,
-            boxShadow: "0 20px 40px rgba(0,0,0,0.08)",
-            position: "relative",
-          },
-        },
-      }}
-    >
-      <CloseButton onClick={onClose} />
-
-      <DialogContent sx={{ p: 3, pt: 4 }}>
-        <Box sx={{ textAlign: "right", mb: 2 }}>
+    <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
+      <CloseButton onClick={handleClose} />
+      <DialogContent sx={{ p: 4, pt: 4, overflowX: "hidden" }}>
+        {/* ترويسة معلومات الدواء */}
+        <Box sx={{ textAlign: "right", mb: 4 }}>
           <Typography
             variant="h5"
             sx={{ fontWeight: 800, color: "#0f172a", mb: 0.5 }}
           >
-            Panadol Advance
+            {foundDrug?.tradeName || "اسم الدواء"}
           </Typography>
-          <Typography
-            variant="body1"
-            sx={{ color: "#94a3b8", fontWeight: 500 }}
-          >
-            Paracetamol 500mg
+          <Typography variant="body1" sx={{ color: "#94a3b8" }}>
+            {foundDrug?.dosageForm?.dosageFormName || "المادة الفعالة"}
           </Typography>
         </Box>
 
-        <Typography
-          variant="body2"
-          sx={{ color: "#64748b", fontWeight: 500, mb: 4, textAlign: "right" }}
+        {/* سطر العدادات الرقمية */}
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
+            gap: 3,
+            mb: 3,
+          }}
         >
-          يرجى ملء الحقول المطلوبة لإدارة مخزونك بدقة.
-        </Typography>
+          <NumberSpinner
+            label="حد التنبيه (نقص المادة)"
+            value={alertLimit}
+            onChange={setAlertLimit}
+          />
+          <NumberSpinner
+            label="تنبيه انتهاء الصلاحية قبل (بالأشهر)"
+            value={expiryAlertMonths}
+            onChange={setExpiryAlertMonths}
+          />
+        </Box>
 
-        {/* استدعاء المكون المستخرج بنجاح */}
-        <MedicineStockForm {...props} />
+        {/* شبكة حقول البيانات الأساسية للمخزون */}
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
+            gap: 3,
+            mb: 3,
+          }}
+        >
+          <CustomTextField
+            label="سعر الشراء"
+            type="number"
+            value={purchasePrice}
+            onChange={setPurchasePrice}
+          />
+          <CustomTextField
+            label="سعر البيع"
+            type="number"
+            value={salePrice}
+            onChange={setSalePrice}
+          />
+          <CustomTextField
+            label="الموقع في المستودع"
+            placeholder="مثال: الرف العلوي"
+            value={location}
+            onChange={setLocation}
+          />
+          <CustomTextField
+            label="ملاحظة"
+            placeholder="اكتب ملاحظتك هنا..."
+            value={note}
+            onChange={setNote}
+          />
 
+          <Box
+            sx={{
+              gridColumn: { xs: "span 1", sm: "span 2" },
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "flex-start",
+              mt: 1,
+            }}
+          >
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={allowRetail}
+                  onChange={(e) => setAllowRetail(e.target.checked)}
+                  sx={{
+                    color: "#cbd5e1",
+                    "&.Mui-checked": { color: "#0f172a" },
+                  }}
+                />
+              }
+              label={
+                <Typography
+                  sx={{ fontWeight: 600, color: "#334155", fontSize: "14px" }}
+                >
+                  هل يمكن البيع بالتجزئة؟
+                </Typography>
+              }
+              sx={{ direction: "rtl", marginRight: 0, gap: 1 }}
+            />
+          </Box>
+        </Box>
+
+        <Divider sx={{ my: 3, borderColor: "#f1f5f9" }} />
+
+        {/* قسم جدول الدفعات */}
         <Box
           sx={{
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            mt: 4,
-            pt: 2,
+            mb: 2,
           }}
         >
           <Typography
-            sx={{ fontWeight: 700, color: "#64748b", fontSize: "15px" }}
+            variant="subtitle1"
+            sx={{ fontWeight: 700, color: "#1e293b" }}
           >
+            جدولة الدفعات الحالية
+          </Typography>
+          <Button
+            variant="contained"
+            onClick={addNewBatchRow}
+            startIcon={<AddIcon />}
+            sx={{
+              backgroundColor: "tertiary.dark",
+              "&:hover": { backgroundColor: "#0d9488" },
+              borderRadius: "12px",
+              px: 2.5,
+              py: 0.8,
+              fontWeight: "bold",
+              boxShadow: "none",
+            }}
+          >
+            إضافة دفعة
+          </Button>
+        </Box>
+
+        <BatchesTable
+          batches={batches}
+          onUpdateField={updateBatchField}
+          onDeleteRow={deleteBatchRow}
+        />
+
+        {/* تذييل الـ Dialog */}
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            mt: 5,
+            alignItems: "center",
+          }}
+        >
+          <Typography sx={{ fontWeight: 700, color: "#64748b" }}>
             إجمالي الكمية المدخلة:{" "}
             <span
-              style={{
-                color: "tertiary.dark",
-                fontSize: "24px",
-                fontWeight: "800",
-                marginRight: "6px",
-              }}
+              style={{ color: "#0284c7", fontSize: "24px", fontWeight: "800" }}
             >
               {totalQuantity}
             </span>{" "}
             علبة
           </Typography>
-
           <Stack direction="row" spacing={2}>
             <Button
-              onClick={onClose}
-              sx={{
-                color: "#64748b",
-                fontWeight: "bold",
-                px: 3,
-                borderRadius: "12px",
-              }}
+              onClick={handleClose}
+              disabled={loading || success}
+              sx={{ color: "#64748b", fontWeight: 700 }}
             >
               إلغاء
             </Button>
             <Button
               variant="contained"
-              onClick={onClose}
+              onClick={handleSubmitSave}
+              disabled={loading || success} // شل الحركة في حال الحفظ أو النجاح
+              startIcon={
+                loading && <CircularProgress size={20} color="inherit" />
+              }
               sx={{
                 backgroundColor: "secondary.dark",
-                "&:hover": { backgroundColor: "#1e293b" },
-                borderRadius: "12px",
                 px: 4,
-                py: 1.2,
-                fontWeight: "bold",
-                boxShadow: "none",
+                borderRadius: "14px",
+                "&:hover": { backgroundColor: "secondary.main" },
               }}
             >
-              تأكيد حفظ الدواء
+              {loading ? "جاري الحفظ..." : "تأكيد حفظ الدواء"}
             </Button>
           </Stack>
         </Box>
