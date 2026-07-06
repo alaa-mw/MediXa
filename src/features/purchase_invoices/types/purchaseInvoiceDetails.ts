@@ -1,7 +1,7 @@
-import type { BatchStatus, InvoiceStatus, PaymentStatus } from "./enums";
+import type { BatchStatus, PaymentStatus, SupplierInvoiceStatus } from "./enums";
 
 export interface PurchaseInvoice{
-   supplierInvoiceId: number;
+  supplierInvoiceId: number;
   supplierId: number;
   invoiceNumber: string;
   invoiceDate: string;
@@ -10,7 +10,7 @@ export interface PurchaseInvoice{
   discount: string;
   totalPrice: string;
   notes: string | null;
-  status?: InvoiceStatus;
+  status?: SupplierInvoiceStatus;
   createdAt: string;
   updatedAt: string;
 }
@@ -21,8 +21,8 @@ export interface PurchaseInvoiceDetails extends PurchaseInvoice {
 }
 
 export interface Supplier {
-  supplierId: number;
-  pharmacyId: number;
+  supplierId: string;
+  pharmacyId: string;
   supplierName: string;
   phone: string;
   address: string;

@@ -135,14 +135,7 @@ const PurchaseInvoiceItems = ({ items }: { items: SupplierInvoiceItem[] }) => {
                             color: "#4A5568",
                           }}
                         >
-                          {new Date(batch.expiryDate).toLocaleDateString(
-                            "en-US",
-                            {
-                              month: "2-digit",
-                              day: "2-digit",
-                              year: "numeric",
-                            },
-                          )}
+                          {batch.expiryDate.split("T")[0]}
                         </Box>
                       </Box>
                       <Box sx={{ px: 1 }}>
@@ -170,7 +163,7 @@ const PurchaseInvoiceItems = ({ items }: { items: SupplierInvoiceItem[] }) => {
                             fontWeight: 600,
                           }}
                         >
-                          {formatArabicDateTime(batch?.receivedDate)}
+                            {batch.receivedDate.split("T")[0]}
                         </Box>
                       </Box>
                       <Box sx={{ px: 1 }}>

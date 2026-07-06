@@ -4,47 +4,18 @@ import {
   CardContent,
   Typography,
   Button,
+  IconButton,
   Chip,
   Grid,
   Stack,
   Box,
 } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import { formatArabicDateTime } from "../../utils/formatArabicDateTime";
-import type { PurchaseInvoiceDetails } from "../../types/purchaseInvoiceDetails";
-import { Person2Rounded } from "@mui/icons-material";
+import { formatArabicDateTime } from "../utils/formatArabicDateTime";
+import type { PurchaseInvoiceDetails } from "../types/purchaseInvoiceDetails";
+import { Edit, Person2Rounded } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-
-// Map status for chip color and icon
-const getStatusMap = (
-  status: string,
-): {
-  label: string;
-  color: "warning" | "success" | "error" | "info" | "default";
-} => {
-  switch (status) {
-    case "PENDING":
-      return {
-        label: "قيد الانتظار",
-        color: "warning",
-      };
-    case "ACTIVE":
-      return {
-        label: "نشط",
-        color: "success",
-      };
-    case "EXPIRED":
-      return {
-        label: "منتهي",
-        color: "error",
-      };
-    default:
-      return {
-        label: status,
-        color: "default",
-      };
-  }
-};
+import { getStatusMap } from "../utils/getStatusMap";
 
 const PurchaseInvoiceCard: React.FC<{ data: PurchaseInvoiceDetails }> = ({
   data,
@@ -107,6 +78,7 @@ const PurchaseInvoiceCard: React.FC<{ data: PurchaseInvoiceDetails }> = ({
             color={statusMap.color}
             size="small"
             sx={{
+              color: `${statusMap.color}.dark`,
               fontWeight: 700,
               borderRadius: "999px",
               height: 30,
@@ -116,10 +88,7 @@ const PurchaseInvoiceCard: React.FC<{ data: PurchaseInvoiceDetails }> = ({
         </Grid>
 
         {/* Supplier Section */}
-        <Grid
-          container
-          sx={{ mb: 3,gap:1,alignItems: "center" }}
-        >
+        <Grid container sx={{ mb: 3, gap: 1, alignItems: "center" }}>
           <Box
             sx={{
               width: 54,
@@ -141,7 +110,7 @@ const PurchaseInvoiceCard: React.FC<{ data: PurchaseInvoiceDetails }> = ({
 
           <Box>
             <Typography
-            variant="h5"
+              variant="h5"
               sx={{
                 fontWeight: 700,
                 color: "#34495E",
@@ -190,29 +159,51 @@ const PurchaseInvoiceCard: React.FC<{ data: PurchaseInvoiceDetails }> = ({
             ر.س
           </Typography>
         </Box>
-
-        {/* Details Button */}
-        <Button
-          fullWidth
-          variant="contained"
-          color="secondary"
-          startIcon={<VisibilityIcon />}
-          onClick={()=>navigate("details")}
-          sx={{
-            height: 56,
-            borderRadius: "18px",
-            fontWeight: 700,
-            fontSize: "1rem",
-            textTransform: "none",
-            boxShadow: "none",
-            "&:hover": {
-              bgcolor: "#355D60",
+        <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
+          {/* Details Button */}
+          <Button
+            fullWidth
+            variant="contained"
+            color="secondary"
+            startIcon={<VisibilityIcon />}
+            onClick={() => navigate("details/" + data.supplierInvoiceId)}
+            sx={{
+              height: 56,
+              borderRadius: "18px",
+              fontWeight: 700,
+              fontSize: "1rem",
+              textTransform: "none",
               boxShadow: "none",
-            },
-          }}
-        >
-          عرض التفاصيل
-        </Button>
+              "&:hover": {
+                bgcolor: "#355D60",
+                boxShadow: "none",
+              },
+            }}
+          >
+            عرض التفاصيل
+          </Button>
+          {data.status === "PENDING" || data.status === "PARTIALLY_STOCKED" ? (
+            <IconButton
+              aria-label="edit"
+              onClick={() => navigate("/pharmacy/invoices/purchase/edit/" + data.supplierInvoiceId)} // later
+              
+              sx={{
+                width: 56,
+                height: 56,
+                borderRadius: "50%",
+                bgcolor: "secondary.main",
+                color: "#fff",
+                boxShadow: "none",
+                "&:hover": {
+                  bgcolor: "#355D60",
+                  boxShadow: "none",
+                },
+              }}
+            >
+              <Edit />
+            </IconButton>
+          ) : null}
+        </Box>
       </CardContent>
     </Card>
   );

@@ -45,9 +45,9 @@ const PricingSection = () => {
             gap: 2.5,
           }}
         >
-          {pricingData.map((tier) => (
+          {pricingData.map((tier, index) => (
             <Card
-              key={tier.title}
+              key={index}
               sx={{
                 position: "relative",
                 borderRadius: 3,
@@ -84,8 +84,9 @@ const PricingSection = () => {
                 </Typography>
 
                 <Stack spacing={1} sx={{ mb: 3 }}>
-                  {tier.features.map((feature) => (
+                  {tier.features.map((feature, index) => (
                     <Box
+                      key={index}
                       sx={{
                         display: "flex",
                         alignItems: "center",

@@ -9,6 +9,7 @@ interface CustomTextFieldProps {
   placeholder?: string;
   type?: "text" | "number";
   fullWidth?: boolean;
+  padding?: string;
 }
 
 export const CustomTextField: React.FC<CustomTextFieldProps> = ({
@@ -18,6 +19,7 @@ export const CustomTextField: React.FC<CustomTextFieldProps> = ({
   placeholder,
   type = "text",
   fullWidth = true,
+  padding = "16px",
 }) => {
   return (
     <TextField
@@ -77,7 +79,7 @@ export const CustomTextField: React.FC<CustomTextFieldProps> = ({
           paddingRight: "16px !important",
           paddingLeft: "16px !important",
           height: "1.4375em", 
-          padding: "16.5px 14px",
+          padding: padding,
         },
       }}
     />

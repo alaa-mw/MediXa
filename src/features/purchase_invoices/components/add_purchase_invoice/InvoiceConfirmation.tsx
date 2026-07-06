@@ -1,57 +1,32 @@
-import React from "react";
-import { Box, Typography, Paper, Grid, Divider, Button, Chip } from "@mui/material";
+import { Box, Typography, Paper, Grid, Divider, Chip } from "@mui/material";
 import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
 import MedicationOutlinedIcon from "@mui/icons-material/MedicationOutlined";
 import ReceiptOutlinedIcon from "@mui/icons-material/ReceiptOutlined";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import type { RootState } from "../../store";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getTotalItemsPrice,
+  updateField,
+} from "../../store/purchaseInvoiceSlice";
+import { getStatusMap } from "../../utils/getStatusMap";
+import { CustomTextField } from "../../../../shared/layout/CustomTextField";
 
-export default function InvoiceFinalConfirmation({
-  onBack,
-}: {
-  onBack: () => void;
-}) {
-  const items = [
-    {
-      name: "أوجمنتين 1 جم",
-      label: "Augmentin 1g Tablets",
-      qty: "50 علبة",
-      price: "120.00 ر.س",
-      total: "6,000.00 ر.س",
-    },
-    {
-      name: "بانادول إكسترا",
-      label: "Panadol Extra 20 Tablets",
-      qty: "200 علبة",
-      price: "12.50 ر.س",
-      total: "2,500.00 ر.س",
-    },
-    {
-      name: "فولتارين جل 50جم",
-      label: "Voltaren Emulgel 50g",
-      qty: "30 أنبوب",
-      price: "35.00 ر.س",
-      total: "1,050.00 ر.س",
-    },
-  ];
+export default function InvoiceConfirmation() {
+  const dispatch = useDispatch();
 
+  const purchaseInvoice = useSelector(
+    (state: RootState) => state.purchaseInvoice,
+  );
+
+  const totalItemsPrice = useSelector(getTotalItemsPrice);
+  const netTotal = totalItemsPrice - purchaseInvoice.discount;
+
+  const statusMap = getStatusMap(purchaseInvoice.paymentStatus);
   return (
     <Box sx={{ maxWidth: 1100, mx: "auto" }}>
-      <Box sx={{ textAlign: "center", mb: 4 }}>
-        <Typography
-          variant="h5"
-          sx={{ fontWeight: 800, color: "#2D3A4D", mb: 1 }}
-        >
-          تأكيد الفاتورة النهائية
-        </Typography>
-        <Typography sx={{ color: "#64748B" }}>
-          تأكد من مطابقة البيانات المستلمة مع الفاتورة الورقية قبل الاعتماد
-          النهائي للمخزون
-        </Typography>
-      </Box>
-
       <Grid container spacing={4}>
-        <Grid sx={{ xs: 12, md: 8 }}>
+        <Grid size={{ xs: 12, lg: 8 }}>
           <Paper
             sx={{
               p: 4,
@@ -70,7 +45,7 @@ export default function InvoiceFinalConfirmation({
                 </Typography>
               </Box>
               <Chip
-                label="6 أصناف مسجلة"
+                label={`${purchaseInvoice.items.length} أصناف`}
                 sx={{ bgcolor: "#316A75", color: "white" }}
               />
             </Box>
@@ -92,7 +67,7 @@ export default function InvoiceFinalConfirmation({
               <Box sx={{ textAlign: "center" }}>الإجمالي</Box>
             </Box>
 
-            {items.map((item, idx) => (
+            {purchaseInvoice.items.map((item, idx) => (
               <Box
                 key={idx}
                 sx={{
@@ -118,26 +93,28 @@ export default function InvoiceFinalConfirmation({
                   </Box>
                   <Box>
                     <Typography sx={{ fontWeight: 700, fontSize: 14 }}>
-                      {item.name}
+                      {item.drugName}
                     </Typography>
                     <Typography variant="caption" sx={{ color: "#A0AEC0" }}>
-                      {item.label}
+                      {item.pharmacyDrugId}
                     </Typography>
                   </Box>
                 </Box>
-                <Typography sx={{ textAlign: "center" }}>{item.qty}</Typography>
                 <Typography sx={{ textAlign: "center" }}>
-                  {item.price}
+                  {item.quantity}
+                </Typography>
+                <Typography sx={{ textAlign: "center" }}>
+                  {item.netUnitPrice}
                 </Typography>
                 <Typography sx={{ textAlign: "center", fontWeight: 800 }}>
-                  {item.total}
+                  {item.quantity * item.netUnitPrice}
                 </Typography>
               </Box>
             ))}
           </Paper>
         </Grid>
 
-        <Grid sx={{ xs: 12, md: 4 }}>
+        <Grid size={{ xs: 12, lg: 4 }}>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
             <Paper
               sx={{ p: 3, borderRadius: 4, bgcolor: "#2C394B", color: "white" }}
@@ -159,31 +136,35 @@ export default function InvoiceFinalConfirmation({
                 <Typography sx={{ color: "#CBD5E1" }}>
                   إجمالي الأصناف
                 </Typography>
-                <Typography>16,662.50</Typography>
+                <Typography>{totalItemsPrice}</Typography>
               </Box>
               <Box
                 sx={{
                   display: "flex",
                   justifyValue: "space-between",
                   justifyContent: "space-between",
-                  mb: 1.5,
-                }}
-              >
-                <Typography sx={{ color: "#CBD5E1" }}>
-                  ضريبة القيمة المضافة (14%)
-                </Typography>
-                <Typography>2,332.75</Typography>
-              </Box>
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyValue: "space-between",
-                  justifyContent: "space-between",
+                  alignItems: "center",
                   mb: 3,
+                  gap:3
                 }}
               >
-                <Typography sx={{ color: "#CBD5E1" }}>خصم خاص</Typography>
-                <Typography>- 495.25</Typography>
+                <Typography sx={{ color: "#CBD5E1", whiteSpace: "nowrap" }}>
+                  خصم خاص
+                </Typography>
+                <CustomTextField
+                  label= ""
+                  value={purchaseInvoice.discount}
+                  onChange={(value) =>
+                    dispatch(
+                      updateField({
+                        field: "discount",
+                        value: parseFloat(value),
+                      }),
+                    )
+                  }
+                  type="number"
+                  padding="4px"
+                />
               </Box>
               <Divider sx={{ bgcolor: "rgba(255,255,255,0.1)", mb: 2 }} />
               <Box
@@ -199,7 +180,7 @@ export default function InvoiceFinalConfirmation({
                     الصافي المطلوب دفعه
                   </Typography>
                   <Chip
-                    label="EGP"
+                    label="ل.س"
                     size="small"
                     sx={{
                       bgcolor: "#415065",
@@ -210,7 +191,7 @@ export default function InvoiceFinalConfirmation({
                   />
                 </Box>
                 <Typography sx={{ fontWeight: 900, fontSize: 26 }}>
-                  18,500.00
+                  {netTotal}
                 </Typography>
               </Box>
             </Paper>
@@ -242,7 +223,7 @@ export default function InvoiceFinalConfirmation({
                   المورد
                 </Typography>
                 <Typography variant="body2" sx={{ fontWeight: 700 }}>
-                  مستودع الأدوية المركزية
+                  {purchaseInvoice.supplier.supplierName}
                 </Typography>
               </Box>
               <Box
@@ -257,7 +238,7 @@ export default function InvoiceFinalConfirmation({
                   تاريخ الشراء
                 </Typography>
                 <Typography variant="body2" sx={{ fontWeight: 700 }}>
-                  15 أكتوبر 2023
+                  {purchaseInvoice.invoiceDate}
                 </Typography>
               </Box>
               <Box
@@ -272,11 +253,11 @@ export default function InvoiceFinalConfirmation({
                   حالة الدفع
                 </Typography>
                 <Chip
-                  label="دفع مؤجل (30 يوم)"
+                  label={statusMap.label}
+                  color={statusMap.color}
                   size="small"
                   sx={{
-                    bgcolor: "#D1FAE5",
-                    color: "#065F46",
+                    color: `${statusMap.color}.dark`,
                     fontWeight: 700,
                     borderRadius: 1,
                   }}
@@ -286,31 +267,6 @@ export default function InvoiceFinalConfirmation({
           </Box>
         </Grid>
       </Grid>
-
-      <Paper
-        sx={{
-          p: 2,
-          borderRadius: 3,
-          display: "flex",
-          justifyContent: "space-between",
-          mt: 4,
-          boxShadow: "none",
-        }}
-      >
-        <Button
-          onClick={onBack}
-          startIcon={<ArrowForwardIcon sx={{ ml: 1, mr: 0 }} />}
-          sx={{ color: "#64748B" }}
-        >
-          الرجوع للسابق
-        </Button>
-        <Button
-          variant="contained"
-          sx={{ bgcolor: "#5C4066", "&:hover": { bgcolor: "#4A3352" }, px: 4 }}
-        >
-          تأكيد الفاتورة
-        </Button>
-      </Paper>
     </Box>
   );
 }

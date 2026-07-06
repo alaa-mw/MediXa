@@ -97,11 +97,11 @@ export const sideBarLabels: Record<
     //   path: "/reports",
     //   icon: BarChartIcon,
     // },
-    // {
-    //   title: "الموردين",
-    //   path: "/suppliers",
-    //   icon: LocalShippingIcon,
-    // },
+    {
+      title: "الموردين",
+      path: "/suppliers",
+      icon: LocalShippingIcon,
+    },
     {
       title: "استكشاف الأدوية",
       path: "/medicine-search",

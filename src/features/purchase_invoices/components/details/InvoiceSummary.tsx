@@ -1,20 +1,24 @@
-import React from "react";
-import { Box, Container, Typography } from "@mui/material";
-import { detailData } from "../detailData";
+import { alpha, Box, Container, Typography } from "@mui/material";
+import type { PurchaseInvoiceDetails } from "../../types/purchaseInvoiceDetails";
+import theme from "../../../../shared/styles/mainTheme";
 
-const SupplierInfo = () => {
+const InvoiceSummary = ({
+  detailData,
+}: {
+  detailData: PurchaseInvoiceDetails;
+}) => {
   return (
     <Container
       maxWidth="xs"
       sx={{
-        backgroundColor: "background.paper",
+        backgroundColor: alpha(theme.palette.secondary.main, 1),
+        color: "white",
         p: 4,
-        m: 2,
         borderRadius: 2,
       }}
     >
       <Typography variant="h6" sx={{ fontWeight: "bold", mb: 2 }}>
-        معلومات المورد
+        معلومات الفاتورة
       </Typography>
       <Box
         sx={{
@@ -32,24 +36,10 @@ const SupplierInfo = () => {
           }}
         >
           <Typography variant="body1" sx={{ mb: 1 }}>
-            اسم المورد
+            رقم الفاتورة
           </Typography>
-          <Typography variant="body1" color="secondary">
-            {detailData.data.supplier.supplierName}
-          </Typography>
-        </Box>
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-between",
-          }}
-        >
-          <Typography variant="body1" sx={{ mb: 1 }}>
-            رقم الموبايل{" "}
-          </Typography>
-          <Typography variant="body1" color="secondary">
-            {detailData.data.supplier.phone}
+          <Typography variant="body1" color="inherit">
+            {detailData.invoiceNumber}
           </Typography>
         </Box>
         <Box
@@ -60,10 +50,10 @@ const SupplierInfo = () => {
           }}
         >
           <Typography variant="body1" sx={{ mb: 1 }}>
-            العنوان{" "}
+            تاريخ الفاتورة{" "}
           </Typography>
-          <Typography variant="body1" color="secondary">
-            {detailData.data.supplier.address}
+          <Typography variant="body1" color="inherit">
+            {detailData.invoiceDate}
           </Typography>
         </Box>
         <Box
@@ -74,10 +64,10 @@ const SupplierInfo = () => {
           }}
         >
           <Typography variant="body1" sx={{ mb: 1 }}>
-            ملاحظات{" "}
+            ملاحظة{" "}
           </Typography>
-          <Typography variant="body1" color="secondary">
-            {detailData.data.supplier.notes}
+          <Typography variant="body1" color="inherit">
+            {detailData.notes}
           </Typography>
         </Box>
       </Box>
@@ -85,4 +75,4 @@ const SupplierInfo = () => {
   );
 };
 
-export default SupplierInfo;
+export default InvoiceSummary;
