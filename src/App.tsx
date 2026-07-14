@@ -14,7 +14,6 @@ import AuthGateway from "./features/auth/components/AuthGateway";
 import SuppliersList from "./features/suppliers/components/SuppliersList";
 import AddSupplier from "./features/suppliers/components/AddSupplier";
 import InvoiceLayout from "./features/invoices/InvoiceLayout";
-import PharmacyManagement from "./features/pharma_account/pages/pharamcy-account-management";
 import { CreatePharmacyAccount } from "./features/pharma_account/pages/CreatePharmacyAccount";
 import InventoryPage from "./features/inventory/pages/InventoryPage";
 import AddMedicinePage from "./features/inventory/pages/AddMedicinePage";
@@ -24,7 +23,12 @@ import SalesLayout from "./features/sales-and-return/pages/SalesReturnLayout";
 import { SaleInvoicesPage } from "./features/sales-and-return/pages/SaleInvoicesPage";
 import { ReturnInvoicesPage } from "./features/sales-and-return/pages/ReturnInvoicePage";
 import { DrugBatchesPage } from "./features/inventory/pages/DrugBatchesPage";
-import PurchaseInvoiceDetails from "./features/purchase_invoices/components/PurchaseInvoiceDetails";
+import PharmacyManagement from "./features/pharma_account/pages/PharamcyAccountManagement";
+import AddGeneralDrug from "./features/medteam_cdb/pages/AddGeneralDrug";
+import AllGeneralDrug from "./features/medteam_cdb/pages/AllGeneralDrug";
+import SaleInvoiceDetails from "./features/SUB_invoice/SalesInvoiceDetailsPage";
+import CreateReturnInvoicePage from "./features/SUB_invoice/return-invoice/CreatReturnInvoicePage";
+// import PurchaseInvoiceDetails from "./features/purchase_invoices/components/PurchaseInvoiceDetails";
 
 function App() {
   const pharmacyPaths = ["/pharmacy", "/pharmacy_owner"];
@@ -102,7 +106,6 @@ function App() {
           >
             {pharmacyPaths.map((path) => (
               <Route path={path} key={path} element={<DashboardTemplate />}>
-                <Route path="*" element={<div>later</div>} />
                 <Route index element={<div>hello</div>} />
 
                 <Route path="sales" element={<SalesLayout />}>
@@ -124,10 +127,10 @@ function App() {
                   />
                 </Route>
 
-                <Route
+                {/* <Route
                   path="invoices/purchase/details/:invoiceId"
                   element={<PurchaseInvoiceDetails />}
-                />
+                /> */}
                 <Route
                   path="invoices/purchase/add"
                   element={<PurchaseInvoiceWizard />}
@@ -156,6 +159,11 @@ function App() {
 
                 <Route path="support" element={<div>support</div>} />
                 <Route path="sales-details" element={<SaleInvoiceDetails />} />
+                {/* return */}
+                <Route
+                  path="sales-details/create-return"
+                  element={<CreateReturnInvoicePage />}
+                />
               </Route>
             ))}
           </Route>

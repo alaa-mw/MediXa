@@ -28,7 +28,11 @@ const InvoiceSaleTable = ({ data }: Props) => {
         <EmptyState />
       ) : ( */}
       {data.map((pharmacy, index) => (
-        <InvoiceTableRow item={pharmacy} itemIndex={index} />
+        <InvoiceTableRow
+          key={pharmacy.saleInvoiceItemId}
+          item={pharmacy}
+          itemIndex={index}
+        />
       ))}
     </Box>
   );

@@ -103,9 +103,9 @@ const BatchAllocationButton: React.FC<InvoiceRowProps> = ({ item }) => {
               <Box
                 key={alloc.saleInvoiceItemBatchId}
                 sx={{
-                  pb: index !== item.batchAllocations.length - 1 ? 1.5 : 0,
+                  pb: index !== item.batchAllocations!.length - 1 ? 1.5 : 0,
                   borderBottom:
-                    index !== item.batchAllocations.length - 1
+                    index !== item.batchAllocations!.length - 1
                       ? "1px dashed #E2E8F0"
                       : "none",
                 }}
@@ -134,7 +134,19 @@ const BatchAllocationButton: React.FC<InvoiceRowProps> = ({ item }) => {
                       {alloc.batch.initialQuantity}{" "}
                     </Typography>
                   </Box>
-
+                  <Box
+                    sx={{ display: "flex", justifyContent: "space-between" }}
+                  >
+                    <Typography variant="body2" color="text.secondary">
+                      تاريخ ادخال الدفعة:
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{ color: "black", fontWeight: 600 }}
+                    >
+                      {formatDate(alloc.batch.receivedDate)}
+                    </Typography>
+                  </Box>
                   <Box
                     sx={{ display: "flex", justifyContent: "space-between" }}
                   >

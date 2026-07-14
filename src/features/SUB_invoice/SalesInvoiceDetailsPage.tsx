@@ -1,7 +1,11 @@
 import InvoiceHeader from "./components/InvoiceHeader";
 import InvoiceReturnsTable from "./components/InvoicReturnsTable";
-import { Box, Grid, Paper } from "@mui/material";
+import { Box, Button, Grid, Paper, Typography } from "@mui/material";
 import InvoiceSaleTable from "./components/InvoiceTableItem";
+import ReturnTableWithHeader from "./components/ReturnTableWithHeader";
+import InvoiceSummaryBar from "./components/InvoiceSummaryBar";
+import { Save } from "@mui/icons-material";
+import CreatReturnInvoice from "./components/InvoiceSummaryBar";
 
 // الداتا المرفقة بطلبك مباشرة كـ Mock Data للتمثيل والاستخدام العلمي
 const apiResponse = {
@@ -78,6 +82,79 @@ const apiResponse = {
               drugId: 1,
               dosageFormId: 1,
               tradeName: "cetamol",
+              barcode: "123456789012398",
+              unitsPerBox: 24,
+              netPrice: "5.5",
+              consumerPrice: "7",
+              isRx: false,
+              isActive: true,
+              createdAt: "2026-06-17T02:21:06.969Z",
+              updatedAt: "2026-06-17T02:21:06.969Z",
+            },
+            privateDrug: null,
+          },
+        },
+        batchAllocations: [
+          {
+            saleInvoiceItemBatchId: 6,
+            saleInvoiceItemId: 6,
+            batchId: 1,
+            baseQuantity: 1,
+            unitCostAtSale: null,
+            createdAt: "2026-06-18T01:14:09.587Z",
+            batch: {
+              batchId: 1,
+              pharmacyDrugId: 1,
+              supplierInvoiceItemId: null,
+              expiryDate: "2027-05-01T00:00:00.000Z",
+              initialQuantity: 30,
+              soldQuantity: 29,
+              receivedDate: "2025-01-10T00:00:00.000Z",
+              status: "ACTIVE",
+              createdAt: "2026-06-17T02:25:09.755Z",
+              updatedAt: "2026-06-17T02:25:09.755Z",
+            },
+            displayQuantityFromThisBatch: 1,
+          },
+        ],
+        displayQuantity: 1,
+      },
+      {
+        saleInvoiceItemId: 7,
+        saleInvoiceId: 6,
+        pharmacyDrugId: 1,
+        unitType: "STRIP",
+        baseQuantity: 1,
+        unitFactorToBase: 1,
+        baseUnitPrice: "475",
+        extraPercentage: "20",
+        finalUnitPrice: "475",
+        totalPrice: "475",
+        createdAt: "2026-06-18T01:14:09.581Z",
+        updatedAt: "2026-06-18T01:14:09.581Z",
+        pharmacyDrug: {
+          pharmacyDrugId: 1,
+          pharmacyId: 1,
+          drugId: 1,
+          minStockAlert: 10,
+          sellPart: true,
+          netPrice: "7000",
+          consumerPrice: "9500",
+          expiryDateAlarm: 60,
+          isActive: true,
+          notes: "دواء مضاف من الكتالوج العام",
+          createdAt: "2026-06-17T02:22:50.752Z",
+          updatedAt: "2026-06-17T02:22:50.752Z",
+          drug: {
+            drugId: 1,
+            source: "GENERAL",
+            createdAt: "2026-06-17T02:21:06.969Z",
+            updatedAt: "2026-06-17T02:21:06.969Z",
+            generalDrug: {
+              generalDrugId: 1,
+              drugId: 1,
+              dosageFormId: 1,
+              tradeName: "unadol",
               barcode: "123456789012398",
               unitsPerBox: 24,
               netPrice: "5.5",
@@ -207,7 +284,6 @@ const apiResponse = {
 
 const SaleInvoiceDetails = () => {
   const invoice = apiResponse.data;
-
   return (
     <Box sx={{ p: 1, width: "100%" }}>
       {/* 1. الهيدر العلوي */}
@@ -217,20 +293,14 @@ const SaleInvoiceDetails = () => {
         paymentStatus={invoice.paymentStatus}
         saleType={invoice.saleType}
         totalAmount={invoice.totalAmount}
-      />
-
-      {/* 2. شريط ملخص الفاتورة السفلي */}
-      {/* <InvoiceSummaryBar
-        subtotal={invoice.subtotal}
+        subTotal={invoice.subtotal}
         discount={invoice.discount}
-        totalAmount={invoice.totalAmount}
-      /> */}
+        isFive={invoice.paymentStatus == "PARTIAL" ? true : false}
+      />
 
       {/* 3. تفاصيل محتوى الفاتورة والمرتجع */}
       <Grid container spacing={3} sx={{ width: "100%", m: 0 }}>
-        {/* تمرير xs و md كـ props مباشرة وليس داخل sx */}
         <Grid sx={{ p: "0px !important", xs: 12, md: 12 }}>
-          {/* جدول المبيعات */}
           <Paper
             elevation={0}
             sx={{
@@ -242,31 +312,21 @@ const SaleInvoiceDetails = () => {
           >
             <InvoiceSaleTable data={invoice.items} />
           </Paper>
-          <Paper
-            elevation={0}
-            sx={{
-              border: "1px solid #E2E8F0",
-              borderRadius: "8px",
-              width: "100%",
-              mb: 3,
-            }}
-          >
-            <Box
-              sx={{
-                width: "100%",
-                p: 2,
-                bgcolor: "error.main",
-                borderRadius: "8px",
-                borderBottom: "1px solid #f0e3e2",
-              }}
-            >
-              فاتورة مرتجعة رقم 5
-            </Box>
-            {/* جدول المرتجعات إن وجد */}
-            <InvoiceReturnsTable returns={invoice.returns} />
-          </Paper>
+
+          {/* جدول المرتجعات */}
+          {invoice.returns.length > 0 &&
+            invoice.returns.map((returnInvoice) => (
+              <ReturnTableWithHeader
+                key={returnInvoice.returnInvoiceId}
+                returnInvoice={returnInvoice}
+              />
+            ))}
         </Grid>
       </Grid>
+
+      {/* 2. شريط ملخص الفاتورة السفلي */}
+      {/* 2. شريط ملخص الفاتورة السفلي مرري له الـ items */}
+      <CreatReturnInvoice items={invoice.items} discount={invoice.discount} />
     </Box>
   );
 };
