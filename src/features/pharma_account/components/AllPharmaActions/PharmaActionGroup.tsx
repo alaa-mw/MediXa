@@ -9,6 +9,7 @@ interface Props {
   onEdit: (pharmacy: Pharmacy) => void;
   onDetails: (pharmacy: Pharmacy) => void;
 }
+
 const PharmaActionGroup = ({ pharmacy, onEdit, onDetails }: Props) => {
   return (
     <Stack
@@ -26,7 +27,7 @@ const PharmaActionGroup = ({ pharmacy, onEdit, onDetails }: Props) => {
     >
       <EditButton pharmacy={pharmacy} onEdit={onEdit} />
       <DetailsButton pharmacy={pharmacy} onDetails={onDetails} />
-      <SubscriptionHistoryButton />
+      <SubscriptionHistoryButton pharmacyId={pharmacy.pharmacyId} />
     </Stack>
   );
 };

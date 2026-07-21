@@ -19,16 +19,15 @@ import type {
 import PharmaStatsCards from "../components/PharmaStats";
 import PharmaciesTable from "../components/PharmaciesTable";
 import PharmaInfoCard from "../components/PharmaInfoCard";
+
 export const PharmacyManagement = () => {
-  const {
-    data,
-    isLoading,
-    refetch,
-    setQueryParams,
-  } = useGetWithParams<AllPharmaciesResponse>("/pharmacy/get-all", {
-    page: 1,
-    limit: 10,
-  });
+  const { data, isLoading, refetch, setQueryParams } =
+    useGetWithParams<AllPharmaciesResponse>("/pharmacy/get-all", {
+      page: 1,
+      limit: 10,
+      name: "", // إضافة بارامتر البحث الأولي
+      status: "", // إضافة بارامتر الحالة الأولي
+    });
 
   const allPharmacies = data?.data.data ?? [];
   const paginationMeta = data?.data.meta;
@@ -43,21 +42,25 @@ export const PharmacyManagement = () => {
     setIsOpenDetails(true);
   };
 
-  // 💡 States للفلترة والبحث
-  const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
-  const [subFilter, setSubFilter] = useState("");
+  // 💡 التعامل مع البحث عند كل حرف وتحديث البارامترات وإعادة الصفحة إلى 1
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setQueryParams((prev) => ({
+      ...prev,
+      name: value,
+      page: 1, // العودة للصفحة الأولى عند البحث لتجنب فراغ النتائج
+    }));
+  };
 
-  // 💡 منطق الفلترة الديناميكي
-  const filteredPharmacies = allPharmacies.filter((pharma) => {
-    const matchesSearch =
-      pharma.pharmacyName.includes(searchQuery) ||
-      pharma.pharmacyOwner.user.fullName.includes(searchQuery);
-    const matchesStatus = statusFilter === "" || pharma.status === statusFilter;
-    //  const matchesSub = subFilter === "" || pharma.subscription === subFilter;
-
-    return matchesSearch && matchesStatus;
-  });
+  // 💡 التعامل مع تغيير فلتر الحالة
+  const handleStatusChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setQueryParams((prev) => ({
+      ...prev,
+      status: value,
+      page: 1, // العودة للصفحة الأولى عند الفلترة
+    }));
+  };
 
   const textFieldStyles = {
     bgcolor: "#ffffff",
@@ -82,19 +85,13 @@ export const PharmacyManagement = () => {
       left: 8,
     },
   };
+
   return (
     <Box>
       <Box>
         {/* Header */}
         <Stack direction={"row"} sx={{ justifyContent: "space-between" }}>
-          <Box
-            sx={{
-              mb: 4,
-              textAlign: "right",
-              // display: "flex",
-              // justifyContent: "space-between",
-            }}
-          >
+          <Box sx={{ mb: 4, textAlign: "right" }}>
             <Typography
               variant="h4"
               sx={{ fontWeight: "bold", color: "#0F172A" }}
@@ -121,8 +118,8 @@ export const PharmacyManagement = () => {
             variant="outlined"
             size="small"
             placeholder="ابحث عن صيدلية أو مالك ... "
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            // نقرأ القيمة الحالية للـ name من الـ queryParams أو نضع قيمة فارغة
+            onChange={handleSearchChange}
             sx={{ width: 300, ...textFieldStyles }}
             slotProps={{
               input: {
@@ -138,11 +135,10 @@ export const PharmacyManagement = () => {
             select
             size="small"
             label="الحالات"
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
+            defaultValue=""
+            onChange={handleStatusChange}
             sx={{ width: 150, ...textFieldStyles }}
           >
-            {/* المطلب 4: وضعنا value حقيقية لكي تعمل الفلترة */}
             <MenuItem value="">الكل</MenuItem>
             <MenuItem value="ACTIVE">نشط</MenuItem>
             <MenuItem value="PENDING">قيد الانتظار</MenuItem>
@@ -154,8 +150,16 @@ export const PharmacyManagement = () => {
             select
             size="small"
             label="الاشتراك"
-            value={subFilter}
-            onChange={(e) => setSubFilter(e.target.value)}
+            defaultValue=""
+            onChange={(e) => {
+              // إذا كان الـ Backend يدعم فلترة الاشتراك أضفها هنا
+              const value = e.target.value;
+              setQueryParams((prev) => ({
+                ...prev,
+                subscription: value,
+                page: 1,
+              }));
+            }}
             sx={{
               width: 150,
               ...textFieldStyles,
@@ -166,6 +170,7 @@ export const PharmacyManagement = () => {
             <MenuItem value="منتهي">منتهي</MenuItem>
           </TextField>
         </Box>
+
         <Grid
           container
           spacing={3}
@@ -176,8 +181,9 @@ export const PharmacyManagement = () => {
               elevation={0}
               sx={{ border: "1px solid #E2E8F0", borderRadius: "8px" }}
             >
+              {/* نمرر البيانات القادمة من الباكيند مباشرة بدون .filter() */}
               <PharmaciesTable
-                data={filteredPharmacies}
+                data={allPharmacies}
                 onShowDetails={handleShowDetails}
                 refetch={refetch}
                 isLoading={isLoading}

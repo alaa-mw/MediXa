@@ -136,7 +136,7 @@ export const sideBarLabels: Record<
     },
     {
       title: "المالية",
-      path: "/finance",
+      path: "/Create_offer",
       icon: SupportAgentIcon,
     },
   ],

@@ -28,6 +28,10 @@ import AddGeneralDrug from "./features/medteam_cdb/pages/AddGeneralDrug";
 import AllGeneralDrug from "./features/medteam_cdb/pages/AllGeneralDrug";
 import SaleInvoiceDetails from "./features/SUB_invoice/SalesInvoiceDetailsPage";
 import CreateReturnInvoicePage from "./features/SUB_invoice/return-invoice/CreatReturnInvoicePage";
+import PricingPage from "./features/subscription/pages/PricingPage";
+import CreatePrivateOfferPage from "./features/finance/pages/CreatePharmaOffer";
+import PharmacySubscriptionSchedule from "./features/finance/pages/PharmacySubscriptionSchedule";
+import RenewSubscriptionPage from "./features/finance/pages/RenewSubscriptionPage";
 // import PurchaseInvoiceDetails from "./features/purchase_invoices/components/PurchaseInvoiceDetails";
 
 function App() {
@@ -58,9 +62,18 @@ function App() {
                 path="create-account"
                 element={<CreatePharmacyAccount />}
               />
+              <Route path="subscription-plans" element={<PricingPage />} />
               <Route path="pharmacies" element={<PharmacyManagement />} />
+              <Route
+                path="pharmacies/subscription-schedule/:id"
+                element={<PharmacySubscriptionSchedule />}
+              />
+              <Route
+                path="pharmacies/renew-subscription/:pharmacyId"
+                element={<RenewSubscriptionPage />}
+              />
               <Route path="support" element={<div>support</div>} />
-              <Route path="finance" element={<div>finance</div>} />
+              <Route path="create_offer" element={<CreatePrivateOfferPage />} />
             </Route>
           </Route>
 
