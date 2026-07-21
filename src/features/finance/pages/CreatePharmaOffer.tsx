@@ -23,6 +23,7 @@ const CreatePrivateOfferPage = () => {
       },
       {
         onSuccess: (response) => {
+          console.log("payload:", payload);
           console.log("✅ تم إنشاء العرض بنجاح:", response);
           showSnackbar("تم إنشاء العرض بنجاح", "success");
         },
