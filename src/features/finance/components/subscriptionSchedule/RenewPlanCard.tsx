@@ -36,21 +36,25 @@ export default function RenewPlanCard({
   const lightColor =
     lightColors[plan.code as keyof typeof lightColors] ?? "#EBF7EE";
 
-  const defaultOffer = plan.publicOffers?.[0];
+  // استخراج العروض العامة (مصفوفة فارغة كقيمة احترازية)
+  const publicOffers = plan.publicOffers || [];
 
-  // حالة العرض المختار داخل الخطة
+  // تحديد أول عرض افتراضياً إذا توفرت عروض
   const [selectedOfferId, setSelectedOfferId] = useState<number | null>(
-    defaultOffer ? defaultOffer.offerId : null,
+    publicOffers.length > 0 ? publicOffers[0].offerId : null,
   );
 
-  const currentAppliedOffer = plan.publicOffers?.find(
+  // العثور على كائن العرض المحدد حالياً لتطبيق الخصم
+  const currentAppliedOffer = publicOffers.find(
     (o) => o.offerId === selectedOfferId,
   );
 
+  // حساب السعر بناءً على تطبيق العرض أو السعر الأساسي
   const displayPrice = currentAppliedOffer
     ? currentAppliedOffer.finalPrice
     : plan.basePrice;
 
+  // التبديل بين اختيار العرض أو إلغائه وتحديث الحالة الأب إن كانت الخطة محددة
   const handleToggleOffer = (offerId: number) => {
     const nextOfferId = selectedOfferId === offerId ? null : offerId;
     setSelectedOfferId(nextOfferId);
@@ -80,9 +84,10 @@ export default function RenewPlanCard({
         transition: "all 0.3s ease",
         display: "flex",
         flexDirection: "column",
-        justify: "space-between",
+        justifyContent: "space-between",
       }}
     >
+      {/* شريط الخصم العلوي يظهر فقط عند تفعيل عرض معين */}
       {currentAppliedOffer && (
         <DiscountCorner
           discount={currentAppliedOffer.discountValue}
@@ -145,22 +150,29 @@ export default function RenewPlanCard({
             </Stack>
           </Stack>
 
+          {/* السعر المحدث ديناميكياً بناءً على العرض المختار */}
           <PriceSection
             basePrice={plan.basePrice}
             currentPrice={displayPrice}
             color={color}
           />
 
-          {defaultOffer && (
-            <OfferBanner
-              offerId={defaultOffer.offerId}
-              title={defaultOffer.title}
-              description={defaultOffer.description}
-              endsAt={defaultOffer.endsAt}
-              color={color}
-              isSelected={selectedOfferId === defaultOffer.offerId}
-              onSelectOffer={handleToggleOffer}
-            />
+          {/* عرض جميع العروض المتاحة عبر الـ map بدلاً من عرض واحد فقط */}
+          {publicOffers.length > 0 && (
+            <Stack spacing={1.5}>
+              {publicOffers.map((offer) => (
+                <OfferBanner
+                  key={offer.offerId}
+                  offerId={offer.offerId}
+                  title={offer.title}
+                  description={offer.description}
+                  endsAt={offer.endsAt}
+                  color={color}
+                  isSelected={selectedOfferId === offer.offerId}
+                  onSelectOffer={handleToggleOffer}
+                />
+              ))}
+            </Stack>
           )}
 
           <Button
