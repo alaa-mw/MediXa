@@ -16,12 +16,19 @@ const OfferDateFields = ({ control, isEndDate }: Props) => {
         render={({ field }) => (
           <RTLDatePicker
             label="تاريخ انتهاء العرض"
-            value={
-              field.value
-              // ? new Date(field.value).toString()
-              // : new Date().toString()
-            }
-            onChange={(value) => field.onChange(value?.toString())}
+            value={field.value}
+            onChange={(value) => {
+              if (!value) {
+                field.onChange("");
+                return;
+              }
+              const date = new Date(value);
+              if (!isNaN(date.getTime())) {
+                field.onChange(date.toISOString());
+              } else {
+                field.onChange("");
+              }
+            }}
           />
         )}
       />
@@ -36,11 +43,21 @@ const OfferDateFields = ({ control, isEndDate }: Props) => {
         <RTLDatePicker
           label="تاريخ بدء العرض"
           value={field.value}
-          //   field.value
-          //     ? new Date(field.value).toString()
-          //     : new Date().toString()
-          // }
-          onChange={(value) => field.onChange(value?.toString())}
+          onChange={(value) => {
+            if (!value) {
+              field.onChange("");
+              return;
+            }
+            // إضافة 3 ساعات ودقيقة واحدة لموازنة فروق الأوقات
+            const date = new Date(value);
+            if (!isNaN(date.getTime())) {
+              date.setHours(date.getHours() + 3);
+              date.setMinutes(date.getMinutes() + 1);
+              field.onChange(date.toISOString());
+            } else {
+              field.onChange("");
+            }
+          }}
         />
       )}
     />

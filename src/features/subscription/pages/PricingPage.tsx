@@ -6,6 +6,7 @@ import PricingHero from "../components/PricingHero";
 import PlanCard from "../components/PlanCard";
 import { useLocation } from "react-router-dom";
 import { useGetData } from "../../../shared/hooks/useGetData";
+import PlanCardSkeleton from "../../finance/components/subscriptionSchedule/SkeltonPlanCard";
 
 export default function PricingPage() {
   const location = useLocation();
@@ -24,24 +25,35 @@ export default function PricingPage() {
   return (
     <Container maxWidth="xl" sx={{ py: 1 }}>
       <PricingHero />
-
       <Grid container spacing={4} sx={{ px: 5 }}>
-        {plans.map((plan) => (
-          <Grid
-            key={plan.planId}
-            size={{
-              xs: 12,
-              md: 4,
-            }}
-          >
-            <PlanCard
-              plan={plan}
-              featured={plan.code === "PROFESSIONAL"}
-              returnTo={returnTo} // نمرر مسار الرجوع
-              savedForm={savedForm} // نمرر البيانات المحفوظة
-            />
-          </Grid>
-        ))}
+        {isLoading
+          ? Array.from({ length: 3 }).map((_, index) => (
+              <Grid
+                key={index}
+                size={{
+                  xs: 12,
+                  md: 4,
+                }}
+              >
+                <PlanCardSkeleton />
+              </Grid>
+            ))
+          : plans.map((plan) => (
+              <Grid
+                key={plan.planId}
+                size={{
+                  xs: 12,
+                  md: 4,
+                }}
+              >
+                <PlanCard
+                  plan={plan}
+                  featured={plan.code === "PROFESSIONAL"}
+                  returnTo={returnTo}
+                  savedForm={savedForm}
+                />
+              </Grid>
+            ))}
       </Grid>
     </Container>
   );

@@ -31,15 +31,23 @@ export const useRenewSubscription = (pharmacyId: string | number) => {
         body.offerId = payload.offerId;
       }
 
+      console.log("Renew subscription payload:", body);
+
       await apiClient.post(body);
 
       showSnackbar("تم تجديد الاشتراك بنجاح", "success");
-      navigate(-1); // العودة للصفحة السابقة
+      navigate(-1);
     } catch (error: any) {
-      const errorMessage =
-        error?.response?.data?.message ||
-        "حدث خطأ أثناء تجديد الاشتراك، يرجى المحاولة مرة أخرى";
-      showSnackbar(errorMessage, "error");
+      console.error("❌ رسالة الخطأ:", error?.message || error);
+      const errorMessage = error?.message;
+      if (
+        errorMessage ===
+        "Subscription period overlaps with an existing subscription."
+      ) {
+        showSnackbar("فترة الاشتراك تتداخل مع اشتراك موجو مسبقاً", "error");
+      } else {
+        showSnackbar(errorMessage, "error");
+      }
     } finally {
       setIsSubmitting(false);
     }

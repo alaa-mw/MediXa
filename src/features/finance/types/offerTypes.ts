@@ -16,10 +16,6 @@ export interface OfferFormModel {
 export interface PharmacyAssignmentModel {
   pharmacyIds: number[];
 
-  validFrom: string;
-
-  validUntil: string;
-
   grantReason: string;
 
   note: string;

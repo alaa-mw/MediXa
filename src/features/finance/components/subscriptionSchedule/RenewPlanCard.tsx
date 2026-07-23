@@ -1,16 +1,24 @@
-import { useState } from "react";
-import { Button, Card, CardContent, Stack, Typography } from "@mui/material";
+import { useState, useEffect } from "react";
+import {
+  Button,
+  Card,
+  CardContent,
+  Stack,
+  Typography,
+  Box,
+} from "@mui/material";
 import { Check } from "@mui/icons-material";
 import DiscountCorner from "../../../subscription/components/DiscountRibbon";
 import IconHelper from "../../../subscription/components/IconHelper";
-import OfferBanner from "../../../subscription/components/OfferBanner";
 import PriceSection from "../../../subscription/components/PriceSection";
 import type { SubscriptionPlan } from "../../../subscription/types/subscriptionTypes";
+import PlanOffersDialog from "./PlaneOffersDialog";
 
 interface Props {
   plan: SubscriptionPlan;
   featured?: boolean;
   isSelectedPlan: boolean;
+  pharmacyId?: number;
   onSelectPlan: (planId: number, offerId: number | null) => void;
 }
 
@@ -30,38 +38,48 @@ export default function RenewPlanCard({
   plan,
   featured,
   isSelectedPlan,
+  pharmacyId,
   onSelectPlan,
 }: Props) {
   const color = colors[plan.code as keyof typeof colors] ?? "primary";
   const lightColor =
     lightColors[plan.code as keyof typeof lightColors] ?? "#EBF7EE";
 
-  // استخراج العروض العامة (مصفوفة فارغة كقيمة احترازية)
   const publicOffers = plan.publicOffers || [];
 
-  // تحديد أول عرض افتراضياً إذا توفرت عروض
+  // الحالة لتخزين العرض المختار
   const [selectedOfferId, setSelectedOfferId] = useState<number | null>(
     publicOffers.length > 0 ? publicOffers[0].offerId : null,
   );
 
-  // العثور على كائن العرض المحدد حالياً لتطبيق الخصم
-  const currentAppliedOffer = publicOffers.find(
-    (o) => o.offerId === selectedOfferId,
+  const [appliedOfferDetails, setAppliedOfferDetails] = useState<any>(
+    publicOffers.length > 0 ? publicOffers[0] : null,
   );
 
-  // حساب السعر بناءً على تطبيق العرض أو السعر الأساسي
-  const displayPrice = currentAppliedOffer
-    ? currentAppliedOffer.finalPrice
-    : plan.basePrice;
+  // دالة لتحديث تفاصيل العرض بناءً على الـ ID المختار (تشمل العروض العامة والخاصة التي سيجلبها الدايلوج)
+  const handleOfferSelection = (
+    offerId: number | null,
+    allOffersList: any[] = [],
+  ) => {
+    setSelectedOfferId(offerId);
 
-  // التبديل بين اختيار العرض أو إلغائه وتحديث الحالة الأب إن كانت الخطة محددة
-  const handleToggleOffer = (offerId: number) => {
-    const nextOfferId = selectedOfferId === offerId ? null : offerId;
-    setSelectedOfferId(nextOfferId);
+    if (offerId === null) {
+      setAppliedOfferDetails(null);
+    } else {
+      const found = allOffersList.find((o) => o.offerId === offerId);
+      if (found) {
+        setAppliedOfferDetails(found);
+      }
+    }
+
     if (isSelectedPlan) {
-      onSelectPlan(plan.planId, nextOfferId);
+      onSelectPlan(plan.planId, offerId);
     }
   };
+
+  const displayPrice = appliedOfferDetails
+    ? appliedOfferDetails.finalPrice
+    : plan.basePrice;
 
   const handleCardSelection = () => {
     onSelectPlan(plan.planId, selectedOfferId);
@@ -87,10 +105,9 @@ export default function RenewPlanCard({
         justifyContent: "space-between",
       }}
     >
-      {/* شريط الخصم العلوي يظهر فقط عند تفعيل عرض معين */}
-      {currentAppliedOffer && (
+      {appliedOfferDetails && (
         <DiscountCorner
-          discount={currentAppliedOffer.discountValue}
+          discount={appliedOfferDetails.discountValue}
           color={color}
           lightColor={lightColor}
         />
@@ -139,7 +156,6 @@ export default function RenewPlanCard({
                       sx={{
                         color: "text.secondary",
                         textAlign: "right",
-                        lineHeight: 1.5,
                         fontWeight: 500,
                       }}
                     >
@@ -150,30 +166,49 @@ export default function RenewPlanCard({
             </Stack>
           </Stack>
 
-          {/* السعر المحدث ديناميكياً بناءً على العرض المختار */}
+          {/* قسم السعر */}
           <PriceSection
             basePrice={plan.basePrice}
             currentPrice={displayPrice}
             color={color}
           />
 
-          {/* عرض جميع العروض المتاحة عبر الـ map بدلاً من عرض واحد فقط */}
-          {publicOffers.length > 0 && (
-            <Stack spacing={1.5}>
-              {publicOffers.map((offer) => (
-                <OfferBanner
-                  key={offer.offerId}
-                  offerId={offer.offerId}
-                  title={offer.title}
-                  description={offer.description}
-                  endsAt={offer.endsAt}
-                  color={color}
-                  isSelected={selectedOfferId === offer.offerId}
-                  onSelectOffer={handleToggleOffer}
-                />
-              ))}
-            </Stack>
+          {/* إظهار تفاصيل العرض المختار حالياً للمستخدم */}
+          {selectedOfferId && (
+            <Box
+              sx={{
+                p: 1.5,
+                bgcolor: lightColor,
+                borderRadius: 2,
+                border: `1px dashed ${color}.main`,
+              }}
+            >
+              <Typography
+                variant="caption"
+                sx={{
+                  fontWeight: 700,
+                  color: `${color}.main`,
+                  display: "block",
+                }}
+              >
+                العرض المطبق حالياً:
+              </Typography>
+              <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                {appliedOfferDetails?.title ||
+                  `عرض برقم ID: ${selectedOfferId}`}
+              </Typography>
+            </Box>
           )}
+
+          {/* زر استعراض العروض (العامة والخاصة) */}
+          <PlanOffersDialog
+            pharmacyId={pharmacyId!}
+            planId={plan.planId}
+            planCode={plan.code}
+            publicOffers={publicOffers}
+            selectedOfferId={selectedOfferId}
+            onSelectOffer={handleOfferSelection}
+          />
 
           <Button
             fullWidth

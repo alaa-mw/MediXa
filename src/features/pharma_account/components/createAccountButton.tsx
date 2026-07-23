@@ -72,6 +72,7 @@ interface CreateAccountButtonProps {
   isPending: boolean;
   formData: PharmacyRegistrationForm;
   hasPlan: boolean;
+  hasdate: boolean;
 }
 
 const CreateAccountButton: React.FC<CreateAccountButtonProps> = ({
@@ -79,6 +80,7 @@ const CreateAccountButton: React.FC<CreateAccountButtonProps> = ({
   isPending,
   formData,
   hasPlan,
+  hasdate,
 }) => {
   const navigate = useNavigate();
 
@@ -108,7 +110,7 @@ const CreateAccountButton: React.FC<CreateAccountButtonProps> = ({
           <Button
             variant="contained"
             size="large"
-            disabled={isPending}
+            disabled={isPending || !hasdate}
             onClick={onSubmit}
             sx={{ bgcolor: "primary.main" }}
           >

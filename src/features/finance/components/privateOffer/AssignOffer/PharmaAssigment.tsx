@@ -29,7 +29,7 @@ const dummyResponse = {
       validUntil: "2026-10-31T23:59:59.000Z",
       note: "عرض ولاء خاص للصيدلية",
       offer: {
-        offerId: 5,
+        offerId: 7,
         code: "LOYALTY_4_YEARS_30",
         title: "عرض ولاء 4 سنوات",
         description:
@@ -74,9 +74,7 @@ const PharmacyAssignment = () => {
     defaultValues: {
       pharmacyIds: [],
       note: "",
-      grantReason: "SPECIAL_CUSTOMER",
-      validFrom: "",
-      validUntil: "",
+      grantReason: "",
     },
   });
   const { mutate, isPending } = useAssignOfferToPharmacies(selectedOfferId!);
@@ -100,8 +98,10 @@ const PharmacyAssignment = () => {
         },
       },
       {
-        onSuccess: () => {
+        onSuccess: (message) => {
+          console.log("Offer assigned payload:", data);
           showSnackbar("تم إسناد العرض للصيدليات بنجاح", "success");
+          console.log('request response:', message.data);
           console.log(
             "idddds",
             selectedPharmacies.map((p) => p.id),
@@ -183,41 +183,47 @@ const PharmacyAssignment = () => {
               : "اختيار الصيدليات المطلوبة"}
           </Button>
         </Box>
-        <Box sx={{ display: "flex", direction: "row" }}>
-          <Box>
-            {selectedOffer && (
-              <Chip
-                color="secondary"
-                label={selectedOffer.offer.title}
-                sx={{ fontWeight: 600 }}
-              />
-            )}
-          </Box>
-          <Box sx={{ gap: 10 }}>
-            {selectedPharmacies.length > 0 && (
-              <>
-                <Stack
-                  direction="row"
-                  spacing={1}
-                  sx={{
-                    overflowX: "auto",
-                    flexWrap: "nowrap",
-                    pb: 1,
-                  }}
-                >
-                  {selectedPharmacies.map((pharmacy) => (
-                    <Chip
-                      key={pharmacy.id}
-                      label={pharmacy.name}
-                      color="primary"
-                      variant="outlined"
-                      sx={{ ml: 10 }}
-                    />
-                  ))}
-                </Stack>
-              </>
-            )}
-          </Box>
+        {/* حاوية الـ Chips */}
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 3,
+            mb: 2,
+            flexWrap: "wrap",
+          }}
+        >
+          {/* Chip العرض المختار */}
+          {selectedOffer && (
+            <Chip
+              color="secondary"
+              label={selectedOffer.offer.title}
+              sx={{ fontWeight: 600 }}
+            />
+          )}
+
+          {/* قائمة الـ Chips للصيدليات المختارة */}
+          {selectedPharmacies.length > 0 && (
+            <Stack
+              direction="row"
+              spacing={1}
+              sx={{
+                overflowX: "auto",
+                flexWrap: "wrap",
+                pb: 1,
+              }}
+            >
+              {selectedPharmacies.map((pharmacy) => (
+                <Chip
+                  key={pharmacy.id}
+                  label={pharmacy.name}
+                  color="primary"
+                  variant="outlined"
+                />
+              ))}
+            </Stack>
+          )}
         </Box>
 
         <Grid container sx={{ mt: 4 }}>

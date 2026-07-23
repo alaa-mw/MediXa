@@ -1,5 +1,3 @@
-// CreatePharmacyAccount.tsx
-
 import { ThemeProvider } from "@emotion/react";
 import theme from "../../../shared/styles/arabicTheme";
 import { Box, CssBaseline, Stack, Typography } from "@mui/material";
@@ -9,7 +7,6 @@ import type { AllOwnersResponse } from "../types/allOwnersResponse";
 import InfoStatus from "../components/InfoSection";
 import OwnerAccountCard from "../components/OwnerCard";
 import PharmacyAccountCard from "../components/PharamcyCard";
-import CreateAccountButton from "../components/CreateAccountButton";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   INITIAL_FORM,
@@ -18,6 +15,7 @@ import {
 import { useLocation, useNavigate } from "react-router-dom";
 import SubscriptionCard from "../components/SubscriptionCrard";
 import { useSnackbar } from "../../../shared/providers/useSnackbar";
+import CreateAccountButton from "../components/createAccountButton";
 
 export const CreatePharmacyAccount = () => {
   const queryClient = useQueryClient();
@@ -25,18 +23,15 @@ export const CreatePharmacyAccount = () => {
   const navigate = useNavigate();
   const { showSnackbar } = useSnackbar();
 
-  // 1. قراءة البيانات المبدئية من الـ sessionStorage إن وجدت، وإلا استخدام المبدئي
   const [formData, setFormData] = useState<PharmacyRegistrationForm>(() => {
     const saved = sessionStorage.getItem("pharmacy_reg_form");
     return saved ? JSON.parse(saved) : INITIAL_FORM;
   });
 
-  // 2. تحديث الـ sessionStorage كلما تغيرت بيانات الفورم
   useEffect(() => {
     sessionStorage.setItem("pharmacy_reg_form", JSON.stringify(formData));
   }, [formData]);
 
-  // 3. مراقبة الـ state القادم من صفحة الباقات فقط لتحديث جزئية الاشتراك
   useEffect(() => {
     if (location.state?.fromPricing) {
       const { selectedPlanId, selectedOfferId } = location.state;
@@ -50,7 +45,6 @@ export const CreatePharmacyAccount = () => {
         },
       }));
 
-      // تنظيف الستيت الخاص بالـ router فوراً
       navigate(location.pathname, { replace: true, state: {} });
     }
   }, [location.state, navigate]);
@@ -59,21 +53,42 @@ export const CreatePharmacyAccount = () => {
     usePostData<AllOwnersResponse>("/pharmacy/create");
 
   const handleSubmit = () => {
-    const minutesToAdd = 5;
+    // 1. أخذ التاريخ المختار من حقل الإدخال (مثلاً "2026-07-23")
+    const selectedDate = new Date(formData.subscription.startsAt);
 
+    // 2. جلب الوقت الحالي وإضافة دقيقتين لفرق السيرفر
     const now = new Date();
-    now.setMinutes(now.getMinutes() + minutesToAdd);
-    const startsAt = now.toISOString();
+    selectedDate.setHours(
+      now.getHours(),
+      now.getMinutes() + 2,
+      now.getSeconds(),
+      now.getMilliseconds(),
+    );
 
-    console.log(startsAt);
-    // النتيجة ستكون بالشكل: "2026-07-21T17:25:43.997Z"
+    // 3. توليد صيغة ISO 8601 صحيحة 100%
+    const formattedStartDate = selectedDate.toISOString();
+
+    const subscriptionPayload: any = {
+      ...formData.subscription,
+      startsAt: formattedStartDate, // الاحتفاظ بالحقل وإرساله بالصيغة الصحيحة
+    };
+
+    // (تم حذف سطر delete subscriptionPayload.startsAt هنا لكي لا يتم حذفه!)
+
+    if (formData.subscription.offerId && formData.subscription.offerId !== "") {
+      subscriptionPayload.offerId = Number(formData.subscription.offerId);
+    } else {
+      delete subscriptionPayload.offerId;
+    }
+
+    if (subscriptionPayload.planId) {
+      subscriptionPayload.planId = Number(subscriptionPayload.planId);
+    }
+
     let finalPayload: any = {
       ownerMode: formData.ownerMode,
-      pharmacy: { ...formData.pharmacy, openingDate: startsAt },
-      subscription: {
-        ...formData.subscription,
-        startsAt: startsAt,
-      },
+      pharmacy: { ...formData.pharmacy, openingDate: formattedStartDate },
+      subscription: subscriptionPayload,
     };
 
     if (formData.ownerMode === "EXISTING") {
@@ -86,10 +101,9 @@ export const CreatePharmacyAccount = () => {
         nationalId: formData.newOwner.nationalId,
       };
     }
-    console.log("*********CreatePharamaInfo************", finalPayload);
+
     createPharmacy(finalPayload, {
       onSuccess: (response) => {
-        console.log("Success : Create pharmacy response", response);
         queryClient.invalidateQueries({ queryKey: ["/pharmacy-owners"] });
         sessionStorage.removeItem("pharmacy_reg_form");
         setFormData(INITIAL_FORM);
@@ -97,6 +111,7 @@ export const CreatePharmacyAccount = () => {
       },
       onError: (error) => {
         console.log("error: Create Pharmacy", error);
+        showSnackbar("حدث خطأ أثناء إنشاء الحساب", "error");
       },
     });
   };
@@ -142,13 +157,27 @@ export const CreatePharmacyAccount = () => {
           />
 
           {!!formData.subscription.planId && (
-            <SubscriptionCard planName={formData.subscription.planId} />
+            <SubscriptionCard
+              planName={formData.subscription.planId}
+              startsAt={formData.subscription.startsAt || ""}
+              onStartDateChange={(newDate) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  subscription: {
+                    ...prev.subscription,
+                    startsAt: newDate,
+                  },
+                }))
+              }
+            />
           )}
 
           <CreateAccountButton
             isPending={isPending}
             onSubmit={handleSubmit}
             formData={formData}
+            hasdate={!!formData.subscription.startsAt}
+            // الزر سيكون مفَعّلاً فقط إذا تم اختيار الخطة وتم تحديد تاريخ البدء
             hasPlan={!!formData.subscription.planId}
           />
         </Stack>

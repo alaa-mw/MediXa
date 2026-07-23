@@ -10,18 +10,15 @@ import RenewPlanCard from "../components/subscriptionSchedule/RenewPlanCard";
 export default function RenewSubscriptionPage() {
   const { pharmacyId } = useParams<{ pharmacyId: string }>();
 
-  // حساب وقت البدء (الوقت الحالي + 5 دقائق لضمان عدم وجود تضارب)
-  const nowPlusBuffer = new Date(Date.now() + 5 * 60 * 1000);
-  const startsAt = nowPlusBuffer.toISOString();
-
   // جلب الخطط المتاحة
   const { data, isLoading, error } = useGetData<SubscriptionPlan[]>(
     "/subscriptions/plans/public",
   );
 
-  // حالة الاختيار
+  // حالات الاختيار (تاريخ البدء يبدأ فارغاً لضمان تعطيل زر التأكيد)
   const [selectedPlanId, setSelectedPlanId] = useState<number | null>(null);
   const [selectedOfferId, setSelectedOfferId] = useState<number | null>(null);
+  const [startsAt, setStartsAt] = useState<string>("");
 
   // هوك تجديد الاشتراك
   const { renewSubscription, isSubmitting } = useRenewSubscription(pharmacyId!);
@@ -35,9 +32,9 @@ export default function RenewSubscriptionPage() {
     setSelectedOfferId(offerId);
   };
 
-  // تأكيد التجديد وإرسال الطلب للـ API
+  // تأكيد التجديد وإرسال الطلب للـ API بالشكل المطلوب تماماً
   const handleConfirmRenew = () => {
-    if (!selectedPlanId) return;
+    if (!selectedPlanId || !startsAt) return;
 
     renewSubscription({
       planId: selectedPlanId,
@@ -58,10 +55,12 @@ export default function RenewSubscriptionPage() {
 
   return (
     <Container maxWidth="xl" sx={{ py: 3, pb: 6 }}>
-      {/* هيرو الصفحة الذي سيتغير شكله ويظهر زر التأكيد و اسم الخطة بداخله عند التحديد */}
+      {/* هيرو الصفحة الذي يحتوي على زر التأكيد وحقل اختيار التاريخ */}
       <PricingHero
         selectedPlanName={selectedPlan?.name}
         isSubmitting={isSubmitting}
+        startsAt={startsAt}
+        onDateChange={(date) => setStartsAt(date)}
         onConfirm={handleConfirmRenew}
       />
 
@@ -73,6 +72,7 @@ export default function RenewSubscriptionPage() {
               featured={plan.code === "PROFESSIONAL"}
               isSelectedPlan={selectedPlanId === plan.planId}
               onSelectPlan={handleSelectPlan}
+              pharmacyId={parseInt(pharmacyId!)}
             />
           </Grid>
         ))}
