@@ -12,12 +12,12 @@ export interface FetchResponse<T> {
   statusCode: number;
   message: string;
   data: T;
+  meta?: Meta;
   error?: string;
   timestamp?: string;
   path?: string;
   meta:Meta;
 }
-
 
 export type QueryParamValue = string | number | boolean | null | undefined;
 

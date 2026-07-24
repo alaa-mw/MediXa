@@ -9,6 +9,9 @@ interface InvoiceHeaderProps {
   paymentStatus: string;
   saleType: string;
   totalAmount: string;
+  subTotal: string;
+  discount: string;
+  isFive: boolean;
 }
 
 const InvoiceHeader: React.FC<InvoiceHeaderProps> = ({
@@ -17,6 +20,9 @@ const InvoiceHeader: React.FC<InvoiceHeaderProps> = ({
   paymentStatus,
   saleType,
   totalAmount,
+  subTotal,
+  discount,
+  isFive,
 }) => {
   const formattedDate = format(new Date(createdAt), "dd MMM yyyy, hh:mm a");
 
@@ -61,6 +67,9 @@ const InvoiceHeader: React.FC<InvoiceHeaderProps> = ({
           paymentStatus={paymentStatus}
           saleType={saleType}
           totalAmount={totalAmount}
+          subTotal={subTotal}
+          discount={discount}
+          isFive={isFive}
         />
       </Stack>
     </Stack>

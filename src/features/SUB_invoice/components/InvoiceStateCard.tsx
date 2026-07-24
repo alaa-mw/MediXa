@@ -13,6 +13,9 @@ interface StatsProps {
   paymentStatus: string;
   saleType: string;
   totalAmount: string;
+  subTotal: string;
+  discount: string;
+  isFive: boolean;
 }
 
 const InvoiceStatsCards: React.FC<StatsProps> = ({
@@ -20,6 +23,9 @@ const InvoiceStatsCards: React.FC<StatsProps> = ({
   paymentStatus,
   saleType,
   totalAmount,
+  subTotal,
+  discount,
+  isFive,
 }) => {
   const cardStyles = {
     pl: 3,
@@ -47,7 +53,7 @@ const InvoiceStatsCards: React.FC<StatsProps> = ({
   });
 
   return (
-    <Grid container spacing={3} sx={{ mb: 4 }} direction="row-reverse">
+    <Grid container spacing={2} sx={{ mb: 4 }} direction="row-reverse">
       {/* Total Amount Card */}
       <Grid
         sx={{
@@ -83,7 +89,6 @@ const InvoiceStatsCards: React.FC<StatsProps> = ({
           </Box>
         </Card>
       </Grid>
-
       {/* Sale Type Card */}
       <Grid sx={{ xs: 12, sm: 6, md: 3 }}>
         <Card sx={cardStyles}>
@@ -105,9 +110,7 @@ const InvoiceStatsCards: React.FC<StatsProps> = ({
           </Box>
         </Card>
       </Grid>
-
       {/* Payment Status Card */}
-
       <Grid sx={{ xs: 12, sm: 6, md: 3 }}>
         <Card sx={cardStyles}>
           <Box sx={iconBoxStyles("#EFF6FF")}>
@@ -142,8 +145,33 @@ const InvoiceStatsCards: React.FC<StatsProps> = ({
           </Box>
         </Card>
       </Grid>
-
       {/* Invoice ID Card */}
+      {isFive && (
+        <Grid sx={{ xs: 12, sm: 6, md: 3 }}>
+          <Card sx={cardStyles}>
+            <Box sx={iconBoxStyles("#EEF2F6")}>
+              <DescriptionOutlined sx={{ color: "#78bfc1" }} />
+            </Box>
+            <Box>
+              <Typography
+                variant="caption"
+                sx={{ color: "text.secondary", fontWeight: 500 }}
+              >
+                Partial paid
+              </Typography>
+              <Typography
+                sx={{
+                  fontSize: "18px",
+                  fontWeight: 700,
+                  color: "tertiary.main",
+                }}
+              >
+                {subTotal}
+              </Typography>
+            </Box>
+          </Card>
+        </Grid>
+      )}
       <Grid sx={{ xs: 12, sm: 6, md: 3 }}>
         <Card sx={cardStyles}>
           <Box sx={iconBoxStyles("#EEF2F6")}>
@@ -154,12 +182,12 @@ const InvoiceStatsCards: React.FC<StatsProps> = ({
               variant="caption"
               sx={{ color: "text.secondary", fontWeight: 500 }}
             >
-              Invoice ID
+              Discount
             </Typography>
             <Typography
               sx={{ fontSize: "18px", fontWeight: 700, color: "tertiary.main" }}
             >
-              {invoiceId}
+              {discount}
             </Typography>
           </Box>
         </Card>

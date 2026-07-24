@@ -76,20 +76,20 @@ const InvoiceTableRow: React.FC<ItemProps> = ({ item, itemIndex }) => {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          gap: 0.5,
+          gap: 0.8,
           fontWeight: 700,
           color: "#0F172A",
         }}
       >
         <Typography
           variant="body2"
-          sx={{ fontWeight: "700", color: "text.primary" }}
+          sx={{ fontSize: 15, fontWeight: "500", color: "text.primary" }}
         >
           {item.finalUnitPrice}
         </Typography>
         <Typography
           variant="body2"
-          sx={{ fontWeight: "400", color: "text.secondary" }}
+          sx={{ fontSize: 12, fontWeight: "400", color: "text.secondary" }}
         >
           ل.س
         </Typography>
@@ -112,13 +112,13 @@ const InvoiceTableRow: React.FC<ItemProps> = ({ item, itemIndex }) => {
       >
         <Typography
           variant="body2"
-          sx={{ fontWeight: "700", color: "text.primary" }}
+          sx={{ fontSize: 15, fontWeight: "500", color: "text.primary" }}
         >
           {item.totalPrice}
         </Typography>
         <Typography
           variant="body2"
-          sx={{ fontWeight: "400", color: "text.secondary" }}
+          sx={{ fontSize: 12, fontWeight: "400", color: "text.secondary" }}
         >
           ل.س
         </Typography>

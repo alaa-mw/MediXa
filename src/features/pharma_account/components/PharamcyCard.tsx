@@ -1,6 +1,6 @@
 import { Card, CardContent, Grid, Typography, Box, alpha } from "@mui/material";
 import CustomTextField from "./CustomTextField";
-import type { PharmacyForm } from "../pages/CreatePharmacyAccount";
+import type { PharmacyForm } from "../types/createPharamacyFormTypes";
 
 interface PharmacyCardProps {
   pharmacyData: PharmacyForm;

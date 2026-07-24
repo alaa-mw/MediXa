@@ -45,11 +45,11 @@ export interface SaleInvoiceItem {
   finalUnitPrice: string;
   totalPrice: string;
   extraPercentage: string;
-  displayQuantity: number;
+  displayQuantity?: number;
 
-  pharmacyDrug: PharmacyDrug;
+  pharmacyDrug?: PharmacyDrug;
 
-  batchAllocations: BatchAllocation[];
+  batchAllocations?: BatchAllocation[];
 }
 
 export interface PharmacyDrug {
@@ -82,6 +82,13 @@ export interface BatchAllocation {
   displayQuantityFromThisBatch: number;
 
   batch: Batch;
+  saleInvoiceItem?: SaleInvoiceItem;
+}
+export interface SaleInvoiceItemBatch {
+  saleInvoiceItemBatchId: number;
+  saleInvoiceItemId: number;
+  batch: Batch;
+  saleInvoiceItem: SaleInvoiceItem;
 }
 
 export interface Batch {
@@ -103,12 +110,20 @@ export interface ReturnInvoice {
   subtotalRefund: string;
 
   createdAt: string;
+  //PHARAMCY INVOICE غير مستخدم هنا
+  pharmacyInvoice: PharmacyInvoice;
 
   items: ReturnInvoiceItem[];
 }
 
 export interface ReturnInvoiceItem {
   returnInvoiceItemId: number;
+
+  unitFactorToBase: number;
+
+  baseQuantity: number;
+
+  unitType: string;
 
   unitPrice: string;
 
@@ -117,4 +132,7 @@ export interface ReturnInvoiceItem {
   returnReason: string;
 
   restockToInventory: boolean;
+
+  //  pharmacyDrug : PharmacyDrug; بدي DRUG
+  saleInvoiceItemBatch: SaleInvoiceItemBatch;
 }
