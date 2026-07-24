@@ -1,7 +1,7 @@
 import { Box, Typography, Paper, Grid } from "@mui/material";
 import { CustomTextField } from "../../../../shared/layout/CustomTextField";
 import useGetWithParams from "../../../../shared/hooks/useGetWithParams";
-import type { Supplier } from "../../types/purchaseInvoiceDetails";
+import type { Supplier } from "../../types/purchaseInvoice";
 import { CustomAutocomplete } from "../../../../shared/layout/CustomAutocomplete";
 import { useEffect } from "react";
 import { RTLDatePicker } from "../../../../shared/layout/RTLDatePicker";
@@ -85,7 +85,7 @@ export default function InvoiceDetailsForm() {
               onChange={(newValue) => {
                 handleFieldChange(
                   "supplierId",
-                 parseInt(newValue.trim().split("-").pop() || "-1", 10),
+                  parseInt(newValue.trim().split("-").pop() || "-1", 10),
                 ); // take just supplierId
                 handleSupplierChange(
                   parseInt(newValue.trim().split("-").pop() || "-1", 10),

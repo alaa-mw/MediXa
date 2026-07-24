@@ -1,12 +1,10 @@
 import { Button, Popover, Box, Typography, IconButton } from "@mui/material";
-import type { PaymentStatus, SupplierInvoiceStatus } from "../types/enums";
+import type { PharmacyInvoiceStatus } from "../types/enums";
 import CloseIcon from "@mui/icons-material/Close";
 import { CustomDatePickerField } from "../../sales-and-return/components/CustomDatePickerField";
 
 interface FilterValues {
-  status: SupplierInvoiceStatus;
-  supplierId: string;
-  paymentStatus: PaymentStatus | "";
+  status: PharmacyInvoiceStatus;
   fromDate: string;
   toDate: string;
 }
@@ -19,31 +17,22 @@ interface FilterDialogProps {
   onClose?: () => void;
   anchorEl?: HTMLButtonElement | null;
 }
-
-const InvoiceStatuses: { value: SupplierInvoiceStatus | ""; label: string }[] =
-  [
-    { value: "PENDING", label: "قيد الانتظار" },
-    { value: "PARTIALLY_STOCKED", label: "مخزون جزئي" },
-    { value: "STOCKED", label: "مخزون كامل" },
+const InvoiceStatuses: { value: PharmacyInvoiceStatus  | ""; label: string }[] =
+  [ 
+    { value: "DRAFT", label: "مسودة" },
+    { value: "POSTED", label: "مكتملة" },
     { value: "CANCELLED", label: "ملغاة" },
     { value: "", label: "❌" }, // "جميع حالات الفواتير"
   ];
 
-const paymentStatuses: { value: PaymentStatus | ""; label: string }[] = [
-  { value: "PAID", label: "مدفوع" },
-  { value: "PARTIAL", label:  "جزئي" },
-  { value: "PENDING", label: "غير مدفوع" },
-  { value: "", label: "❌" },
-];
-
-export default function FilterDialog({
+const FilterDropDown = ({
   // open,
   filters,
   onChange,
   onApply,
   onClose,
   anchorEl,
-}: FilterDialogProps) {
+}: FilterDialogProps) => {
   const open = Boolean(anchorEl);
   const id = open ? "filter-popover" : undefined;
 
@@ -109,54 +98,6 @@ export default function FilterDialog({
           </IconButton>
         )}
       </Box>
-
-      {/* حالة الدفع */}
-      <Box sx={{ mb: 3 }}>
-        <Typography
-          variant="caption"
-          sx={{
-            display: "block",
-            color: "#64748b",
-            fontWeight: "600",
-            mb: 1.5,
-            fontSize: "12px",
-          }}
-        >
-          حالة دفع الفاتورة
-        </Typography>
-        <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
-          {paymentStatuses.map((item) => {
-            const isSelected = filters.paymentStatus === item.value;
-            return (
-              <Button
-                key={item.label}
-                variant="outlined"
-                onClick={() =>
-                  handleChange("paymentStatus", isSelected ? "" : item.value)
-                }
-                sx={{
-                  borderRadius: "20px",
-                  px: 1.7,
-                  py: 0.5,
-                  fontSize: "13px",
-                  fontWeight: "500",
-                  textTransform: "none",
-                  borderColor: isSelected ? "primary.main" : "#e2e8f0",
-                  backgroundColor: isSelected ? "primary.lighter" : "#ffffff",
-                  color: isSelected ? "primary.main" : "#475569",
-                  "&:hover": {
-                    borderColor: "primary.main",
-                    backgroundColor: isSelected ? "primary.lighter" : "#f8fafc",
-                  },
-                }}
-              >
-                {item.label}
-              </Button>
-            );
-          })}
-        </Box>
-      </Box>
-
       {/* حالة الفاتورة */}
       <Box sx={{ mb: 3 }}>
         <Typography
@@ -297,4 +238,6 @@ export default function FilterDialog({
       </Box>
     </Popover>
   );
-}
+};
+
+export default FilterDropDown;

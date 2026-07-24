@@ -13,6 +13,7 @@ interface SearchBarProps<T> {
   selected?: T | null;
 
   getOptionLabel?: (item: T) => string;
+  startAdornment?: React.ReactNode;
 }
 
 export default function SearchBarDynamic<T>({
@@ -21,6 +22,7 @@ export default function SearchBarDynamic<T>({
   results = [],
   onSelect,
   getOptionLabel,
+  startAdornment,
 }: SearchBarProps<T>) {
   const [open, setOpen] = React.useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -86,6 +88,8 @@ export default function SearchBarDynamic<T>({
             textAlign: "right",
           }}
         />
+        
+        {startAdornment && <Box >{startAdornment}</Box>}
       </Box>
 
       {open && results.length > 0 && (
@@ -112,7 +116,10 @@ export default function SearchBarDynamic<T>({
                   setOpen(false);
                 }}
               >
-                <ListItemText primary={getOptionLabel ? getOptionLabel(item) : ""} />
+                <ListItemText
+                  sx={{ my: 0 }}
+                  primary={getOptionLabel ? getOptionLabel(item) : ""}
+                />
               </ListItemButton>
             ))}
           </List>

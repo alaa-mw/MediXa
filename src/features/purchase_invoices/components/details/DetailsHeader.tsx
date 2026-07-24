@@ -1,5 +1,5 @@
 import { Box, Chip, Container, Typography } from "@mui/material";
-import type { PurchaseInvoiceDetails } from "../../types/purchaseInvoiceDetails";
+import type { PurchaseInvoiceDetails } from "../../types/purchaseInvoice";
 
 const DetailsHeader = ({
   detailData,

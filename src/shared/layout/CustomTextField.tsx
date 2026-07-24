@@ -11,6 +11,7 @@ interface CustomTextFieldProps {
   type?: "text" | "number";
   fullWidth?: boolean;
   padding?: string;
+  disabled?: boolean;
 }
 
 export const CustomTextField: React.FC<CustomTextFieldProps> = ({
@@ -21,11 +22,13 @@ export const CustomTextField: React.FC<CustomTextFieldProps> = ({
   type = "text",
   fullWidth = true,
   padding = "16px",
+  disabled = false,
 }) => {
   return (
     <TextField
       fullWidth={fullWidth}
       type={type}
+      disabled={disabled}
       label={label}
       placeholder={placeholder}
       value={value}

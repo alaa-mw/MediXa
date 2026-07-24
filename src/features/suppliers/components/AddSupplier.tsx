@@ -49,7 +49,10 @@ const AddSupplier: React.FC = () => {
     }
 
     mutate(formData, {
-      onSuccess: () => showSnackbar("تم إضافة المورد بنجاح", "success"),
+      onSuccess: () => {
+        showSnackbar("تم إضافة المورد بنجاح", "success");
+        handleReset();
+      },
       onError: () => showSnackbar("حدث خطأ أثناء إضافة المورد", "error"),
     });
   };
