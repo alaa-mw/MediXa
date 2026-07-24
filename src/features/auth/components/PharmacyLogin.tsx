@@ -17,10 +17,12 @@ import logonobg from "../../../assets/logonobg.png";
 import type { LoginResponse } from "../types/LoginResponse";
 import TokenService from "../../../shared/services/tokenService";
 import { useNavigate } from "react-router-dom";
+import { useSnackbar } from "../../../shared/providers/useSnackbar";
 
 const PharmacyLogin = () => {
   const [showPassword, setShowPassword] = useState(false);
- const navigate = useNavigate();
+  const navigate = useNavigate();
+  const { showSnackbar } = useSnackbar();
 
   const { mutate: loginPharmacy, isPending } =
     usePostDataNoToken<LoginResponse>("/authentication/pharmacies/sign-in");
@@ -46,7 +48,7 @@ const PharmacyLogin = () => {
       onSuccess: (response) => {
         console.log("response", response);
 
-        TokenService.setUserRole(response?.data?.accountType); 
+        TokenService.setUserRole(response?.data?.accountType);
         TokenService.setTokens(response?.data?.tokens);
 
         navigate(`/${TokenService.getUserRole()?.toLocaleLowerCase()}`); // change later
@@ -54,10 +56,15 @@ const PharmacyLogin = () => {
 
       onError: (error) => {
         console.log("error:", error);
+        const errorDetails = (error as Error & { details?: string }).details;
+        if(errorDetails )
+          showSnackbar(error.message+": " + errorDetails, "error");
+        else
+          showSnackbar(error.message , "error");
+
       },
     });
   };
-  
 
   return (
     <Paper

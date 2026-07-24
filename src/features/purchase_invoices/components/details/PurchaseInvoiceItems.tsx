@@ -1,7 +1,6 @@
 import { Box, Typography, Chip } from "@mui/material";
 import LocalPharmacyIcon from "@mui/icons-material/LocalPharmacy";
-import type { SupplierInvoiceItem } from "../../types/purchaseInvoiceDetails";
-import { formatArabicDateTime } from "../../utils/formatArabicDateTime";
+import type { SupplierInvoiceItem } from "../../types/purchaseInvoice";
 import { alpha } from "@mui/material/styles";
 import theme from "../../../../shared/styles/mainTheme";
 
@@ -11,14 +10,6 @@ const PurchaseInvoiceItems = ({ items }: { items: SupplierInvoiceItem[] }) => {
       sx={{ width: "100%", display: "flex", flexDirection: "column", gap: 1 }}
     >
       {items.map((item) => {
-        // Calculate the total item quantity across all its batches
-        const totalQuantity = item.batches
-          ? item.batches.reduce(
-              (acc, batch) => acc + (batch.initialQuantity || 0),
-              0,
-            )
-          : 0;
-
         return (
           <Box
             key={item.supplierInvoiceItemId}
@@ -65,7 +56,7 @@ const PurchaseInvoiceItems = ({ items }: { items: SupplierInvoiceItem[] }) => {
                       mb: 0.5,
                     }}
                   >
-                    {"drug name needed"}
+                    {item.tradeName}
                   </Typography>
                 </Box>
               </Box>
@@ -119,7 +110,7 @@ const PurchaseInvoiceItems = ({ items }: { items: SupplierInvoiceItem[] }) => {
                             color: "#4A5568",
                           }}
                         >
-                          {batch.pharmacyDrugId}
+                          {batch.batchId}
                           {/* Fallback to look like image */}
                         </Box>
                       </Box>
@@ -163,7 +154,7 @@ const PurchaseInvoiceItems = ({ items }: { items: SupplierInvoiceItem[] }) => {
                             fontWeight: 600,
                           }}
                         >
-                            {batch.receivedDate.split("T")[0]}
+                          {batch.receivedDate.split("T")[0]}
                         </Box>
                       </Box>
                       <Box sx={{ px: 1 }}>
@@ -188,13 +179,34 @@ const PurchaseInvoiceItems = ({ items }: { items: SupplierInvoiceItem[] }) => {
                 gap: 2,
               }}
             >
+              <Typography
+                sx={{ color: "#2E6A6A", fontWeight: 800, fontSize: "16px" }}
+              >
+                {item.netUnitPrice}
+              </Typography>
+
               <Typography sx={{ color: "#718096", fontSize: "13px" }}>
-                إجمالي الكمية للصنف:
+                سعر الوحدة
+              </Typography>
+
+              <Typography sx={{ color: "#718096", fontSize: "13px" }}>
+                x
               </Typography>
               <Typography
                 sx={{ color: "#2E6A6A", fontWeight: 800, fontSize: "16px" }}
               >
-                {totalQuantity}
+                {item.quantity}
+              </Typography>
+              <Typography sx={{ color: "#718096", fontSize: "13px" }}>
+                =
+              </Typography>
+              <Typography
+                sx={{ color: "#2E6A6A", fontWeight: 800, fontSize: "16px" }}
+              >
+                {item.quantity * parseFloat(item.netUnitPrice)}
+              </Typography>
+              <Typography sx={{ color: "#718096", fontSize: "13px" }}>
+                ل.س
               </Typography>
             </Box>
           </Box>

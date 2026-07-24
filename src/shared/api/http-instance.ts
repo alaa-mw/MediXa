@@ -11,6 +11,6 @@ const http = axios.create({
   },
 });
 
-  setupAuthInterceptors(http);
+setupAuthInterceptors(http);
 
 export default http;
