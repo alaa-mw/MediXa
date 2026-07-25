@@ -28,7 +28,7 @@ import AddGeneralDrug from "./features/medteam_cdb/pages/AddGeneralDrug";
 import AllGeneralDrug from "./features/medteam_cdb/pages/AllGeneralDrug";
 import SaleInvoiceDetails from "./features/SUB_invoice/SalesInvoiceDetailsPage";
 import PharmacyManagement from "./features/pharma_account/pages/PharamcyAccountManagement";
-import PurchaseInvoiceDetails from "./features/purchase_invoices/components/PurchaseInvoiceDetails";
+import { PurchaseInvoiceDetails } from "./features/purchase_invoices/components/PurchaseInvoiceDetails";
 import CompleteBatches from "./features/purchase_invoices/components/complete_purchase_invoice/CompleteBatches";
 import DamageInvoicesGrid from "./features/damage_invoices/components/DamageInvoicesGrid";
 import AddDamageInvoiceDialog from "./features/damage_invoices/components/AddDamageInvoice";
@@ -38,7 +38,8 @@ import PricingPage from "./features/subscription/pages/PricingPage";
 import CreatePrivateOfferPage from "./features/finance/pages/CreatePharmaOffer";
 import PharmacySubscriptionSchedule from "./features/finance/pages/PharmacySubscriptionSchedule";
 import RenewSubscriptionPage from "./features/finance/pages/RenewSubscriptionPage";
-
+import OrderLayout from "./features/orders/OrderLayout";
+import CustomerOrderGrid from "./features/customer_order/components/CustomerOrderGrid";
 
 function App() {
   const pharmacyPaths = ["/pharmacy", "/pharmacy_owner"];
@@ -140,7 +141,6 @@ function App() {
                   <Route path="purchase" element={<PurchaseInvoiceGrid />} />
                   {/* damage */}
                   <Route path="damage" element={<DamageInvoicesGrid />} />
-                 
                 </Route>
 
                 <Route
@@ -160,10 +160,10 @@ function App() {
                   path="invoices/damage/add"
                   element={<AddDamageInvoiceDialog />}
                 />
-                 <Route
-                    path="invoices/damage/details/:invoiceId"
-                    element={<DamageInvoiceDetails />}
-                  />
+                <Route
+                  path="invoices/damage/details/:invoiceId"
+                  element={<DamageInvoiceDetails />}
+                />
 
                 {/* inventory */}
                 <Route path="inventory" element={<InventoryPage />} />
@@ -173,7 +173,11 @@ function App() {
                   element={<DrugBatchesPage />}
                 />
 
-                <Route path="orders" element={<div>orders</div>} />
+                <Route path="orders" element={<OrderLayout />}>
+                  <Route index element={<Navigate to="purchase" replace />} />
+                  <Route path="purchase" element={<div>purchase orders</div>} />
+                  <Route path="customer" element={<CustomerOrderGrid/>} />
+                </Route>
 
                 <Route path="suppliers" element={<SuppliersList />} />
                 <Route path="suppliers/add" element={<AddSupplier />} />
