@@ -1,22 +1,11 @@
-import { DeleteOutlined, ErrorOutlined } from "@mui/icons-material";
-import AddIcon from "@mui/icons-material/Add";
+import { ErrorOutlined } from "@mui/icons-material";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import LocalPharmacyIcon from "@mui/icons-material/LocalPharmacy";
 import {
   Box,
-  Button,
-  IconButton,
-  Paper,
   Typography,
-  alpha,
 } from "@mui/material";
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import useGetData from "../../../../shared/hooks/useGetData";
-import { CustomCounterField } from "../../../../shared/layout/CustomCounterField";
-import { CustomTextField } from "../../../../shared/layout/CustomTextField";
-import { RTLDatePicker } from "../../../../shared/layout/RTLDatePicker";
-import theme from "../../../../shared/styles/mainTheme";
 import {
   addBatch,
   addItem,
@@ -31,6 +20,7 @@ import {
 import type { RootState } from "../../store";
 import type { PurchaseInvoiceItemRequest } from "../../types/purchaseInvoiceStore";
 import DrugSearch from "./DrugSearch";
+import BatchItemCard from "./BatchItemCard";
 import type { PharmacyDrug } from "../../types/searchDrug";
 
 export default function BatchManagementForm() {
@@ -164,145 +154,43 @@ export default function BatchManagementForm() {
     dispatch(printState());
   }, [items]);
 
+  const ref = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState(0);
+
+  useLayoutEffect(() => {
+    if (!ref.current) return;
+
+    const observer = new ResizeObserver(([entry]) => {
+      setWidth(entry.contentRect.width);
+    });
+
+    observer.observe(ref.current);
+
+    return () => observer.disconnect();
+  }, []);
+  console.log("Width of the BatchManagementForm:", width);
+
   return (
-    <Box sx={{ maxWidth: 1000, mx: "auto" }}>
-      <DrugSearch onSelect={handleAddDrug}/> 
-      
+    <Box sx={{ maxWidth: 1000, mx: "auto" }} ref={ref}>
+      <DrugSearch onSelect={handleAddDrug} width={width} />
+      <Box sx={{ width: "inherit", mt: 6 }} />
       {/* Active Filled Card Block */}
-      {items.length > 0 ? items.map((item, index) => (
-        <Paper
-          key={index}
-          sx={{
-            p: 3,
-            borderRadius: 4,
-            my: 1,
-            borderRight: `6px solid ${theme.palette.primary.main}`,
-          }}
-        >
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "flex-end",
-              mb: 1,
-            }}
-          >
-            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-              <Box sx={{ bgcolor: "#F0F4F8", p: 1, borderRadius: 2 }}>
-                <LocalPharmacyIcon sx={{ color: "#316A75" }} />
-              </Box>
-              <Typography
-                sx={{ fontWeight: 700, color: "#2D3A4D", fontSize: 16 }}
-              >
-                {`${item.drugName}`}
-              </Typography>
-            </Box>
-
-            <Box sx={{ display: "flex", width: "50%", gap: 1 }}>
-              <CustomTextField
-                label="الكمية الاجمالية"
-                value={item.quantity}
-                onChange={(value) =>
-                  handleQuantityChange(index, parseInt(value))
-                }
-                padding="8px"
-              />
-              <CustomTextField
-                label="سعر الوحدة"
-                value={item.netUnitPrice}
-                onChange={(value) =>
-                  handleNetUnitPriceChange(index, parseFloat(value))
-                }
-                padding="8px"
-              />
-
-              <IconButton color="error" onClick={() => handleRemoveItem(index)}>
-                <DeleteOutlined />
-              </IconButton>
-            </Box>
-          </Box>
-
-          <Box
-            sx={{
-              display: "grid",
-              alignItems: "center",
-              gridTemplateColumns: "2.5fr 2.5fr  1fr ",
-              bgcolor: alpha(theme.palette.primary.main, 0.2),
-              p: 1.5,
-              borderRadius: 2,
-              textAlign: "center",
-              fontWeight: 700,
-              fontSize: 13,
-              mb: 1,
-            }}
-          >
-            <Box>الكمية (علبة)</Box>
-            <Box>تاريخ الانتهاء</Box>
-            <Box>
-              <Button
-                variant="contained"
-                startIcon={<AddIcon sx={{ ml: 1, mr: 0 }} />}
-                onClick={() => handleAddBatch(index)}
-                sx={{
-                  borderRadius: 5,
-                  fontSize: "0.7rem",
-                }}
-              >
-                إضافة دفعة
-              </Button>
-            </Box>
-          </Box>
-
-          {item.batches.map((row, idx) => (
-            <Box
-              key={idx}
-              sx={{
-                display: "grid",
-                gridTemplateColumns: "2.5fr 2.5fr  1fr",
-                alignItems: "center",
-                mb: 1,
-                textAlign: "center",
-              }}
-            >
-              <Box sx={{ px: 1 }}>
-                <Box sx={{ bgcolor: "#F1F5F9", py: 1, borderRadius: 2 }}>
-                  <CustomCounterField
-                    value={row.initialQuantity}
-                    onChange={(value) =>
-                      handleBatchQuantityChange(index, idx, value)
-                    }
-                    height="32px"
-                  />
-                </Box>
-              </Box>
-              <Box sx={{ px: 1 }}>
-                <Box
-                  sx={{
-                    bgcolor: "#F1F5F9",
-                    py: 1,
-                    borderRadius: 2,
-                    fontWeight: 700,
-                  }}
-                >
-                  <RTLDatePicker
-                    value={row.expiryDate}
-                    onChange={(date) =>
-                      handleBatchExpiryChange(index, idx, date)
-                    }
-                    padding="0px 8px"
-                  />
-                </Box>
-              </Box>
-              <IconButton
-                color="error"
-                onClick={() => handleRemoveBatch(index, idx)}
-              >
-                <DeleteOutlined />
-              </IconButton>
-            </Box>
-          ))}
-        </Paper>
-      )):(
+      {items.length > 0 ? (
+        items.map((item, index) => (
+          <BatchItemCard
+            key={index}
+            item={item}
+            index={index}
+            onQuantityChange={handleQuantityChange}
+            onNetUnitPriceChange={handleNetUnitPriceChange}
+            onRemoveItem={handleRemoveItem}
+            onAddBatch={handleAddBatch}
+            onBatchQuantityChange={handleBatchQuantityChange}
+            onBatchExpiryChange={handleBatchExpiryChange}
+            onRemoveBatch={handleRemoveBatch}
+          />
+        ))
+      ) : (
         <Box
           sx={{
             display: "flex",

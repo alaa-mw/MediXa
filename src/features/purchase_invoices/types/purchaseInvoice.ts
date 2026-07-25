@@ -44,6 +44,7 @@ export interface SupplierInvoiceItem {
 
   pharmacyDrug: PharmacyDrug;
   batches?: Batch[];
+  tradeName: string;
 }
 
 export interface PharmacyDrug {

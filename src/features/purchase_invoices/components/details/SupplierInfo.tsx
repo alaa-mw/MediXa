@@ -1,6 +1,6 @@
 import React from "react";
 import { alpha, Box, Container, Typography } from "@mui/material";
-import type { Supplier } from "../../types/purchaseInvoiceDetails";
+import type { Supplier } from "../../types/purchaseInvoice";
 import theme from "../../../../shared/styles/mainTheme";
 
 const SupplierInfo = ({ supplier }: { supplier: Supplier }) => {

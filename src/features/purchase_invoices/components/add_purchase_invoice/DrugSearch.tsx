@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import {
   Box,
   Typography,
@@ -8,40 +8,60 @@ import {
   Tooltip,
   Chip,
 } from "@mui/material";
+import { useQueryClient } from "@tanstack/react-query";
 import { BarcodeReader, PlusOne, Search } from "@mui/icons-material";
 import useGetWithParams from "../../../../shared/hooks/useGetWithParams";
 import type { PharmacyDrug, SearchDrugResponse } from "../../types/searchDrug";
+import type { FetchResponse } from "../../../../shared/api/api-types";
 
 const DrugSearch = ({
   onSelect,
+  width,
 }: {
   onSelect: (pharmacyDrug: PharmacyDrug) => void;
+  width: number | undefined;
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isManualModalOpen, setIsManualModalOpen] = useState(false);
+  const [, setIsManualModalOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const localScrollRootRef = useRef<HTMLDivElement | null>(null);
+  const generalScrollRootRef = useRef<HTMLDivElement | null>(null);
+  const localSentinelRef = useRef<HTMLDivElement | null>(null);
+  const generalSentinelRef = useRef<HTMLDivElement | null>(null);
+  const localRequestingRef = useRef(false);
+  const generalRequestingRef = useRef(false);
+  const queryClient = useQueryClient();
 
-  // Manual drug form state
-  const [manualDrugName, setManualDrugName] = useState("");
-
-  const { data, queryParams, setQueryParams } =
+  const { data, queryParams, setQueryParams, isFetching } =
     useGetWithParams<SearchDrugResponse>(
       "/pharmacy-drugs/search-in-stock-and-cdb/by-name",
       {
         name: "",
         page: 1,
         limit: 10,
+        generalPage: 1,
+        generalLimit: 4,
       },
       {
         shouldFetch: (params) => String(params.name ?? "").trim().length >= 3,
       },
     );
 
+  type GeneralDrugItem = SearchDrugResponse["generalDrugs"]["items"][number];
+
+  const searchName = String(queryParams.name ?? "").trim();
+  const canSearch = searchName.length >= 3;
+
   // const searchName = String(queryParams.name ?? "");
   // const hasMinSearchLength = searchName.trim().length >= 3;
 
   const resetSearch = () => {
-    setQueryParams((prev) => ({ ...prev, name: "", page: 1 }));
+    setQueryParams((prev) => ({
+      ...prev,
+      name: "",
+      page: 1,
+      generalPage: 1,
+    }));
   };
 
   // Close dropdown when clicking outside
@@ -73,20 +93,187 @@ const DrugSearch = ({
     resetSearch();
   };
 
-  // 3. Add Custom Manual Drug
-  const handleAddManualSubmit = () => {
-    if (!manualDrugName.trim()) return;
-
-    console.log("handleAddManualSubmit");
-
-    setIsManualModalOpen(false);
-    setIsDropdownOpen(false);
-    resetSearch();
-    // Reset form
-    setManualDrugName("");
+  const readParamsFromQueryKey = (
+    queryKey: unknown,
+  ): Record<string, unknown> => {
+    if (!Array.isArray(queryKey) || queryKey.length < 2) return {};
+    const params = queryKey[1];
+    if (!params || typeof params !== "object") return {};
+    return params as Record<string, unknown>;
   };
+
+  const localResults = useMemo(() => {
+    if (!canSearch) return [] as PharmacyDrug[];
+
+    const cached = queryClient.getQueriesData<
+      FetchResponse<SearchDrugResponse>
+    >({
+      queryKey: ["/pharmacy-drugs/search-in-stock-and-cdb/by-name"],
+    });
+
+    const pages = cached
+      .map(([queryKey, value]) => {
+        const params = readParamsFromQueryKey(queryKey);
+        const name = String(params.name ?? "").trim();
+        const page = Number(params.page ?? 1);
+        const items = value?.data?.pharmacyDrugs?.items ?? [];
+        return { name, page, items };
+      })
+      .filter((p) => p.name === searchName)
+      .sort((a, b) => a.page - b.page);
+
+    const seen = new Set<string>();
+    const merged: PharmacyDrug[] = [];
+    pages.forEach((p) => {
+      p.items.forEach((item) => {
+        if (seen.has(item.pharmacyDrugId)) return;
+        seen.add(item.pharmacyDrugId);
+        merged.push(item);
+      });
+    });
+
+    return merged;
+  }, [canSearch, queryClient, searchName]);
+
+  const generalResults
+   = useMemo(() => {
+    if (!canSearch) return [] as GeneralDrugItem[];
+
+    const cached = queryClient.getQueriesData<
+      FetchResponse<SearchDrugResponse>
+    >({
+      queryKey: ["/pharmacy-drugs/search-in-stock-and-cdb/by-name"],
+    });
+
+    const pages = cached
+      .map(([queryKey, value]) => {
+        const params = readParamsFromQueryKey(queryKey);
+        const name = String(params.name ?? "").trim();
+        const page = Number(params.generalPage ?? 1);
+        const items = value?.data?.generalDrugs?.items ?? [];
+        return { name, page, items };
+      })
+      .filter((p) => p.name === searchName)
+      .sort((a, b) => a.page - b.page); 
+
+    const seen = new Set<string>();
+    const merged: GeneralDrugItem[] = [];
+    pages.forEach((p) => {
+      p.items.forEach((item) => {
+        if (seen.has(item.generalDrugId)) return; 
+        seen.add(item.generalDrugId);
+        merged.push(item);
+      });
+    });
+
+    return merged;
+  }, [canSearch, queryClient, searchName]);
+  // = data?.data?.generalDrugs?.items ?? [];
+
+  const hasMoreLocal =
+    (data?.data?.pharmacyDrugs?.items?.length ?? 0) >=
+    Number(queryParams.limit || 10);
+  const hasMoreGeneral =
+    (data?.data?.generalDrugs?.items?.length ?? 0) >=
+    Number(queryParams.generalLimit || 10);
+
+  useEffect(() => {
+    if (!isFetching) {
+      localRequestingRef.current = false;
+      generalRequestingRef.current = false;
+    }
+  }, [isFetching]);
+
+  useEffect(() => {
+    if (
+      !isDropdownOpen ||
+      !canSearch ||
+      !localScrollRootRef.current ||
+      !localSentinelRef.current ||
+      !hasMoreLocal
+    ) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        if (isFetching || localRequestingRef.current || !hasMoreLocal) return;
+
+        localRequestingRef.current = true;
+        setQueryParams((prev) => ({ ...prev, page: (prev.page || 1) + 1 }));
+      },
+      {
+        root: localScrollRootRef.current,
+        rootMargin: "0px 0px 100px 0px",
+        threshold: 0.1,
+      },
+    );
+
+    observer.observe(localSentinelRef.current);
+    return () => observer.disconnect();
+  }, [
+    canSearch,
+    hasMoreLocal,
+    isDropdownOpen,
+    isFetching,
+    localResults.length,
+    setQueryParams,
+  ]);
+
+  useEffect(() => {
+    if (
+      !isDropdownOpen ||
+      !canSearch ||
+      !generalScrollRootRef.current ||
+      !generalSentinelRef.current ||
+      !hasMoreGeneral
+    ) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        if (isFetching || generalRequestingRef.current || !hasMoreGeneral)
+          return;
+
+        generalRequestingRef.current = true;
+        console.log("Loading more general results...");
+        setQueryParams((prev) => ({
+          ...prev,
+          generalPage: (prev.generalPage || 1) + 1,
+        }));
+      },
+      {
+        root: generalScrollRootRef.current,
+        rootMargin: "0px 0px 100px 0px",
+        threshold: 0.1,
+      },
+    );
+
+    observer.observe(generalSentinelRef.current);
+    return () => observer.disconnect();
+  }, [
+    canSearch,
+    generalResults.length,
+    hasMoreGeneral,
+    isDropdownOpen,
+    isFetching,
+    setQueryParams,
+  ]);
+
   return (
-    <Box sx={{ position: "relative", mb: 2 }} ref={dropdownRef}>
+    <Box
+      sx={{
+        position: "fixed",
+        top: "22vh",
+        width,
+        zIndex: 100,
+        mb: 2,
+      }}
+      ref={dropdownRef}
+    >
       <Box
         sx={{
           display: "flex",
@@ -114,7 +301,12 @@ const DrugSearch = ({
           value={queryParams.name}
           onFocus={() => setIsDropdownOpen(true)}
           onChange={(e) => {
-            setQueryParams((prev) => ({ ...prev, name: e.target.value }));
+            setQueryParams((prev) => ({
+              ...prev,
+              name: e.target.value,
+              page: 1,
+              generalPage: 1,
+            }));
             setIsDropdownOpen(true);
           }}
           style={{
@@ -154,7 +346,7 @@ const DrugSearch = ({
             border: "1px solid #ECE8EF",
             boxShadow:
               "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-            p: 3,
+            p: 2,
             bgcolor: "#FFFFFF",
             animation: "fadeIn 0.2s ease-out",
           }}
@@ -183,17 +375,19 @@ const DrugSearch = ({
               </span>
             </Typography>
             <Box
+              ref={localScrollRootRef}
               sx={{
-                maxHeight: "120px",
+                height: "125px",
                 overflowY: "auto",
                 display: "flex",
                 flexDirection: "column",
                 gap: 1,
               }}
             >
-              {data?.data.pharmacyDrugs.items.length === 0 && (
+              {localResults.length === 0 && (
                 <Box
                   sx={{
+                    height: "inherit",
                     borderRadius: "20px",
                     p: 1,
                     bgcolor: "#FAF8FB",
@@ -215,7 +409,7 @@ const DrugSearch = ({
                   </Typography>
                 </Box>
               )}
-              {data?.data.pharmacyDrugs.items.map((drug) => (
+              {localResults.map((drug) => (
                 <Box
                   component="div"
                   key={drug.pharmacyDrugId}
@@ -307,6 +501,7 @@ const DrugSearch = ({
                   />
                 </Box>
               ))}
+              <Box ref={localSentinelRef} sx={{ height: 1 }} />
             </Box>
           </Box>
 
@@ -328,22 +523,48 @@ const DrugSearch = ({
               قاعدة البيانات المركزية
             </Typography>
             <Box
+              ref={generalScrollRootRef}
               sx={{
-                maxHeight: "120px",
+                height: "125px",
                 overflowY: "auto",
                 display: "flex",
                 flexDirection: "column",
                 gap: 1,
               }}
             >
-              {data?.data.generalDrugs.items.map((general) => (
+              {generalResults.length === 0 && (
+                <Box
+                  sx={{
+                    height: "inherit",
+                    borderRadius: "20px",
+                    p: 1,
+                    bgcolor: "#FAF8FB",
+                    display: "flex",
+                    justifyContent: "center",
+                    gap: 2,
+                    flexDirection: { xs: "column", md: "row" },
+                  }}
+                >
+                  <Typography
+                    sx={{
+                      alignSelf: "center",
+                      color: "gray",
+                      fontSize: "12px",
+                      fontWeight: 500,
+                    }}
+                  >
+                    لا توجد نتائج..
+                  </Typography>
+                </Box>
+              )}
+              {generalResults.map((general) => (
                 <Box
                   key={general.generalDrugId}
                   sx={{
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "space-between",
-                    bgcolor: "#F8F6F9",
+                    bgcolor: "#f3eaf8",
                     border: "1px solid #EFEAF2",
                     borderRadius: "16px",
                     px: 2,
@@ -365,7 +586,7 @@ const DrugSearch = ({
                         sx={{
                           fontWeight: 800,
                           fontSize: "15px",
-                          color: "#5E3A60",
+                          color: "primary.main",
                         }}
                       >
                         {general.tradeName}
@@ -405,6 +626,7 @@ const DrugSearch = ({
                   </Button>
                 </Box>
               ))}
+              <Box ref={generalSentinelRef} sx={{ height: 1 }} />
             </Box>
           </Box>
 
@@ -413,7 +635,7 @@ const DrugSearch = ({
             sx={{
               border: "2px dashed #D3CAD6",
               borderRadius: "20px",
-              p: 2,
+              p: 1,
               bgcolor: "#FAF8FB",
               display: "flex",
               alignItems: "center",
@@ -433,11 +655,11 @@ const DrugSearch = ({
               <PlusOne />
               <Box>
                 <Typography
-                  sx={{ fontWeight: 800, fontSize: "15px", color: "#2E1A30" }}
+                  sx={{ fontWeight: 800, fontSize: "14px", color: "#2E1A30" }}
                 >
                   لم تجد الدواء في قاعدة البيانات؟
                 </Typography>
-                <Typography
+                {/* <Typography
                   sx={{
                     fontSize: "12px",
                     color: "#8B7D8C",
@@ -446,12 +668,14 @@ const DrugSearch = ({
                   }}
                 >
                   يمكنك إضافة تعريف جديد كلياً لهذا الدواء وتثبيته في سجلاتك.
-                </Typography>
+                </Typography> */}
               </Box>
             </Box>
             <Button
               variant="contained"
-              onClick={() => setIsManualModalOpen(true)}
+              onClick={() => {
+                setIsManualModalOpen(true);
+              }}
               sx={{
                 bgcolor: "#5E3E63",
                 color: "#FFFFFF",
@@ -459,7 +683,7 @@ const DrugSearch = ({
                 px: 3,
                 py: 1.2,
                 fontWeight: 800,
-                fontSize: "13px",
+                fontSize: "12px",
                 boxShadow: "0 6px 16px rgba(94, 62, 99, 0.15)",
                 textTransform: "none",
                 whiteSpace: "nowrap",
@@ -472,22 +696,7 @@ const DrugSearch = ({
                 },
               }}
             >
-              <svg
-                width="15"
-                height="15"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                <polyline points="14 2 14 8 20 8"></polyline>
-                <line x1="12" y1="18" x2="12" y2="12"></line>
-                <line x1="9" y1="15" x2="15" y2="15"></line>
-              </svg>
-              <span>إضافة دواء جديد يدوياً</span>
+              إضافة دواء جديد يدوياً
             </Button>
           </Box>
         </Paper>

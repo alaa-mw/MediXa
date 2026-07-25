@@ -16,8 +16,10 @@ export interface FetchResponse<T> {
   error?: string;
   timestamp?: string;
   path?: string;
+  meta:Meta;
 }
 
 export type QueryParamValue = string | number | boolean | null | undefined;
 
 export type QueryParams = Record<string, QueryParamValue>;
+

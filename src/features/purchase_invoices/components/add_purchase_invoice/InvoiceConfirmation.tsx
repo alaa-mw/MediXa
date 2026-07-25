@@ -9,7 +9,7 @@ import {
   getTotalItemsPrice,
   updateField,
 } from "../../store/purchaseInvoiceSlice";
-import { getStatusMap } from "../../utils/getStatusMap";
+import { getPaymentStatusMap } from "../../utils/getStatusMap";
 import { CustomTextField } from "../../../../shared/layout/CustomTextField";
 
 export default function InvoiceConfirmation() {
@@ -22,7 +22,7 @@ export default function InvoiceConfirmation() {
   const totalItemsPrice = useSelector(getTotalItemsPrice);
   const netTotal = totalItemsPrice - purchaseInvoice.discount;
 
-  const statusMap = getStatusMap(purchaseInvoice.paymentStatus);
+  const statusMap = getPaymentStatusMap(purchaseInvoice.paymentStatus);
   return (
     <Box sx={{ maxWidth: 1100, mx: "auto" }}>
       <Grid container spacing={4}>
@@ -145,14 +145,14 @@ export default function InvoiceConfirmation() {
                   justifyContent: "space-between",
                   alignItems: "center",
                   mb: 3,
-                  gap:3
+                  gap: 3,
                 }}
               >
                 <Typography sx={{ color: "#CBD5E1", whiteSpace: "nowrap" }}>
                   خصم خاص
                 </Typography>
                 <CustomTextField
-                  label= ""
+                  label=""
                   value={purchaseInvoice.discount}
                   onChange={(value) =>
                     dispatch(

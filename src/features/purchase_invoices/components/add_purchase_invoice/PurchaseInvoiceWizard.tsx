@@ -6,7 +6,7 @@ import InvoiceConfirmation from "./InvoiceConfirmation";
 
 const PurchaseInvoiceWizard = () => {
   const [currentStep, setCurrentStep] = useState(0);
-
+ 
   return (
     <>
       <PurchaseInvoiceStepper
@@ -14,9 +14,9 @@ const PurchaseInvoiceWizard = () => {
         onNext={() => setCurrentStep((s) => Math.min(s + 1, 2))}
         onBack={() => setCurrentStep((s) => Math.max(s - 1, 0))}
       >
-        {currentStep === 0 && <InvoiceDetailsForm />}
-        {currentStep === 1 && <BatchManagementForm />}
-        {currentStep === 2 && <InvoiceConfirmation />}
+        {currentStep === 0 && <InvoiceDetailsForm/>}
+        {currentStep === 1 && <BatchManagementForm/>}
+        {currentStep === 2 && <InvoiceConfirmation/>}
       </PurchaseInvoiceStepper>
     </>
   );
