@@ -30,7 +30,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           ),
           endAdornment: (
             <InputAdornment position="end" sx={{ mr: 0.5 }}>
-              <QrCodeScannerIcon sx={{ color: "#1e2524", cursor: "pointer" }} />
+              <QrCodeScannerIcon sx={{ color: "#000202", cursor: "pointer" }} />
             </InputAdornment>
           ),
         },

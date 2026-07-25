@@ -9,6 +9,7 @@ import type {
   PurchaseInvoiceRequest,
   PurchaseInvoiceItemRequest,
 } from "../types/purchaseInvoiceStore";
+import type { PurchaseInvoiceDetails } from "../types/purchaseInvoice";
 import type { PaymentStatus, SupplierInvoiceStatus } from "../types/enums";
 
 const initialState: SliceState = {
@@ -92,6 +93,7 @@ const purchaseInvoiceSlice = createSlice({
       if (index >= 0 && index < state.items.length) {
         state.items[index].quantity = quantity;
       }
+      // ensureItemQuantityAtLeastBatches(state, index);
     },
     updateItemNetUnitPrice: (
       state,
@@ -115,6 +117,7 @@ const purchaseInvoiceSlice = createSlice({
       if (itemIndex >= 0 && itemIndex < state.items.length) {
         state.items[itemIndex].batches.push(batch);
       }
+      ensureItemQuantityAtLeastBatches(state, itemIndex);
     },
     updateBatch: (
       state,
@@ -131,6 +134,7 @@ const purchaseInvoiceSlice = createSlice({
           item.batches[batchIndex] = updatedBatch;
         }
       }
+      ensureItemQuantityAtLeastBatches(state, itemIndex);
     },
     removeBatch: (
       state,
@@ -140,6 +144,7 @@ const purchaseInvoiceSlice = createSlice({
       if (itemIndex >= 0 && itemIndex < state.items.length) {
         state.items[itemIndex].batches.splice(batchIndex, 1);
       }
+      ensureItemQuantityAtLeastBatches(state, itemIndex);
     },
 
     // ============ UI ONLY FIELDS ============
@@ -172,6 +177,43 @@ const purchaseInvoiceSlice = createSlice({
     printState: (state) => {
       console.log("Current Purchase Invoice State:", current(state));
     },
+    // ============ LOAD FROM SERVER RESPONSE ============
+    loadFromDetails: (state, action: PayloadAction<PurchaseInvoiceDetails>) => {
+      const details = action.payload;
+
+      // Map top-level request fields
+      state.status = (details.status as SliceState["status"]) || state.status;
+      state.supplierId = details.supplierId;
+      state.invoiceNumber = details.invoiceNumber || state.invoiceNumber;
+      state.invoiceDate = details.invoiceDate || state.invoiceDate;
+      state.discount = Number(details.discount) || 0;
+      state.notes = details.notes || "";
+
+      // Items mapping: adapt server shape to request shape
+      state.items = (details.items || []).map((it) => {
+        return {
+          pharmacyDrugId: String(it.pharmacyDrugId),
+          drugName: it.tradeName,
+          quantity: it.quantity,
+          netUnitPrice: Number(it.netUnitPrice),
+          batches: (it.batches || []).map((b) => ({
+            initialQuantity: b.initialQuantity,
+            expiryDate: b.expiryDate,
+          })),
+        } as PurchaseInvoiceItemRequest;
+      });
+
+      // UI-only fields
+      state.supplier = {
+        supplierId: Number(details.supplier?.supplierId ?? -1),
+        pharmacyId: Number(details.supplier?.pharmacyId ?? -1),
+        supplierName: details.supplier?.supplierName ?? "",
+      };
+
+      state.paymentStatus =
+        (details.paymentStatus as SliceState["paymentStatus"]) ||
+        state.paymentStatus;
+    },
   },
 });
 
@@ -197,9 +239,23 @@ export const selectRequestPayload = (state: {
 export const getTotalItemsPrice = (state: { purchaseInvoice: SliceState }) => {
   return state.purchaseInvoice.items.reduce((total, item) => {
     // دالة reduce تستخدم لتحويل المصفوفة إلى قيمة واحدة.
-    return total + item.quantity * item.netUnitPrice;
+    return total + item.quantity * item.netUnitPrice; // later
   }, 0);
 };
+
+// Helper: ensure an item's quantity is at least the sum of its batches
+function ensureItemQuantityAtLeastBatches(
+  state: SliceState,
+  itemIndex: number,
+) {
+  const item = state.items[itemIndex];
+  if (!item) return;
+  const total = (item.batches || []).reduce(
+    (s, b) => s + (b?.initialQuantity ?? 0),
+    0,
+  );
+  if (item.quantity < total) item.quantity = total;
+}
 
 // Export actions
 export const {
@@ -220,6 +276,8 @@ export const {
   updateInvoiceRequest,
   resetForm,
   printState,
+  loadFromDetails,
 } = purchaseInvoiceSlice.actions;
 
 export default purchaseInvoiceSlice.reducer;
+

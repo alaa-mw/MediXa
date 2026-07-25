@@ -1,91 +1,96 @@
 import { ThemeProvider } from "@emotion/react";
 import theme from "../../../shared/styles/arabicTheme";
 import { Box, CssBaseline, Stack, Typography } from "@mui/material";
-import InfoStatus from "../components/info-section";
-import OwnerAccountCard from "../components/owner_card";
-import PharmacyAccountCard from "../components/pharamcy-card";
-import CreateAccountButton from "../components/createAccountButton";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import usePostData from "../../../shared/hooks/usePostData";
 import type { AllOwnersResponse } from "../types/allOwnersResponse";
-
-export interface OwnerForm {
-  id?: number;
-  ownerName: string;
-  email: string;
-  mobile: string;
-  nationalId: string;
-}
-
-export interface PharmacyForm {
-  pharmacyName: string;
-  pharmacistLicenseNo: string;
-  contactPhone: string;
-  email: string;
-  governorate: string;
-  healthDirectorate: string;
-  areaName: string;
-  addressText: string;
-  openingDate: string;
-  // add more attributes
-}
-
-export interface PharmacyRegistrationForm {
-  ownerMode: "NEW" | "EXISTING";
-  newOwner: OwnerForm;
-  pharmacy: PharmacyForm;
-}
-
-export const INITIAL_FORM: PharmacyRegistrationForm = {
-  ownerMode: "NEW",
-  newOwner: {
-    ownerName: "",
-    email: "",
-    mobile: "",
-    nationalId: "",
-  },
-  pharmacy: {
-    pharmacyName: "",
-    pharmacistLicenseNo: "",
-    contactPhone: "",
-    email: "",
-    governorate: "",
-    healthDirectorate: "",
-    areaName: "",
-    addressText: "",
-    openingDate: "",
-  },
-};
+import InfoStatus from "../components/InfoSection";
+import OwnerAccountCard from "../components/OwnerCard";
+import PharmacyAccountCard from "../components/PharamcyCard";
+import { useQueryClient } from "@tanstack/react-query";
+import {
+  INITIAL_FORM,
+  type PharmacyRegistrationForm,
+} from "../types/createPharamacyFormTypes";
+import { useLocation, useNavigate } from "react-router-dom";
+import SubscriptionCard from "../components/SubscriptionCrard";
+import { useSnackbar } from "../../../shared/providers/useSnackbar";
+import CreateAccountButton from "../components/createAccountButton";
 
 export const CreatePharmacyAccount = () => {
-  const [formData, setFormData] =
-    useState<PharmacyRegistrationForm>(INITIAL_FORM);
+  const queryClient = useQueryClient();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { showSnackbar } = useSnackbar();
+
+  const [formData, setFormData] = useState<PharmacyRegistrationForm>(() => {
+    const saved = sessionStorage.getItem("pharmacy_reg_form");
+    return saved ? JSON.parse(saved) : INITIAL_FORM;
+  });
+
+  useEffect(() => {
+    sessionStorage.setItem("pharmacy_reg_form", JSON.stringify(formData));
+  }, [formData]);
+
+  useEffect(() => {
+    if (location.state?.fromPricing) {
+      const { selectedPlanId, selectedOfferId } = location.state;
+
+      setFormData((prev) => ({
+        ...prev,
+        subscription: {
+          ...prev.subscription,
+          planId: selectedPlanId,
+          offerId: selectedOfferId || "",
+        },
+      }));
+
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state, navigate]);
 
   const { mutate: createPharmacy, isPending } =
     usePostData<AllOwnersResponse>("/pharmacy/create");
 
   const handleSubmit = () => {
-    const today = new Date().toISOString().split("T")[0];
+    // 1. أخذ التاريخ المختار من حقل الإدخال (مثلاً "2026-07-23")
+    const selectedDate = new Date(formData.subscription.startsAt);
+
+    // 2. جلب الوقت الحالي وإضافة دقيقتين لفرق السيرفر
+    const now = new Date();
+    selectedDate.setHours(
+      now.getHours(),
+      now.getMinutes() + 2,
+      now.getSeconds(),
+      now.getMilliseconds(),
+    );
+
+    // 3. توليد صيغة ISO 8601 صحيحة 100%
+    const formattedStartDate = selectedDate.toISOString();
+
+    const subscriptionPayload: any = {
+      ...formData.subscription,
+      startsAt: formattedStartDate, // الاحتفاظ بالحقل وإرساله بالصيغة الصحيحة
+    };
+
+    // (تم حذف سطر delete subscriptionPayload.startsAt هنا لكي لا يتم حذفه!)
+
+    if (formData.subscription.offerId && formData.subscription.offerId !== "") {
+      subscriptionPayload.offerId = Number(formData.subscription.offerId);
+    } else {
+      delete subscriptionPayload.offerId;
+    }
+
+    if (subscriptionPayload.planId) {
+      subscriptionPayload.planId = Number(subscriptionPayload.planId);
+    }
+
     let finalPayload: any = {
       ownerMode: formData.ownerMode,
-      pharmacy: {
-        pharmacyName: formData.pharmacy.pharmacyName,
-        pharmacistLicenseNo: formData.pharmacy.pharmacistLicenseNo,
-        contactPhone: formData.pharmacy.contactPhone,
-        email: formData.pharmacy.email,
-        governorate: formData.pharmacy.governorate,
-        healthDirectorate: formData.pharmacy.healthDirectorate,
-        areaName: formData.pharmacy.areaName,
-        addressText: formData.pharmacy.addressText,
-        openingDate: today,
-      },
-      // owner: {
-      //   name: formData.newOwner.ownerName,
-      //   email: formData.newOwner.email,
-      //   mobile: formData.newOwner.mobile,
-      //   nationalId: formData.newOwner.nationalId,
-      // },
+      pharmacy: { ...formData.pharmacy, openingDate: formattedStartDate },
+      subscription: subscriptionPayload,
     };
+
     if (formData.ownerMode === "EXISTING") {
       finalPayload.existingOwnerId = Number(formData.newOwner.id);
     } else {
@@ -96,15 +101,17 @@ export const CreatePharmacyAccount = () => {
         nationalId: formData.newOwner.nationalId,
       };
     }
-    console.log("Payload to send:", JSON.stringify(finalPayload, null, 2));
 
     createPharmacy(finalPayload, {
       onSuccess: (response) => {
-        console.log("Success : Create pharmacy response", response);
+        queryClient.invalidateQueries({ queryKey: ["/pharmacy-owners"] });
+        sessionStorage.removeItem("pharmacy_reg_form");
         setFormData(INITIAL_FORM);
+        showSnackbar("تم إنشاء الحساب بنجاح", "success");
       },
       onError: (error) => {
         console.log("error: Create Pharmacy", error);
+        showSnackbar("حدث خطأ أثناء إنشاء الحساب", "error");
       },
     });
   };
@@ -115,25 +122,21 @@ export const CreatePharmacyAccount = () => {
       <Box>
         <Stack
           direction="row"
-          sx={{
-            justifyContent: "space-between",
-            alignItems: "flex-start",
-          }}
+          sx={{ justifyContent: "space-between", alignItems: "flex-start" }}
         >
           <Stack direction="column">
             <Typography variant="h4" sx={{ fontWeight: 700 }} gutterBottom>
               إنشاء حساب صيدلية
             </Typography>
-
             <Typography color="text.secondary">
               إضافة صيدلية جديدة إلى النظام بشكل متكامل
             </Typography>
           </Stack>
-
           <Box>
             <InfoStatus />
           </Box>
         </Stack>
+
         <Stack spacing={4} sx={{ mt: 4 }}>
           <OwnerAccountCard
             ownerData={formData.newOwner}
@@ -152,7 +155,31 @@ export const CreatePharmacyAccount = () => {
               }))
             }
           />
-          <CreateAccountButton isPending={isPending} onSubmit={handleSubmit} />
+
+          {!!formData.subscription.planId && (
+            <SubscriptionCard
+              planName={formData.subscription.planId}
+              startsAt={formData.subscription.startsAt || ""}
+              onStartDateChange={(newDate) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  subscription: {
+                    ...prev.subscription,
+                    startsAt: newDate,
+                  },
+                }))
+              }
+            />
+          )}
+
+          <CreateAccountButton
+            isPending={isPending}
+            onSubmit={handleSubmit}
+            formData={formData}
+            hasdate={!!formData.subscription.startsAt}
+            // الزر سيكون مفَعّلاً فقط إذا تم اختيار الخطة وتم تحديد تاريخ البدء
+            hasPlan={!!formData.subscription.planId}
+          />
         </Stack>
       </Box>
     </ThemeProvider>

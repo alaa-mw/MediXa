@@ -4,206 +4,231 @@ import {
   CardContent,
   Typography,
   Button,
-  IconButton,
   Chip,
   Grid,
   Stack,
   Box,
 } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import { formatArabicDateTime } from "../utils/formatArabicDateTime";
-import type { PurchaseInvoiceDetails } from "../types/purchaseInvoiceDetails";
+import { CalendarTodayRounded } from "@mui/icons-material";
+import type { PurchaseInvoiceDetails } from "../types/purchaseInvoice";
 import { Edit, Person2Rounded } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import { getStatusMap } from "../utils/getStatusMap";
+import {
+  getInvoiceStatusMap,
+  getPaymentStatusMap,
+} from "../utils/getStatusMap";
+import { formatDate } from "../../damage_invoices/utils/formatDate";
 
 const PurchaseInvoiceCard: React.FC<{ data: PurchaseInvoiceDetails }> = ({
   data,
 }) => {
-  const statusMap = getStatusMap(data.paymentStatus);
+  const statusMap = getInvoiceStatusMap(data?.status || "");
+  const paymentMap = getPaymentStatusMap(data?.paymentStatus || "");
   const navigate = useNavigate();
   return (
     <Card
       sx={{
         width: "100%",
-        // minWidth: 320,
-        // aspectRatio: "1/1",
-        borderRadius: "24px",
-        bgcolor: "#fff",
-        boxShadow: "0px 4px 16px rgba(0,0,0,0.04)",
-        border: "1px solid #F0F2F5",
+        borderRadius: 4,
+        transition: "all 0.2s ease-in-out",
+        border: "1px solid #eef2f5",
+        boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.01)",
+        "&:hover": {
+          transform: "translateY(-4px)",
+          boxShadow: "0px 10px 25px rgba(0, 0, 0, 0.05)",
+        },
+        bgcolor: "background.paper",
         overflow: "hidden",
       }}
     >
-      <CardContent
-        sx={{
-          p: 3,
-          "&:last-child": {
-            pb: 3,
-          },
-        }}
-      >
-        {/* Top Row */}
-        <Grid
-          container
-          sx={{
-            mb: 3,
-            justifyContent: "space-between",
-            alignItems: "flex-start",
-          }}
-        >
-          <Stack spacing={0.5}>
-            <Typography
-              sx={{
-                fontWeight: 700,
-                fontSize: "1.15rem",
-                color: "#2F3B52",
-              }}
-            >
-              #{data.invoiceNumber}
-            </Typography>
-
-            <Typography
-              variant="caption"
-              sx={{
-                color: "#b4b4b4",
-                fontWeight: 600,
-              }}
-            >
-              {formatArabicDateTime(data.invoiceDate)}
-            </Typography>
-          </Stack>
-          <Chip
-            label={statusMap.label}
-            color={statusMap.color}
-            size="small"
+      <CardContent sx={{ p: 3 }}>
+        <Stack spacing={3}>
+          {/* ================= Header ================= */}
+          <Stack
             sx={{
-              color: `${statusMap.color}.dark`,
-              fontWeight: 700,
-              borderRadius: "999px",
-              height: 30,
-              px: 1,
-            }}
-          />
-        </Grid>
-
-        {/* Supplier Section */}
-        <Grid container sx={{ mb: 3, gap: 1, alignItems: "center" }}>
-          <Box
-            sx={{
-              width: 54,
-              height: 54,
-              borderRadius: "50%",
-              bgcolor: "#F3F7FA",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "flex-start",
             }}
           >
-            <Person2Rounded
+            <Box>
+              <Typography
+                variant="h6"
+                sx={{
+                  fontWeight: 700,
+                  mt: 0.2,
+                }}
+              >
+                {data.invoiceNumber}
+              </Typography>
+
+              <Box
+                sx={{
+                  display: "flex",
+                  direction: "row",
+                  gap: 1,
+                  alignItems: "center",
+                }}
+              >
+                <CalendarTodayRounded
+                  sx={{ fontSize: 14, color: "text.secondary" }}
+                />
+                <Typography
+                  variant="caption"
+                  sx={{ color: "text.secondary", fontWeight: 600 }}
+                >
+                  {formatDate(data.invoiceDate || data.createdAt)}
+                </Typography>
+              </Box>
+            </Box>
+
+            <Chip
+              label={statusMap.label}
+              color={statusMap.color}
               sx={{
-                fontSize: 30,
-                color: "#506680",
+                fontWeight: 700,
+                borderRadius: 10,
+                color: `${statusMap.color}.dark`,
               }}
             />
-          </Box>
+          </Stack>
 
-          <Box>
-            <Typography
-              variant="h5"
+          {/* ================= Supplier ================= */}
+          <Grid container sx={{ mb: 3, gap: 1, alignItems: "center" }}>
+            {" "}
+            <Box
               sx={{
-                fontWeight: 700,
-                color: "#34495E",
-                mb: 0.5,
-              }}
-            >
-              {data.supplier.supplierName}
-            </Typography>
-
-            {/* <Typography
-              sx={{
-                color: "#8A94A6",
-                fontSize: "0.9rem",
-              }}
-            >
-              {data.notes}
-            </Typography> */}
-          </Box>
-        </Grid>
-
-        {/* Divider */}
-        <Box
-          sx={{
-            borderTop: "1px solid #EEF2F5",
-            my: 2.5,
-          }}
-        />
-
-        {/* Total Amount */}
-        <Box
-          sx={{
-            textAlign: "center",
-            mb: 4,
-          }}
-        >
-          <Typography
-            sx={{
-              fontSize: "2rem",
-              fontWeight: 700,
-              color: "#3F6F73",
-            }}
-          >
-            {parseFloat(data.totalPrice).toLocaleString("ar-EG", {
-              minimumFractionDigits: 2,
-            })}{" "}
-            ر.س
-          </Typography>
-        </Box>
-        <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
-          {/* Details Button */}
-          <Button
-            fullWidth
-            variant="contained"
-            color="secondary"
-            startIcon={<VisibilityIcon />}
-            onClick={() => navigate("details/" + data.supplierInvoiceId)}
-            sx={{
-              height: 56,
-              borderRadius: "18px",
-              fontWeight: 700,
-              fontSize: "1rem",
-              textTransform: "none",
-              boxShadow: "none",
-              "&:hover": {
-                bgcolor: "#355D60",
-                boxShadow: "none",
-              },
-            }}
-          >
-            عرض التفاصيل
-          </Button>
-          {data.status === "PENDING" || data.status === "PARTIALLY_STOCKED" ? (
-            <IconButton
-              aria-label="edit"
-              onClick={() => navigate("/pharmacy/invoices/purchase/edit/" + data.supplierInvoiceId)} // later
-              
-              sx={{
-                width: 56,
-                height: 56,
+                width: 54,
+                height: 54,
                 borderRadius: "50%",
-                bgcolor: "secondary.main",
-                color: "#fff",
-                boxShadow: "none",
-                "&:hover": {
-                  bgcolor: "#355D60",
-                  boxShadow: "none",
-                },
+                bgcolor: "#F3F7FA",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
               }}
             >
-              <Edit />
-            </IconButton>
-          ) : null}
-        </Box>
+              {" "}
+              <Person2Rounded sx={{ fontSize: 30, color: "#506680" }} />{" "}
+            </Box>{" "}
+            <Box>
+              {" "}
+              <Typography
+                variant="h5"
+                sx={{ fontWeight: 700, color: "#34495E", mb: 0.5 }}
+              >
+                {" "}
+                {data.supplier.supplierName}{" "}
+              </Typography>{" "}
+              {/* <Typography sx={{ color: "#8A94A6", fontSize: "0.9rem", }} > {data.notes} </Typography> */}{" "}
+            </Box>{" "}
+          </Grid>{" "}
+
+          {/* Divider */}{" "}
+          <Box sx={{ borderTop: "1px solid #EEF2F5", my: 2 }} />
+
+          {/* ================= Statistics ================= */}
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: "repeat(2,1fr)",
+              gap: 2,
+            }}
+          >
+            <Box
+              sx={{
+                p: 2,
+                borderRadius: 3,
+                bgcolor: "grey.100",
+              }}
+            >
+              <Typography variant="caption" color="text.secondary">
+                إجمالي الفاتورة
+              </Typography>
+
+              <Typography
+                variant="h6"
+                sx={{
+                  mt: 1,
+                  fontWeight: 700,
+                }}
+              >
+                {data.totalPrice}
+
+                <Typography
+                  component="span"
+                  variant="body2"
+                  color="text.secondary"
+                >
+                  {" "}
+                 ل.س
+                </Typography>
+              </Typography>
+            </Box>
+
+            <Box
+              sx={{
+                p: 2,
+                borderRadius: 3,
+                bgcolor: "grey.100",
+              }}
+            >
+              <Typography variant="caption" color="text.secondary">
+                حالة الدفع
+              </Typography>
+
+              <Box sx={{ mt: 1 }}>
+                <Chip
+                  label={paymentMap.label}
+                  color={paymentMap.color}
+                  size="small"
+                  sx={{
+                    fontWeight: 700,
+                  }}
+                />
+              </Box>
+            </Box>
+          </Box>
+          {/* ================= Action ================= */}
+          {data.status === "PENDING" || data.status === "PARTIALLY_STOCKED" ? (
+            <Button
+              fullWidth
+              variant="contained"
+              color="secondary"
+              startIcon={<Edit />}
+              onClick={() =>
+                navigate(
+                  "/pharmacy/invoices/purchase/complete/" +
+                    data.supplierInvoiceId,
+                )
+              }
+              sx={{
+                height: 52,
+                borderRadius: 3,
+                fontWeight: 700,
+                textTransform: "none",
+              }}
+            >
+              إكمال الدفعات
+            </Button>
+          ) : (
+            <Button
+              fullWidth
+              variant="contained"
+              color="secondary"
+              startIcon={<VisibilityIcon />}
+              onClick={() => navigate("details/" + data.supplierInvoiceId)}
+              sx={{
+                height: 52,
+                borderRadius: 3,
+                fontWeight: 700,
+                textTransform: "none",
+              }}
+            >
+              عرض التفاصيل
+            </Button>
+          )}
+        </Stack>
       </CardContent>
     </Card>
   );

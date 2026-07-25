@@ -17,30 +17,28 @@ export const useGetWithParams = <TData>(
     useState<Record<string, any>>(initialQueryParams);
   const apiClient = new APIClient<TData>(endpoint);
 
-   // حذف أي بارامتر قيمته ""
+  // حذف أي بارامتر قيمته ""
   const cleanedQueryParams = useMemo(
     () =>
       Object.fromEntries(
         Object.entries(queryParams).filter(
-          ([, value]) =>
-            value !== "" &&
-            value !== null &&
-            value !== undefined
-        )
+          ([, value]) => value !== "" && value !== null && value !== undefined,
+        ),
       ),
-    [queryParams]
+    [queryParams],
   );
 
   const isEnabled = options.shouldFetch
-    ? options.shouldFetch(cleanedQueryParams) 
+    ? options.shouldFetch(cleanedQueryParams)
     : true;
-  
+
   const query = useQuery<FetchResponse<TData>, Error>({
     queryKey: [endpoint, cleanedQueryParams], // Include cleanedQueryParams in the query key to refetch when they change
     queryFn: () => apiClient.get(cleanedQueryParams),
     placeholderData: keepPreviousData, // Keep previous data while fetching new data
     enabled: isEnabled,
   });
+
 
   return {
     data: query.data as FetchResponse<TData> | undefined,
@@ -55,7 +53,6 @@ export const useGetWithParams = <TData>(
 };
 
 export default useGetWithParams;
-
 
 /*
   USAGE EXAMPLE:

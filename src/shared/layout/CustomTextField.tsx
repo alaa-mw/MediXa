@@ -89,6 +89,7 @@
 // features/inventory/components/CustomTextField.tsx
 import React from "react";
 import TextField from "@mui/material/TextField";
+import textfieldStyle from "../constants/textFieldStyle";
 
 interface CustomTextFieldProps {
   label: string;
@@ -100,6 +101,8 @@ interface CustomTextFieldProps {
   padding?: string;
   error?: boolean;
   helperText?: string; // أضفنا هذه الخاصية لعرض نص الخطأ أسفل الحقل
+
+  disabled?: boolean;
 }
 
 export const CustomTextField: React.FC<CustomTextFieldProps> = ({
@@ -112,11 +115,13 @@ export const CustomTextField: React.FC<CustomTextFieldProps> = ({
   padding = "16px",
   error = false,
   helperText,
+  disabled = false,
 }) => {
   return (
     <TextField
       fullWidth={fullWidth}
       type={type}
+      disabled={disabled}
       label={label}
       placeholder={placeholder}
       value={value}

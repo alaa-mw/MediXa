@@ -2,10 +2,18 @@ import useGetWithParams from "../../../shared/hooks/useGetWithParams";
 import type {
   PurchaseInvoiceDetails,
   Supplier,
-} from "../types/purchaseInvoiceDetails";
+} from "../types/purchaseInvoice";
 import type { PaymentStatus, SupplierInvoiceStatus } from "../types/enums";
 import PurchaseInvoiceCard from "./PurchaseInvoiceCard";
-import { Box, Button, Chip, Stack } from "@mui/material";
+import {
+  Box,
+  Button,
+  Chip,
+  Pagination,
+  Stack,
+  ToggleButton,
+  ToggleButtonGroup,
+} from "@mui/material";
 import { Add, FilterList } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import FilterDialog from "./FilterDialog";
@@ -13,17 +21,26 @@ import PurchaseInvoiceCardSkeleton from "./PurchaseInvoiceCardSkeleton";
 import { useNavigate } from "react-router-dom";
 import EmptyState from "../../../shared/layout/EmptyState";
 import SearchBarDynamic from "../../../shared/layout/SearchBarDynamic";
+import theme from "../../../shared/styles/mainTheme";
+
+export interface PharmacyDrugSearch {
+  pharmacyDrugId: string;
+  tradeName: string;
+}
 
 const PurchaseInvoiceGrid = () => {
   const navigate = useNavigate();
-  const [filterOpen, setFilterOpen] = useState(false);
+  const [filterAnchorEl, setFilterAnchorEl] =
+    useState<HTMLButtonElement | null>(null);
   const [localFilters, setLocalFilters] = useState({
     status: "" as SupplierInvoiceStatus,
-    supplierId: "",
     paymentStatus: "" as PaymentStatus | "",
     fromDate: "",
     toDate: "",
+    supplierId: "",
+    pharmacyDrugId: "",
   });
+  const [searchMode, setSearchMode] = useState<"supplier" | "drug">("supplier");
 
   const { data, isLoading, queryParams, setQueryParams } = useGetWithParams<
     PurchaseInvoiceDetails[]
@@ -33,9 +50,34 @@ const PurchaseInvoiceGrid = () => {
     data: suppliersSearch,
     queryParams: suppliersQueryParams,
     setQueryParams: setSuppliersQueryParams,
-  } = useGetWithParams<Supplier[]>("/supplier", {
-    searchQuery: "",
-  });
+  } = useGetWithParams<Supplier[]>(
+    "/supplier",
+    {
+      searchQuery: "",
+    },
+    {
+      shouldFetch: (params) =>
+        String(params.searchQuery ?? "").trim().length >= 3 &&
+        searchMode === "supplier",
+    },
+  );
+
+  const {
+    data: phDrugsSearch,
+    // queryParams: phDrugsQueryParams,
+    setQueryParams: setphDrugsQueryParams,
+  } = useGetWithParams<PharmacyDrugSearch[]>(
+    "/pharmacy-drugs/search-my-drugs/by-name",
+    {
+      name: "",
+      page: "", //later
+      limit: 10,
+    },
+    {
+      shouldFetch: (params) =>
+        String(params.name ?? "").trim().length >= 3 && searchMode === "drug",
+    },
+  );
 
   const paymentStatusLabels: Record<PaymentStatus, string> = {
     PAID: "مدفوع",
@@ -57,6 +99,12 @@ const PurchaseInvoiceGrid = () => {
       chips.push({
         key: "supplierId",
         label: `المورد: ${localFilters.supplierId}`,
+      });
+    }
+    if (localFilters.pharmacyDrugId) {
+      chips.push({
+        key: "pharmacyDrugId",
+        label: `الدواء: ${localFilters.pharmacyDrugId}`,
       });
     }
 
@@ -108,10 +156,11 @@ const PurchaseInvoiceGrid = () => {
   const removeAllFilters = () => {
     const clearedFilters = {
       status: "" as SupplierInvoiceStatus,
-      supplierId: "",
       paymentStatus: "" as PaymentStatus | "",
       fromDate: "",
       toDate: "",
+      supplierId: "",
+      pharmacyDrugId: "",
     };
     setLocalFilters(clearedFilters);
     setQueryParams(clearedFilters);
@@ -128,23 +177,65 @@ const PurchaseInvoiceGrid = () => {
     console.log("Current query params:", suppliersQueryParams);
   }, [localFilters, queryParams, suppliersQueryParams]);
 
+  const toggleAdornment = (
+    <ToggleButtonGroup
+      size="small"
+      value={searchMode}
+      exclusive
+      onChange={(_, v) => v && setSearchMode(v)}
+      sx={{
+        backgroundColor: "transparent",
+        borderRadius: "12px",
+        width: "fit-content",
+        boxShadow: "none",
+        "& .MuiToggleButton-root": {
+          border: "none",
+          borderRadius: "12px !important",
+          fontWeight: "bold",
+          color: "text.primary",
+          transition: "all 0.3s ease",
+          "&.Mui-selected": {
+            backgroundColor: theme.palette?.tertiary?.light,
+            color: "white",
+          },
+        },
+      }}
+    >
+      <ToggleButton value="supplier">المورد</ToggleButton>
+      <ToggleButton value="drug">الدواء</ToggleButton>
+    </ToggleButtonGroup>
+  );
+
   return (
     <Box sx={{ display: "flex", flexDirection: "column" }}>
       <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
-        <SearchBarDynamic<Supplier>
-          placeholder="ابحث عن فاتورة مورد (عبر الاسم , رقم الموبايل)..."
-          onChange={(term) => setSuppliersQueryParams({ searchQuery: term })}
-          results={suppliersSearch?.data || []}
-          getOptionLabel={(supplier) => supplier.supplierName}
-          onSelect={(supplier) => {
-            handleFilterChange("supplierId", supplier.supplierId);
-          }}
-        />
-
+        {searchMode === "supplier" ? (
+          <SearchBarDynamic<Supplier>
+            startAdornment={toggleAdornment}
+            placeholder="ابحث عن فاتورة مورد (عبر الاسم , رقم الموبايل)..."
+            onChange={(term) => setSuppliersQueryParams({ searchQuery: term })}
+            results={suppliersSearch?.data || []}
+            getOptionLabel={(supplier) => supplier.supplierName}
+            onSelect={(supplier) => {
+              handleFilterChange("supplierId", supplier.supplierId);
+            }}
+          />
+        ) : (
+          <SearchBarDynamic<PharmacyDrugSearch>
+            startAdornment={toggleAdornment}
+            placeholder="ابحث عن دواء فاتورة (عبر الاسم)..."
+            onChange={(term) => setphDrugsQueryParams({ name: term })}
+            results={phDrugsSearch?.data || []}
+            getOptionLabel={(drug) => drug.tradeName}
+            onSelect={(drug) => {
+              handleFilterChange("pharmacyDrugId", drug.pharmacyDrugId);
+            }}
+          />
+        )}
         <Button
           variant="outlined"
           color="primary"
-          onClick={() => setFilterOpen(true)}
+          onClick={(event) => setFilterAnchorEl(event.currentTarget)}
           startIcon={<FilterList />}
           sx={{
             minWidth: 100,
@@ -171,38 +262,50 @@ const PurchaseInvoiceGrid = () => {
           فاتورة شراء
         </Button>
       </Box>
-      {getFilterChips().length > 0 ? (
-        <Stack
-          direction="row"
-          sx={{
-            spacing: 1,
-            flexWrap: "wrap",
-            mt: 2,
-            mb: 2,
-            gap: 1,
-          }}
-        >
-          {getFilterChips().map((chip) => (
-            <Chip
-              key={chip.key}
-              label={chip.label}
-              color="success"
-              variant="filled"
-              onDelete={() => removeFilter(chip.key)}
-            />
-          ))}
+      {/* filters bar */}
+      <Stack
+        direction="row"
+        sx={{
+          spacing: 1,
+          flexWrap: "wrap",
+          my: 1,
+          gap: 1,
+          height: 32,
+          justifyContent: "space-between",
+        }}
+      >
+        <Box sx={{ display: "flex", gap: 1.5 }}>
+          {getFilterChips().length > 0 && (
+            <>
+              {getFilterChips().map((chip) => (
+                <Chip
+                  key={chip.key}
+                  label={chip.label}
+                  color="success"
+                  variant="filled"
+                  onDelete={() => removeFilter(chip.key)}
+                />
+              ))}
 
-          <Chip label="مسح الكل" color="error" onClick={removeAllFilters} />
-        </Stack>
-      ) : (
-        <Box
-          sx={{
-            height: 32,
-            mt: 2,
-            mb: 2,
-          }}
-        />
-      )}
+              <Chip label="مسح الكل" color="error" onClick={removeAllFilters} />
+            </>
+          )}
+        </Box>
+        {/* {(data?.meta?.totalPages ?? 1) > 1 && ( */}
+          <Box sx={{ direction: "rtl" }}>
+            <Box sx={{ display: "flex", alignItems: "center" }}>
+              <Pagination
+                count={data?.meta?.totalPages ?? 1}
+                page={data?.meta?.page ?? 1}
+                size="small"
+                onChange={(_, value) =>
+                  setQueryParams({ ...queryParams, page: value })
+                }
+              />
+            </Box>
+          </Box>
+        {/* )} */}
+      </Stack>
       <Box
         sx={{
           width: "100%",
@@ -233,12 +336,16 @@ const PurchaseInvoiceGrid = () => {
         />
       )}
       <FilterDialog
-        open={filterOpen}
+        anchorEl={filterAnchorEl}
         filters={localFilters}
         onChange={(newFilters) => setLocalFilters(newFilters)}
         onApply={() => {
           applyAdvancedFilters();
-          setFilterOpen(false);
+          setFilterAnchorEl(null);
+        }}
+        onClose={() => {
+          removeAllFilters();
+          setFilterAnchorEl(null);
         }}
       />
     </Box>

@@ -1,6 +1,7 @@
 // features/inventory/components/CustomTextField.tsx
 import React from "react";
 import TextField from "@mui/material/TextField";
+import { InputAdornment } from "@mui/material";
 
 interface CustomTextFieldProps {
   label: string;
@@ -9,6 +10,7 @@ interface CustomTextFieldProps {
   placeholder?: string;
   type?: "text" | "number";
   fullWidth?: boolean;
+  showCurrency?: boolean;
 }
 
 export const CustomTextField: React.FC<CustomTextFieldProps> = ({
@@ -18,6 +20,7 @@ export const CustomTextField: React.FC<CustomTextFieldProps> = ({
   placeholder,
   type = "text",
   fullWidth = true,
+  showCurrency = false,
 }) => {
   return (
     <TextField
@@ -27,16 +30,31 @@ export const CustomTextField: React.FC<CustomTextFieldProps> = ({
       placeholder={placeholder}
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      variant="outlined" 
+      variant="outlined"
+      slotProps={{
+        input: {
+          startAdornment: showCurrency ? (
+            <InputAdornment
+              position="end"
+              sx={{
+                color: "#64748b",
+                userSelect: "none",
+              }}
+            >
+              ل.س
+            </InputAdornment>
+          ) : null,
+        },
+      }}
       sx={{
-        direction: "rtl",
-        
+        direction: "ltr",
+
         "& .MuiOutlinedInput-root": {
           backgroundColor: "#f1f5f9",
           borderRadius: "14px",
           transition: "all 0.2s ease-in-out",
           paddingRight: "0px !important",
-          paddingLeft: "0px !important",
+          paddingLeft: "5px !important",
 
           "& fieldset": {
             borderColor: "transparent",
@@ -54,30 +72,35 @@ export const CustomTextField: React.FC<CustomTextFieldProps> = ({
 
         "& .MuiInputLabel-outlined": {
           color: "#64748b",
-          right: "16px !important", 
+          right: "16px !important",
           left: "auto !important",
           transformOrigin: "top right",
-          transform: "translate(0, 16px) scale(1)", 
+          transform: "translate(0, 16px) scale(1)",
           zIndex: 1,
           pointerEvents: "none",
-          
+
           "&.MuiInputLabel-shrink": {
-            transform: "translate(0, -6px) scale(0.75)", 
-            backgroundColor: "#ffffff", 
+            transform: "translate(0, -6px) scale(0.75)",
+            backgroundColor: "#ffffff",
             padding: "0 6px",
           },
           // لون الـ Label عند التركيز
           "&.Mui-focused": {
             color: "#0f766e",
-          }
+          },
         },
 
         "& .MuiOutlinedInput-input": {
           textAlign: "right",
           paddingRight: "16px !important",
           paddingLeft: "16px !important",
-          height: "1.4375em", 
+          height: "1.4375em",
           padding: "16.5px 14px",
+          MozAppearance: "textfield", // لإخفائها في متصفح Firefox
+          "&::-webkit-outer-spin-button, &::-webkit-inner-spin-button": {
+            WebkitAppearance: "none", // لإخفائها في Chrome, Safari, Edge
+            margin: 0,
+          },
         },
       }}
     />

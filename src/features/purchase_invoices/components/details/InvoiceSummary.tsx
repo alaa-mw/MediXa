@@ -1,5 +1,5 @@
 import { alpha, Box, Container, Typography } from "@mui/material";
-import type { PurchaseInvoiceDetails } from "../../types/purchaseInvoiceDetails";
+import type { PurchaseInvoiceDetails } from "../../types/purchaseInvoice";
 import theme from "../../../../shared/styles/mainTheme";
 
 const InvoiceSummary = ({
@@ -68,6 +68,34 @@ const InvoiceSummary = ({
           </Typography>
           <Typography variant="body1" color="inherit">
             {detailData.notes}
+          </Typography>
+        </Box>
+         <Box
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+          }}
+        >
+          <Typography variant="body1" sx={{ mb: 1 }}>
+            الحسم{" "}
+          </Typography>
+          <Typography variant="body1" color="inherit">
+            {detailData.discount} ل.س
+          </Typography>
+        </Box>
+         <Box
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+          }}
+        >
+          <Typography variant="body1" sx={{ mb: 1 }}>
+            السعر الاجمالي{" "}
+          </Typography>
+          <Typography variant="body1" color="inherit">
+            {detailData.totalPrice} ل.س
           </Typography>
         </Box>
       </Box>

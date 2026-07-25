@@ -1,23 +1,16 @@
+import type { Pagination } from "../../../shared/api/api-pagination-types";
+
 export interface SearchDrugResponse {
   pharmacyDrugs: PaginatedDrugs<PharmacyDrug>;
   generalDrugs: PaginatedDrugs<GeneralDrug>;
 }
 
-interface Pagination {
-  page: number;
-  limit: number;
-  total: number;
-  pages: number;
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
-}
-
 // Generic paginated response wrapper
-interface PaginatedDrugs<T> extends Pagination {
+interface PaginatedDrugs<T> {
   items: T[];
 }
 
-export interface PharmacyDrug {
+export interface PharmacyDrug extends Pagination {
   pharmacyDrugId: string;
   drugId: string;
   source: string;
@@ -29,7 +22,7 @@ export interface PharmacyDrug {
   availableBoxCount: number;
 }
 
-interface GeneralDrug {
+interface GeneralDrug extends Pagination {
   generalDrugId: string;
   drugId: string;
   tradeName: string;

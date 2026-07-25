@@ -6,8 +6,8 @@ const InvoiceLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const currentTab = location.pathname.includes("/remove")
-    ? "remove"
+  const currentTab = location.pathname.includes("/damage")
+    ? "damage"
     : "purchase";
 
   const handleChange = (
@@ -53,7 +53,7 @@ const InvoiceLayout = () => {
           فواتير الشراء
         </ToggleButton>
 
-        <ToggleButton value="remove">
+        <ToggleButton value="damage">
           فواتير الإتلاف
         </ToggleButton>
       </ToggleButtonGroup>

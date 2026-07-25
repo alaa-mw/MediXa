@@ -40,6 +40,12 @@ class APIClient<T> {
       url: this.buildUrl(queryParams),
     });
 
+  getById = (id: string, queryParams: QueryParams = {}) =>
+    this.request<T>({
+      method: "GET",
+      url: `${this.buildUrl(queryParams)}/${id}`,
+    });
+
   post = (data?: unknown) =>
     this.request<T>({
       method: "POST",

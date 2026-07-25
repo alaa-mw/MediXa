@@ -8,7 +8,7 @@ import {
   ListItemText,
   Typography,
 } from "@mui/material";
-import SearchTextField from "./search_text_filed";
+import SearchTextField from "./SearchTextFiled";
 
 interface Owner {
   id: number;
