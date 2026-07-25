@@ -15,8 +15,8 @@ import { PriceBox } from "./PriceBox";
 import type { PharmacyDrug } from "../../types/inventory";
 import { MedicalDetailsDialog } from "./MedicalDetailsDialog";
 
-import { EditGlobalMedicineDialog } from "./EditGlobalMedicineDialog";
-import { EditPrivateMedicineDialog } from "./EditPrivateMedicineDialog";
+import { EditGlobalMedicineDialog } from "../EditMedicine/EditGlobalMedicineDialog";
+import { EditPrivateMedicineDialog } from "../EditMedicine/EditPrivateMedicineDialog";
 import { useNavigate } from "react-router-dom";
 
 export const MedicineCard: React.FC<{ medicine: PharmacyDrug }> = ({

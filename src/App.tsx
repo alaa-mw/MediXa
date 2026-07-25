@@ -25,6 +25,7 @@ import { SaleInvoicesPage } from "./features/sales-and-return/pages/SaleInvoices
 import { ReturnInvoicesPage } from "./features/sales-and-return/pages/ReturnInvoicePage";
 import { DrugBatchesPage } from "./features/inventory/pages/DrugBatchesPage";
 import PurchaseInvoiceDetails from "./features/purchase_invoices/components/PurchaseInvoiceDetails";
+import { CreateSaleInvoicePage } from "./features/sales-and-return/pages/CreateSaleInvoicePage";
 
 function App() {
   const pharmacyPaths = ["/pharmacy", "/pharmacy_owner"];
@@ -108,6 +109,8 @@ function App() {
                   <Route path="sales" element={<SaleInvoicesPage />} />
                   <Route path="return" element={<ReturnInvoicesPage />} />
                 </Route>
+                                  <Route path="sales/sales/create" element={<CreateSaleInvoicePage/>} />
+
 
                 <Route path="invoices" element={<InvoiceLayout />}>
                   {/* Redirect from /invoices to /invoices/purchase */}
