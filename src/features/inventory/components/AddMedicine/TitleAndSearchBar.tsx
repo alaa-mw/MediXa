@@ -1,6 +1,7 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
 import { SearchBar } from "../SearchBar";
+import { useBarcodeScanner } from "../../../../shared/services/useBarcodeScanner";
 
 interface AddMedicineSearchBarProps {
   searchQuery: string;
@@ -13,6 +14,18 @@ export const AddMedicineSearchBar: React.FC<AddMedicineSearchBarProps> = ({
   setSearchQuery,
   onSubmit,
 }) => {
+  useBarcodeScanner({
+    onScan: (scannedCode) => {
+      console.log("تم تلقي الباركود من القارئ الإلكتروني:", scannedCode);
+
+      // 1. تحديث قيمة حقل البحث بالبارود الممسوخ
+      setSearchQuery(scannedCode);
+
+      // 2. (اختياري) إذا كنت تريد إرسال النموذج تلقائياً بمجرد مسح الباركود
+      // يمكنك استدعاء دالة البحث أو إرسال الـ Form هنا مباشرة
+    },
+  });
+
   return (
     <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
       <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>

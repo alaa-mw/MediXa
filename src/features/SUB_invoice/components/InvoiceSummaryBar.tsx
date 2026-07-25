@@ -4,13 +4,16 @@ import { useNavigate } from "react-router-dom";
 import type { SaleInvoiceItem } from "../Types/saleInvoiceDetailsTypes";
 
 interface CreatReturnInvoiceProps {
-  items: SaleInvoiceItem[]; // نمرر له العناصر من الصفحة الأب
-  discount: string;
+  items: SaleInvoiceItem[];
+  saleInvoiceDiscount: number;
 }
 
-const CreatReturnInvoice = ({ items, discount }: CreatReturnInvoiceProps) => {
+const CreatReturnInvoice = ({
+  items,
+  saleInvoiceDiscount,
+}: CreatReturnInvoiceProps) => {
+  console.log("before navigate ", saleInvoiceDiscount);
   const navigate = useNavigate();
-
   return (
     <Button
       variant="contained"
@@ -28,12 +31,11 @@ const CreatReturnInvoice = ({ items, discount }: CreatReturnInvoiceProps) => {
         padding: "12px 24px",
         boxShadow: "0px 8px 16px rgba(0, 0, 0, 0.2)",
       }}
-      onClick={() =>
-        // نقوم بإرسال الـ items الحالية داخل الـ state الخاص بالراوتر
+      onClick={() => {
         navigate("/pharmacy/sales-details/create-return", {
-          state: { items, discount },
-        })
-      }
+          state: { items, saleInvoiceDiscount },
+        });
+      }}
     >
       إضافة فاتورة إرجاع
     </Button>

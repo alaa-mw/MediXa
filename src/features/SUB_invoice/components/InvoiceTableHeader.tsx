@@ -5,7 +5,7 @@ const InvoiceTableHeader = () => {
     <Box
       sx={{
         display: "grid",
-        gridTemplateColumns: "1fr 3fr 2fr 2fr 2fr 2fr 3fr 3fr 3fr",
+        gridTemplateColumns: "1fr 3fr 2fr 2fr 2fr 2fr 2fr 3fr 3fr",
         p: 1.2,
         bgcolor: "#F8FAFC",
         borderBottom: "1px solid #E2E8F0",
@@ -24,7 +24,7 @@ const InvoiceTableHeader = () => {
       <Box sx={{ display: "flex", justifyContent: "center" }}>الكمية</Box>
       <Box sx={{ display: "flex", justifyContent: "center" }}>سعر المفرد</Box>
       <Box sx={{ display: "flex", justifyContent: "center" }}>
-        النسبة المضافة{" "}
+        النسبة المضافة
       </Box>
       <Box sx={{ display: "flex", justifyContent: "center" }}>
         السعر الإجمالي

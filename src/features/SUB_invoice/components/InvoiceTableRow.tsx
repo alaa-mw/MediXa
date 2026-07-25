@@ -19,7 +19,7 @@ const InvoiceTableRow: React.FC<ItemProps> = ({ item, itemIndex }) => {
     <Box
       sx={{
         display: "grid",
-        gridTemplateColumns: "1fr 3fr 2fr 2fr 2fr 2fr 3fr 3fr 3fr",
+        gridTemplateColumns: "1fr 3fr 2fr 2fr 2fr 2fr 2fr 3fr 3fr",
         p: 1.2,
         borderBottom: "1px solid #F1F5F9",
         alignItems: "center",

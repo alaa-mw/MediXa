@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { DrugFormData } from "../types/drugFormType";
+import type { DrugFormData } from "../types/generalDrugFormType";
 
 const createInitialFormState = (): DrugFormData => ({
   dosageFormId: "",

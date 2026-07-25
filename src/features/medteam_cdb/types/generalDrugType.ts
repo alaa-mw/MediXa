@@ -1,5 +1,4 @@
 import type { PaginatedResponse } from "../../../shared/api/api-pagination-types";
-import type { ActiveIngredientApiResponse } from "./activeIngrediantType";
 import type { DosageForm } from "./dosageFormType";
 import type { DrugCategoryForm } from "./drugCategoryType";
 

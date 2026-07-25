@@ -24,7 +24,16 @@ export default function PricingPage() {
 
   return (
     <Container maxWidth="xl" sx={{ py: 1 }}>
-      <PricingHero />
+      <PricingHero
+        isSubmitting={false}
+        startsAt={""}
+        onDateChange={function (date: string): void {
+          throw new Error("Function not implemented.");
+        }}
+        onConfirm={function (): void {
+          throw new Error("Function not implemented.");
+        }}
+      />
       <Grid container spacing={4} sx={{ px: 5 }}>
         {isLoading
           ? Array.from({ length: 3 }).map((_, index) => (

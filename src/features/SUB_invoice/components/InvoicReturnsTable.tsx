@@ -1,11 +1,11 @@
 import React from "react";
-import type { ReturnInvoice } from "../Types/saleInvoiceDetailsTypes";
+import type { ReturnInvoiceBySale } from "../return-invoice/Types/returnInvoiceList";
 import ReturnInvoiceTableHeader from "./ReturnInvoiceTableHeader";
 import ReturnInvoiceTableRow from "./ReturnInvoiceTableRow";
 import { Box } from "@mui/material";
 
 interface ReturnsProps {
-  returns: ReturnInvoice[];
+  returns: ReturnInvoiceBySale[];
 }
 
 const InvoiceReturnsTable: React.FC<ReturnsProps> = ({ returns }) => {
@@ -20,17 +20,13 @@ const InvoiceReturnsTable: React.FC<ReturnsProps> = ({ returns }) => {
     >
       <ReturnInvoiceTableHeader />
 
-      {/* {isLoading ? (
-        <LoadingState />
-      ) : data.length === 0 ? (
-        <EmptyState />
-      ) : ( */}
       {returns.map((returnInvoice) =>
         returnInvoice.items.map((subItem, index) => (
           <ReturnInvoiceTableRow
             key={`${returnInvoice.returnInvoiceId}-${index}`}
             item={subItem}
             itemIndex={index}
+            discount={parseInt(returnInvoice.referenceSaleInvoice?.discount!)} // Assuming discount is a string, convert it to number
           />
         )),
       )}

@@ -12,10 +12,11 @@ import React, { useState } from "react";
 
 interface ReturnSummaryProps {
   totalReturnValues: number;
-  totalDiscount: number;
+  totalDiscount?: number;
   finalRefundAmount: number;
   onConfirm: (notes: string) => void;
   onCancel: () => void;
+  isLoading?: boolean;
 }
 
 const InvoiceReturnSummary: React.FC<ReturnSummaryProps> = ({
@@ -24,6 +25,7 @@ const InvoiceReturnSummary: React.FC<ReturnSummaryProps> = ({
   finalRefundAmount,
   onConfirm,
   onCancel,
+  isLoading = false,
 }) => {
   const [notes, setNotes] = useState("");
 
@@ -41,6 +43,7 @@ const InvoiceReturnSummary: React.FC<ReturnSummaryProps> = ({
         flexDirection: "column",
         justifyContent: "space-between",
         overflow: "hidden",
+        mb: 5,
       }}
     >
       {/* جزء المحتوى العلوي */}
@@ -104,14 +107,13 @@ const InvoiceReturnSummary: React.FC<ReturnSummaryProps> = ({
               </Typography>
             </Stack>
             <Typography sx={{ fontWeight: "bold", color: "#d97706" }}>
-              {/* - {totalDiscount.toLocaleString()} */}
-              10
+              - {totalDiscount}
             </Typography>
           </Box>
 
           <Box
             sx={{
-              bgcolor: "#634A7B", // استخدام نفس لون الصيدلية الأساسي لتوحيد الهوية البصرية
+              bgcolor: "primary.main", // استخدام نفس لون الصيدلية الأساسي لتوحيد الهوية البصرية
               color: "white",
               p: 1,
               borderRadius: 3,
@@ -179,6 +181,7 @@ const InvoiceReturnSummary: React.FC<ReturnSummaryProps> = ({
           <Button
             variant="contained"
             onClick={handleConfirmClick}
+            disabled={isLoading} // تعطيل الزر إذا كان المبلغ المسترد صفر أو أقل
             sx={{
               flex: 1,
               bgcolor: "#634A7B",

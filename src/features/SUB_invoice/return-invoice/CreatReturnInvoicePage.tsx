@@ -1,53 +1,141 @@
-import { Box, Grid, Paper, Stack, Typography } from "@mui/material";
+import {
+  Box,
+  Grid,
+  Paper,
+  Stack,
+  Typography,
+  TextField,
+  MenuItem,
+  Snackbar,
+  Alert,
+} from "@mui/material";
 import InvoiceReturnSummary from "./components/InvoiceReturnSummary";
 import { format } from "date-fns";
 import SelectDrugReturnTable from "./components/SelectDrugReturnTable";
 import type { SaleInvoiceItem } from "../Types/saleInvoiceDetailsTypes";
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useIdempotency } from "../../../shared/hooks/useIdempotency";
 import { usePostData } from "../../../shared/hooks/usePostData";
-import type { ReturnInvoiceResponse } from "../Types/returnInvoiceResponse";
+import type { ReturnInvoiceResponse } from "./Types/returnInvoiceResponse";
+import { useSnackbar } from "../../../shared/providers/useSnackbar";
 
 interface Props {
   items?: SaleInvoiceItem[];
-  discount?: string;
+  saleInvoiceDiscount?: number;
 }
-
-// إضافة checked للنوع لتتبع الاختيار
 type ReturnInvoiceItem = SaleInvoiceItem & {
   checked: boolean;
+  selectedQuantity: number;
+  netTotalPrice: string;
+  batches?: any[]; // قائمة الدفعات القادمة من الـ API
+  selectedBatchId?: number; // الدفعة المختارة حالياً للإرسال
 };
 
 const toNumber = (value: string | number | undefined) =>
   Number.parseFloat(String(value ?? 0)) || 0;
 
-const CreateReturnInvoicePage = ({ items: propsItems, discount }: Props) => {
+const CreateReturnInvoicePage = ({
+  items: propsItems,
+  saleInvoiceDiscount: propsDiscount,
+}: Props) => {
   const location = useLocation();
+  const navigate = useNavigate();
 
-  // جلب البيانات من الـ state أو الـ props
+  const saleInvoiceDiscount =
+    propsDiscount ??
+    location.state?.saleInvoiceDiscount ??
+    location.state?.discount ??
+    0;
+
   const items = location.state?.items || propsItems || [];
-
   const [invoiceItems, setInvoiceItems] = useState<ReturnInvoiceItem[]>([]);
+  const [returnReason, setReturnReason] = useState<string>(
+    "CUSTOMER_CHANGED_MIND",
+  );
+
+  const { showSnackbar } = useSnackbar();
+
+  const returnReasonsList = [
+    {
+      value: "CUSTOMER_CHANGED_MIND",
+      label: "تغيير رأي العميل (Customer Changed Mind)",
+    },
+    { value: "WRONG_ITEM", label: "صنف خاطئ (Wrong Item)" },
+    { value: "DAMAGED", label: "تالف (Damaged)" },
+    { value: "EXPIRED", label: "منتهي الصلاحية (Expired)" },
+  ];
+
+  const recalculateItemsWithDiscount = (itemsList: any[], discount: number) => {
+    const totalItemsValue = itemsList.reduce((sum, item) => {
+      const qty = item.selectedQuantity || 1;
+      const unitPrice = toNumber(item.finalUnitPrice);
+      return sum + qty * unitPrice;
+    }, 0);
+
+    return itemsList.map((item) => {
+      const qty = item.selectedQuantity || 1;
+      const unitPrice = toNumber(item.finalUnitPrice);
+      const rowOriginalTotal = qty * unitPrice;
+
+      let rowDiscountShare = 0;
+      if (totalItemsValue > 0) {
+        rowDiscountShare = (rowOriginalTotal / totalItemsValue) * discount;
+      }
+
+      const netTotal = Math.max(0, rowOriginalTotal - rowDiscountShare);
+
+      return {
+        ...item,
+        displayQuantity: item.displayQuantity || qty,
+        selectedQuantity: qty,
+        totalPrice: rowOriginalTotal.toString(),
+        netTotalPrice: netTotal.toFixed(2),
+      };
+    });
+  };
 
   useEffect(() => {
     if (items && Array.isArray(items)) {
+      const initialMapped = items.map((item: any) => {
+        const qty = toNumber(item.displayQuantity) || 1;
+        const unitPrice = toNumber(item.finalUnitPrice);
+
+        const itemBatches = item.batches || item.batchAllocations || [];
+
+        const defaultBatchId =
+          itemBatches.length === 1
+            ? itemBatches[0].saleInvoiceItemBatchId || itemBatches[0].batchId
+            : undefined;
+
+        return {
+          ...item,
+          displayQuantity: qty,
+          selectedQuantity: qty,
+          totalPrice: (qty * unitPrice).toString(),
+          netTotalPrice: "0",
+          checked: false,
+          batches: itemBatches,
+          selectedBatchId: defaultBatchId,
+        };
+      });
+
       setInvoiceItems(
-        items.map((item: SaleInvoiceItem) => {
-          const qty = toNumber(item.displayQuantity) || 1;
-          const unitPrice = toNumber(item.finalUnitPrice);
-          return {
-            ...item,
-            displayQuantity: qty,
-            totalPrice: (qty * unitPrice).toString(), // تهيئة السعر الإجمالي بناءً على الكمية الحالية
-            checked: false,
-          };
-        }),
+        recalculateItemsWithDiscount(initialMapped, saleInvoiceDiscount),
       );
     }
-  }, [items]);
+  }, [items, saleInvoiceDiscount]);
 
-  // دالة تحديد/إلغاء تحديد الدواء
+  const handleSelectBatch = (saleInvoiceItemId: number, batchId: number) => {
+    setInvoiceItems((prev) =>
+      prev.map((item) =>
+        item.saleInvoiceItemId === saleInvoiceItemId
+          ? { ...item, selectedBatchId: batchId }
+          : item,
+      ),
+    );
+  };
+
   const handleToggleCheck = (saleInvoiceItemId: number) => {
     setInvoiceItems((prev) =>
       prev.map((item) =>
@@ -58,40 +146,39 @@ const CreateReturnInvoicePage = ({ items: propsItems, discount }: Props) => {
     );
   };
 
-  // دالة تحديث الكمية وتحديث السعر الإجمالي للسطر لحظياً
   const handleUpdateQuantity = (saleInvoiceItemId: number, delta: number) => {
-    setInvoiceItems((prev) =>
-      prev.map((item) => {
-        if (item.saleInvoiceItemId === saleInvoiceItemId) {
-          const currentQty = toNumber(item.displayQuantity);
-          const newQty = Math.max(1, currentQty + delta);
-          const unitPrice = toNumber(item.finalUnitPrice);
-
-          return {
-            ...item,
-            displayQuantity: newQty,
-            // الكود المعدل: تحويل الناتج الرقمي إلى string ليطابق الـ Type الأصلي
-            totalPrice: (newQty * unitPrice).toString(),
-          };
+    setInvoiceItems((prev) => {
+      const updated = prev.map((item) => {
+        if (item.saleInvoiceItemId !== saleInvoiceItemId) {
+          return item;
         }
-        return item;
-      }),
-    );
+
+        const newQty = Math.max(
+          1,
+          Math.min(item.selectedQuantity + delta, item.displayQuantity),
+        );
+
+        return {
+          ...item,
+          selectedQuantity: newQty,
+        };
+      });
+
+      return recalculateItemsWithDiscount(updated, saleInvoiceDiscount);
+    });
   };
 
-  // إجمالي قيمة المرتجعات (لكل العناصر بغض النظر عن تحديد الـ Checkbox)
   const totalReturnValues = invoiceItems.reduce(
     (sum, item) => sum + toNumber(item.totalPrice),
     0,
   );
 
-  // المبلغ المسترد الفعلي (فقط للعناصر المحددة بالـ Checkbox)
   const finalRefundAmount = invoiceItems
     .filter((item) => item.checked)
-    .reduce((sum, item) => sum + toNumber(item.totalPrice), 0);
+    .reduce((sum, item) => sum + toNumber(item.netTotalPrice), 0);
 
   const todayDate = format(new Date(), "dd MMM yyyy");
-  const createReturnInvoiceMutation = usePostData<ReturnInvoiceResponse>(
+  const { mutateAsync, isPending } = usePostData<ReturnInvoiceResponse>(
     "/return-invoice/create",
   );
   const { getKey, clearKey } = useIdempotency();
@@ -121,7 +208,7 @@ const CreateReturnInvoicePage = ({ items: propsItems, discount }: Props) => {
               display: "flex",
               flexDirection: "row",
               justifyContent: "space-between",
-              alignItems: "flex-end",
+              alignItems: "center",
               width: "100%",
             }}
           >
@@ -146,22 +233,30 @@ const CreateReturnInvoicePage = ({ items: propsItems, discount }: Props) => {
               </Typography>
             </Box>
 
-            <Box
-              sx={{
-                textAlign: "left",
-                border: "1px solid #E2E8F0",
-                borderRadius: "8px",
-                py: 1,
-                px: 2,
-                bgcolor: "#ffffff",
-                fontSize: "0.85rem",
-              }}
-            >
-              CUSTOMER_CHANGED_MIND
+            <Box sx={{ minWidth: "220px" }}>
+              <TextField
+                select
+                fullWidth
+                size="small"
+                value={returnReason}
+                onChange={(e) => setReturnReason(e.target.value)}
+                sx={{
+                  bgcolor: "#ffffff",
+                  borderRadius: "8px",
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: "8px",
+                  },
+                }}
+              >
+                {returnReasonsList.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))}
+              </TextField>
             </Box>
           </Box>
         </Grid>
-
         <Paper
           elevation={0}
           sx={{ border: "1px solid #E2E8F0", borderRadius: "8px" }}
@@ -170,6 +265,8 @@ const CreateReturnInvoicePage = ({ items: propsItems, discount }: Props) => {
             items={invoiceItems}
             onToggleCheck={handleToggleCheck}
             onUpdateQuantity={handleUpdateQuantity}
+            onSelectBatch={handleSelectBatch} // <-- تأكد من وجود هذا السطر هنا
+            saleInvoiceDiscount={saleInvoiceDiscount}
           />
         </Paper>
       </Box>
@@ -180,15 +277,29 @@ const CreateReturnInvoicePage = ({ items: propsItems, discount }: Props) => {
           minWidth: "300px",
           display: "flex",
           flexDirection: "column",
-          alignSelf: "stretch", // مهم
+          alignSelf: "stretch",
         }}
       >
         <InvoiceReturnSummary
           totalReturnValues={totalReturnValues}
-          totalDiscount={toNumber(discount)}
+          totalDiscount={saleInvoiceDiscount}
           finalRefundAmount={finalRefundAmount}
+          isLoading={isPending}
           onConfirm={async (notesValue) => {
             const selectedItems = invoiceItems.filter((i) => i.checked);
+
+            if (selectedItems.length === 0) {
+              showSnackbar(
+                "يرجى اختيار صنف واحد على الأقل لإنشاء فاتورة المرتجع",
+                "error",
+              );
+              return;
+            }
+
+            const finalReason =
+              returnReason && returnReason.trim() !== ""
+                ? returnReason
+                : "OTHER";
 
             const requestBody = {
               idempotencyKey: getKey(),
@@ -196,32 +307,47 @@ const CreateReturnInvoicePage = ({ items: propsItems, discount }: Props) => {
               invoiceDate: new Date().toISOString(),
               notes: notesValue || "مرتجع من فاتورة بيع",
               items: selectedItems.map((item) => {
+                // التحقق من أن المستخدم قد اختار دفعة إذا كان هناك أكثر من دفعة
                 const batchId =
-                  item.batchAllocations?.[0]?.saleInvoiceItemBatchId ||
+                  item.selectedBatchId ||
+                  item.batches?.[0]?.saleInvoiceItemBatchId ||
                   item.saleInvoiceItemId;
 
                 return {
-                  saleInvoiceItemBatchId: batchId,
+                  saleInvoiceItemBatchId: batchId, // إرسال الـ ID الصحيح للدفعة المختارة
                   unitType: item.unitType,
-                  displayQuantity: item.displayQuantity,
-                  returnReason: "CUSTOMER_CHANGED_MIND",
+                  displayQuantity: item.selectedQuantity,
+                  returnReason: finalReason,
                   restockToInventory: true,
                 };
               }),
             };
 
             try {
-              console.log("Request Body for Return Invoice:", requestBody);
-              // await createReturnInvoiceMutation.mutateAsync(requestBody);
-              // // نجاح
-              // clearKey();
-            } catch (error) {
-              // لا تحذف المفتاح
+              // 2. إرسال الريكوست باستخدام mutateAsync وعرض رسالة النجاح
+              await mutateAsync(requestBody);
+              clearKey(); // مسح الـ idempotency key عند النجاح
 
-              console.error(error);
+              showSnackbar("تم إنشاء فاتورة المرتجع بنجاح", "success");
+
+              // يمكنك توجيه المستخدم لصفحة أخرى بعد النجاح إن أردت
+              // setTimeout(() => navigate(-1), 1500);
+            } catch (error: any) {
+              console.error("Error creating return invoice:", error.message);
+              if (
+                error.message ===
+                "Returned quantity exceeds sold quantity for saleInvoiceItemBatchId 1"
+              ) {
+                showSnackbar(
+                  `الكمية المرتجعة للصنف أكبر من الكمية المباعة `,
+                  "error",
+                );
+              } else {
+                showSnackbar("حدث خطأ أثناء إنشاء فاتورة المرتجع", "error");
+              }
             }
           }}
-          onCancel={() => console.log("Cancelled")}
+          onCancel={() => navigate(-1)}
         />
       </Box>
     </Box>

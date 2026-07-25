@@ -1,4 +1,3 @@
-// src/shared/hooks/useBarcodeScanner.ts
 import { useEffect } from 'react';
 
 interface UseBarcodeScannerProps {
