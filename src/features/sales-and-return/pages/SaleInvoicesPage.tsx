@@ -4,8 +4,10 @@ import { Box, Grid, Typography, CircularProgress, Alert, Pagination } from "@mui
 import { useSaleInvoicesData } from "../hooks/useSaleInvoicesData";
 import { SaleInvoiceHeader } from "../components/sales/SaleInvoiceHeader";
 import { SaleInvoiceCard } from "../components/sales/SaleInvoiceCard";
+import { useNavigate } from "react-router-dom";
 
 export const SaleInvoicesPage: React.FC = () => {
+  const navigate = useNavigate(); 
   const {
     searchInput,
     currentPage,
@@ -26,7 +28,7 @@ export const SaleInvoicesPage: React.FC = () => {
       {/* <Container maxWidth="xl"> */}
         {/* ربط الهيدر المطور بكامل الصلاحيات الفلترة */}
         <SaleInvoiceHeader
-          onAddInvoiceClick={() => console.log("فتح نافذة نقاط البيع POS")}
+onAddInvoiceClick={() => navigate("create")}
           searchValue={searchInput}
           onSearchChange={handleSearch}
           rawFilters={rawFilters}

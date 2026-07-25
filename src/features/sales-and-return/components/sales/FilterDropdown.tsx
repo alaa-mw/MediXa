@@ -34,7 +34,7 @@ export const FilterDropdown: React.FC<FilterDropdownProps> = ({
   // 💡 نربط الـ local states بالـ rawFilters القادمة حياً من الرابط مباشرة لمنع التضارب
   const [selectedStatus, setSelectedStatus] = useState<string>("");
   const [selectedUnit, setSelectedUnit] = useState<string>("");
-  const [selectedSaleType, setSelectedSaleType] = useState<string>("");
+  // const [selectedSaleType, setSelectedSaleType] = useState<string>("");
   const [fromDate, setFromDate] = useState<string | null>(null);
   const [toDate, setToDate] = useState<string | null>(null);
   const [minAmount, setMinAmount] = useState<string>("");
@@ -51,7 +51,7 @@ export const FilterDropdown: React.FC<FilterDropdownProps> = ({
         rawFilters.paymentStatus === "ALL" ? "" : rawFilters.paymentStatus,
       );
       setSelectedUnit(rawFilters.unitType || "");
-      setSelectedSaleType(rawFilters.saleType || "");
+      // setSelectedSaleType(rawFilters.saleType || "");
       setFromDate(rawFilters.fromDate || null);
       setToDate(rawFilters.toDate || null);
       setMinAmount(rawFilters.minTotal || "");
@@ -64,7 +64,7 @@ export const FilterDropdown: React.FC<FilterDropdownProps> = ({
     onApplyFilters({
       paymentStatus: selectedStatus || "ALL",
       unitType: selectedUnit || "",
-      saleType: selectedSaleType || "",
+      // saleType: selectedSaleType || "",
       fromDate: fromDate || "",
       toDate: toDate || "",
       minTotal: minAmount || "",
@@ -224,8 +224,7 @@ export const FilterDropdown: React.FC<FilterDropdownProps> = ({
           })}
         </Box>
       </Box>
-
-      {/* نوع البيع */}
+{/* 
       <Box sx={{ mb: 3 }}>
         <Typography
           variant="caption"
@@ -270,7 +269,7 @@ export const FilterDropdown: React.FC<FilterDropdownProps> = ({
             );
           })}
         </Box>
-      </Box>
+      </Box>  */}
 
       {/* تصفية المدة الزمنية */}
       <Box sx={{ mb: 3 }}>

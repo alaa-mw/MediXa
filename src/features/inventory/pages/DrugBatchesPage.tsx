@@ -105,7 +105,7 @@ export const DrugBatchesPage: React.FC = () => {
   const [isAddBatchOpen, setIsAddBatchOpen] = useState(false);
 
   const { data: response, isLoading, isError } = useGetData<any>(
-    drugId ? `/batch/pharmacy-drug/${drugId}` : ""
+    `/batch/pharmacy-drug/${drugId}` 
   );
 
   const rawBatches = useMemo(() => {
