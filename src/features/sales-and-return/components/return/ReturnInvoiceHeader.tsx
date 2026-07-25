@@ -10,7 +10,6 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { FilterButton } from "../../../inventory/components/FilterButton";
-import { AddMedicineButton } from "../../../inventory/components/AddMedicineButton";
 import { SearchBar } from "../../../inventory/components/SearchBar";
 import type { ReturnInvoiceFilters } from "../../types/returnInvoice";
 import { FilterDropdown } from "./FilterDropdownReturn";
@@ -28,7 +27,6 @@ interface ReturnInvoiceHeaderProps {
 }
 
 export const ReturnInvoiceHeader: React.FC<ReturnInvoiceHeaderProps> = ({
-  onAddReturnClick,
   searchValue,
   onSearchChange,
   rawFilters,

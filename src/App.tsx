@@ -29,6 +29,9 @@ import AllGeneralDrug from "./features/medteam_cdb/pages/AllGeneralDrug";
 import SaleInvoiceDetails from "./features/SUB_invoice/SalesInvoiceDetailsPage";
 import PharmacyManagement from "./features/pharma_account/pages/PharamcyAccountManagement";
 import PurchaseInvoiceDetails from "./features/purchase_invoices/components/PurchaseInvoiceDetails";
+
+import { CreateSaleInvoicePage } from "./features/sales-and-return/pages/CreateSaleInvoicePage";
+
 import CompleteBatches from "./features/purchase_invoices/components/complete_purchase_invoice/CompleteBatches";
 import DamageInvoicesGrid from "./features/damage_invoices/components/DamageInvoicesGrid";
 import AddDamageInvoiceDialog from "./features/damage_invoices/components/AddDamageInvoice";
@@ -132,6 +135,8 @@ function App() {
                   <Route path="sales" element={<SaleInvoicesPage />} />
                   <Route path="return" element={<ReturnInvoicesPage />} />
                 </Route>
+                                  <Route path="sales/sales/create" element={<CreateSaleInvoicePage/>} />
+
 
                 <Route path="invoices" element={<InvoiceLayout />}>
                   {/* Redirect from /invoices to /invoices/purchase */}
