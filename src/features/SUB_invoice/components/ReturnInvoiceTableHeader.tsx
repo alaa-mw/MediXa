@@ -6,7 +6,7 @@ const ReturnInvoiceTableHeader = () => {
     <Box
       sx={{
         display: "grid",
-        gridTemplateColumns: "1fr 2fr 1fr 1fr 2fr 2fr 3fr 1fr 2fr",
+        gridTemplateColumns: "0.7fr 2fr 1fr 1fr 2fr 2fr 3fr 1fr 2fr",
         p: 1.2,
         bgcolor: "#F8FAFC",
         borderBottom: "1px solid #E2E8F0",

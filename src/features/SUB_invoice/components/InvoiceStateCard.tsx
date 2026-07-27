@@ -5,8 +5,10 @@ import {
   DescriptionOutlined,
   LabelOutlined,
   PaidOutlined,
+  PersonOutlineOutlined,
 } from "@mui/icons-material";
 import getStatusArabic from "../../../shared/constants/method/TranslateStatus";
+import type { Patient } from "../Types/saleInvoiceDetailsTypes";
 
 interface StatsProps {
   invoiceId: number;
@@ -16,16 +18,21 @@ interface StatsProps {
   subTotal: string;
   discount: string;
   isFive: boolean;
+  patient?: Patient | null;
+  returnreason?: string;
+  isReturnInvoice?: boolean;
 }
 
 const InvoiceStatsCards: React.FC<StatsProps> = ({
-  invoiceId,
   paymentStatus,
   saleType,
   totalAmount,
   subTotal,
   discount,
   isFive,
+  patient,
+  returnreason,
+  isReturnInvoice,
 }) => {
   const cardStyles = {
     pl: 3,
@@ -39,7 +46,6 @@ const InvoiceStatsCards: React.FC<StatsProps> = ({
     display: "flex",
     alignItems: "start",
     gap: 2,
-    // height: "100%",
   };
 
   const iconBoxStyles = (bgColor: string) => ({
@@ -73,7 +79,7 @@ const InvoiceStatsCards: React.FC<StatsProps> = ({
               variant="caption"
               sx={{ color: "text.secondary", fontWeight: 500 }}
             >
-              Total Amount
+              Total Refund
             </Typography>
             <Stack sx={{ direction: "row", alignItems: "baseline", gap: 0.5 }}>
               <Typography
@@ -89,63 +95,46 @@ const InvoiceStatsCards: React.FC<StatsProps> = ({
           </Box>
         </Card>
       </Grid>
-      {/* Sale Type Card */}
-      <Grid sx={{ xs: 12, sm: 6, md: 3 }}>
-        <Card sx={cardStyles}>
-          <Box sx={iconBoxStyles("#EFF6FF")}>
-            <LabelOutlined sx={{ color: "#78bfc1" }} />
-          </Box>
-          <Box>
-            <Typography
-              variant="caption"
-              sx={{ color: "text.secondary", fontWeight: 500 }}
-            >
-              Sale Type
-            </Typography>
-            <Typography
-              sx={{ fontSize: "1rem", fontWeight: 500, color: "main.primary" }}
-            >
-              {getStatusArabic(saleType)}
-            </Typography>
-          </Box>
-        </Card>
-      </Grid>
+
       {/* Payment Status Card */}
-      <Grid sx={{ xs: 12, sm: 6, md: 3 }}>
-        <Card sx={cardStyles}>
-          <Box sx={iconBoxStyles("#EFF6FF")}>
-            <CheckCircleOutlined sx={{ color: "#78bfc1" }} />
-          </Box>
-          <Box
-            sx={{
-              flexGrow: 1,
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <Box>
-              <Typography
-                variant="caption"
-                sx={{ color: "text.secondary", fontWeight: 500 }}
-              >
-                Payment Status
-              </Typography>
-              <Typography
-                variant="h6"
-                sx={{
-                  fontSize: "1rem",
-                  fontWeight: 500,
-                  color: "secondary",
-                }}
-              >
-                {getStatusArabic(paymentStatus)}
-              </Typography>
+      {!isReturnInvoice && (
+        <Grid sx={{ xs: 12, sm: 6, md: 3 }}>
+          <Card sx={cardStyles}>
+            <Box sx={iconBoxStyles("#EFF6FF")}>
+              <CheckCircleOutlined sx={{ color: "#78bfc1" }} />
             </Box>
-          </Box>
-        </Card>
-      </Grid>
-      {/* Invoice ID Card */}
+            <Box
+              sx={{
+                flexGrow: 1,
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <Box>
+                <Typography
+                  variant="caption"
+                  sx={{ color: "text.secondary", fontWeight: 500 }}
+                >
+                  Payment Status
+                </Typography>
+                <Typography
+                  variant="h6"
+                  sx={{
+                    fontSize: "1rem",
+                    fontWeight: 500,
+                    color: "secondary",
+                  }}
+                >
+                  {getStatusArabic(paymentStatus)}
+                </Typography>
+              </Box>
+            </Box>
+          </Card>
+        </Grid>
+      )}
+
+      {/* Partial Paid Card */}
       {isFive && (
         <Grid sx={{ xs: 12, sm: 6, md: 3 }}>
           <Card sx={cardStyles}>
@@ -172,6 +161,8 @@ const InvoiceStatsCards: React.FC<StatsProps> = ({
           </Card>
         </Grid>
       )}
+
+      {/* Discount Card */}
       <Grid sx={{ xs: 12, sm: 6, md: 3 }}>
         <Card sx={cardStyles}>
           <Box sx={iconBoxStyles("#EEF2F6")}>
@@ -192,6 +183,86 @@ const InvoiceStatsCards: React.FC<StatsProps> = ({
           </Box>
         </Card>
       </Grid>
+
+      {/* Sale Type Card (يظهر فقط إذا لم يكن هناك مريض) أو Patient Card (إذا وُجد مريض) */}
+      {!patient ? (
+        isReturnInvoice ? (
+          <Grid sx={{ xs: 12, sm: 6, md: 3 }}>
+            <Card sx={cardStyles}>
+              <Box sx={iconBoxStyles("#EFF6FF")}>
+                <LabelOutlined sx={{ color: "#78bfc1" }} />
+              </Box>
+              <Box>
+                <Typography
+                  variant="caption"
+                  sx={{ color: "text.secondary", fontWeight: 500 }}
+                >
+                  Return Reason
+                </Typography>
+                <Typography
+                  sx={{
+                    fontSize: "1rem",
+                    fontWeight: 500,
+                    color: "main.primary",
+                  }}
+                >
+                  {returnreason}
+                </Typography>
+              </Box>
+            </Card>
+          </Grid>
+        ) : (
+          <Grid sx={{ xs: 12, sm: 6, md: 3 }}>
+            <Card sx={cardStyles}>
+              <Box sx={iconBoxStyles("#EFF6FF")}>
+                <LabelOutlined sx={{ color: "#78bfc1" }} />
+              </Box>
+              <Box>
+                <Typography
+                  variant="caption"
+                  sx={{ color: "text.secondary", fontWeight: 500 }}
+                >
+                  Sale Type
+                </Typography>
+                <Typography
+                  sx={{
+                    fontSize: "1rem",
+                    fontWeight: 500,
+                    color: "main.primary",
+                  }}
+                >
+                  {getStatusArabic(saleType)}
+                </Typography>
+              </Box>
+            </Card>
+          </Grid>
+        )
+      ) : (
+        <Grid sx={{ xs: 12, sm: 6, md: 3 }}>
+          <Card sx={cardStyles}>
+            <Box sx={iconBoxStyles("#EFF6FF")}>
+              <PersonOutlineOutlined sx={{ color: "#78bfc1" }} />
+            </Box>
+            <Box>
+              <Typography
+                variant="caption"
+                sx={{ color: "text.secondary", fontWeight: 500 }}
+              >
+                {patient.fullName}
+              </Typography>
+              <Typography
+                sx={{
+                  fontSize: "18px",
+                  fontWeight: 700,
+                  color: "tertiary.main",
+                }}
+              >
+                {patient.phone}
+              </Typography>
+            </Box>
+          </Card>
+        </Grid>
+      )}
     </Grid>
   );
 };

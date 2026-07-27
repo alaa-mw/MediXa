@@ -3,8 +3,8 @@ import CustomAutocompleteWithPagination from "../../../../shared/layout/CustomAu
 import type { DosageForm } from "../../types/dosageFormType";
 import { useEffect, useState } from "react";
 import useDosageForms from "../../hook/useFetchDosageForm";
-import type { DrugFormData } from "../../types/drugFormType";
 import DynamicQuickAddModal from "../../../../shared/layout/CustomAutoCompleteWithPagination/DynamicQuickAddModel";
+import type { DrugFormData } from "../../types/generalDrugFormType";
 
 interface DosageFormComponentProps {
   handleInputChange: <K extends keyof DrugFormData>(
@@ -81,8 +81,8 @@ const DosageFormComponent = ({
         onPageChange={dosageForms.setPage}
         onQuickAdd={() => setIsModalOpen(true)}
       />
-     <DynamicQuickAddModal
-         open={isModalOpen}
+      <DynamicQuickAddModal
+        open={isModalOpen}
         onClose={() => {
           setIsModalOpen(false);
         }}

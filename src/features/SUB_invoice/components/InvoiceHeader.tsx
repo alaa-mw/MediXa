@@ -2,6 +2,7 @@ import React from "react";
 import { Box, Stack, Typography } from "@mui/material";
 import { format } from "date-fns";
 import InvoiceStatsCards from "./InvoiceStateCard";
+import type { Patient } from "../Types/saleInvoiceDetailsTypes";
 
 interface InvoiceHeaderProps {
   invoiceId: number;
@@ -12,6 +13,9 @@ interface InvoiceHeaderProps {
   subTotal: string;
   discount: string;
   isFive: boolean;
+  returnreason? : string;
+  patient?: Patient | null;
+  isReturnInvoice: boolean;
 }
 
 const InvoiceHeader: React.FC<InvoiceHeaderProps> = ({
@@ -23,6 +27,9 @@ const InvoiceHeader: React.FC<InvoiceHeaderProps> = ({
   subTotal,
   discount,
   isFive,
+  patient,
+  returnreason,
+  isReturnInvoice,
 }) => {
   const formattedDate = format(new Date(createdAt), "dd MMM yyyy, hh:mm a");
 
@@ -38,7 +45,6 @@ const InvoiceHeader: React.FC<InvoiceHeaderProps> = ({
     >
       {/* قسم العنوان والتاريخ */}
       <Box sx={{ textAlign: "right" }}>
-        {/* تم تعديل الخطأ المطبعي هنا من irection إلى direction */}
         <Stack
           direction="row"
           spacing={1}
@@ -48,7 +54,8 @@ const InvoiceHeader: React.FC<InvoiceHeaderProps> = ({
             variant="h4"
             sx={{ fontWeight: "bold", color: "#0F172A" }}
           >
-            فاتورة بيع رقم {invoiceId}
+            {isReturnInvoice ? " فاتورة مرتجع رقم" : "فاتورة بيع رقم"}{" "}
+            {invoiceId}
           </Typography>
         </Stack>
         <Typography color="text.secondary" sx={{ mt: 0.5, fontSize: "0.9rem" }}>
@@ -70,6 +77,9 @@ const InvoiceHeader: React.FC<InvoiceHeaderProps> = ({
           subTotal={subTotal}
           discount={discount}
           isFive={isFive}
+          patient={patient}
+          returnreason={returnreason}
+          isReturnInvoice={isReturnInvoice}
         />
       </Stack>
     </Stack>

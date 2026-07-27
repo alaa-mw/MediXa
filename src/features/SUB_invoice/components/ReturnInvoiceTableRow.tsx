@@ -1,31 +1,30 @@
-import type { ReturnInvoiceItem } from "../Types/saleInvoiceDetailsTypes";
 import { Box, Typography } from "@mui/material";
 import { CheckIcon } from "lucide-react";
 import ReturnBatchAllocationButton from "./ReturnBatchAllocationButton";
+import type { ReturnInvoiceItem } from "../return-invoice/Types/returnInvoiceList";
 
 interface Props {
   item: ReturnInvoiceItem;
+  discount: number;
   itemIndex: number;
 }
-const ReturnInvoiceTableRow = ({ item, itemIndex }: Props) => {
-  //   const drugName =item.items.
-  //   const drugBarcode =
-  //     item.pharmacyDrug?.drug?.generalDrug?.barcode || "دواء غير معروف";
-  console.log("***********8item", item.saleInvoiceItemBatch);
+
+const ReturnInvoiceTableRow = ({ item, itemIndex, discount }: Props) => {
+  // باقي الكود يبقى كما هو دون أي تغيير
   const qty = item.baseQuantity / item.unitFactorToBase;
 
   return (
     <Box
       sx={{
         display: "grid",
-        gridTemplateColumns: "1fr 2fr 1fr 1fr 2fr 2fr 3fr 1fr 2fr",
+        gridTemplateColumns: "0.7fr 2fr 1fr 1fr 2fr 2fr 3fr 1fr 2fr",
         p: 1.2,
         borderBottom: "1px solid #F1F5F9",
         alignItems: "center",
         direction: "rtl",
       }}
     >
-      {/* اسم الدواء */}
+      {/* اسم الدواء وباقي العناصر */}
       <Box
         sx={{ display: "flex", justifyContent: "flex-start", fontWeight: 500 }}
       >
@@ -35,7 +34,7 @@ const ReturnInvoiceTableRow = ({ item, itemIndex }: Props) => {
       <Box
         sx={{ display: "flex", justifyContent: "flex-start", fontWeight: 500 }}
       >
-        item.tradeName
+        {item.pharmacyDrug?.drug?.generalDrug?.tradeName || "دواء غير معروف"}
       </Box>
 
       {/* نوع الوحدة */}
@@ -106,6 +105,7 @@ const ReturnInvoiceTableRow = ({ item, itemIndex }: Props) => {
           ل.س
         </Typography>
       </Box>
+
       <Box
         sx={{
           display: "flex",

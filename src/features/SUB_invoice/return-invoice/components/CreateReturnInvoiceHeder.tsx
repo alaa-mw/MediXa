@@ -6,7 +6,7 @@ const CreateReturnInvoiceHeder = () => {
     <Box
       sx={{
         display: "grid",
-        gridTemplateColumns: "1fr 2fr 2fr 2fr 3fr 2fr 3fr 3fr",
+        gridTemplateColumns: "1fr 2fr 2fr 2fr 3fr 2fr 3fr 4fr",
         p: 1.2,
         bgcolor: "#F8FAFC",
         borderBottom: "1px solid #E2E8F0",

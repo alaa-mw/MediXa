@@ -6,29 +6,51 @@ import {
   Box,
   Divider,
   Stack,
-  Grow,
+  CircularProgress,
 } from "@mui/material";
 import { InfoOutlined as InfoIcon } from "@mui/icons-material";
-import type { SaleInvoiceItem } from "../Types/saleInvoiceDetailsTypes";
+import useGetData from "../../../shared/hooks/useGetData";
+import type { SaleInvoiceBatchesResponse } from "../Types/saleInvoiceItemBatches";
 
-interface InvoiceRowProps {
-  item: SaleInvoiceItem;
+interface BatchAllocationButtonProps {
+  invoiceId: number;
+  saleInvoiceItemId: number;
 }
 
-const BatchAllocationButton: React.FC<InvoiceRowProps> = ({ item }) => {
-  // استخدام anchorEl للتحكم بمكان ظهور الـ Popover بجانب الزر تماماً
+const BatchAllocationButton: React.FC<BatchAllocationButtonProps> = ({
+  invoiceId,
+  saleInvoiceItemId,
+}) => {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+
+  const {
+    data: response,
+    isLoading,
+    error,
+  } = useGetData<SaleInvoiceBatchesResponse>(
+    `/sale-invoice/${invoiceId}/batches`,
+  );
 
   const handleOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
+    setIsOpen(true);
   };
 
   const handleClose = () => {
     setAnchorEl(null);
+    setIsOpen(false);
   };
 
   const open = Boolean(anchorEl);
   const id = open ? "batch-popover" : undefined;
+
+  // 2. تصفية العناصر واستخراج الدفعات الخاصة بـ item المحدد فقط
+  const invoiceData = response?.data;
+  const currentItem = invoiceData?.items?.find(
+    (item) => item.saleInvoiceItemId === saleInvoiceItemId,
+  );
+  const batchAllocations = currentItem?.batches || [];
 
   // تنسيق التاريخ
   const formatDate = (dateString?: string) => {
@@ -42,7 +64,6 @@ const BatchAllocationButton: React.FC<InvoiceRowProps> = ({ item }) => {
 
   return (
     <Box>
-      {/* زر "تفاصيل" */}
       <Button
         aria-describedby={id}
         variant="text"
@@ -58,8 +79,9 @@ const BatchAllocationButton: React.FC<InvoiceRowProps> = ({ item }) => {
           "& .MuiButton-startIcon": { mx: 0, ml: 1 },
         }}
       >
-        تفاصيل
+        تفاصيل الدفعة
       </Button>
+
       <Popover
         id={id}
         open={open}
@@ -73,7 +95,6 @@ const BatchAllocationButton: React.FC<InvoiceRowProps> = ({ item }) => {
           vertical: "top",
           horizontal: "center",
         }}
-        // 💡 قمنا بحذف الـ TransitionProps من هنا نهائياً لتجنب خطأ التايب سكريبت
         slotProps={{
           paper: {
             sx: {
@@ -83,8 +104,6 @@ const BatchAllocationButton: React.FC<InvoiceRowProps> = ({ item }) => {
               border: "1px solid #E2E8F0",
               p: 2,
               direction: "rtl",
-              // إذا كنت ترغب بالتحكم في سرعة تأثير الظهور (الأنيميشن) بدون مشاكل types:
-              transition: "all 0.3s ease-in-out",
             },
           },
         }}
@@ -97,20 +116,31 @@ const BatchAllocationButton: React.FC<InvoiceRowProps> = ({ item }) => {
         </Typography>
         <Divider sx={{ mb: 1.5 }} />
 
-        {item.batchAllocations && item.batchAllocations.length > 0 ? (
+        {isLoading ? (
+          <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
+            <CircularProgress size={24} />
+          </Box>
+        ) : error ? (
+          <Typography
+            variant="body2"
+            color="error"
+            sx={{ textAlign: "center", py: 1 }}
+          >
+            حدث خطأ أثناء تحميل الدفعات.
+          </Typography>
+        ) : batchAllocations.length > 0 ? (
           <Stack spacing={2}>
-            {item.batchAllocations.map((alloc, index) => (
+            {batchAllocations.map((alloc, index) => (
               <Box
                 key={alloc.saleInvoiceItemBatchId}
                 sx={{
-                  pb: index !== item.batchAllocations!.length - 1 ? 1.5 : 0,
+                  pb: index !== batchAllocations.length - 1 ? 1.5 : 0,
                   borderBottom:
-                    index !== item.batchAllocations!.length - 1
+                    index !== batchAllocations.length - 1
                       ? "1px dashed #E2E8F0"
                       : "none",
                 }}
               >
-                {/* عرض البيانات بشكل طولي تتابعي */}
                 <Stack spacing={0.8}>
                   <Box
                     sx={{ display: "flex", justifyContent: "space-between" }}
@@ -130,15 +160,16 @@ const BatchAllocationButton: React.FC<InvoiceRowProps> = ({ item }) => {
                       الكميات المباعة:
                     </Typography>
                     <Typography variant="body2">
-                      {alloc.batch.soldQuantity}/
-                      {alloc.batch.initialQuantity}{" "}
+                      {alloc.soldDisplayQuantity} ({alloc.soldBaseQuantity}{" "}
+                      وحدة)
                     </Typography>
                   </Box>
+
                   <Box
                     sx={{ display: "flex", justifyContent: "space-between" }}
                   >
                     <Typography variant="body2" color="text.secondary">
-                      تاريخ ادخال الدفعة:
+                      تاريخ الاستلام:
                     </Typography>
                     <Typography
                       variant="body2"
@@ -147,11 +178,12 @@ const BatchAllocationButton: React.FC<InvoiceRowProps> = ({ item }) => {
                       {formatDate(alloc.batch.receivedDate)}
                     </Typography>
                   </Box>
+
                   <Box
                     sx={{ display: "flex", justifyContent: "space-between" }}
                   >
                     <Typography variant="body2" color="text.secondary">
-                      تاريخ انتهاء الصلاحية:
+                      تاريخ الانتهاء:
                     </Typography>
                     <Typography
                       variant="body2"
@@ -160,10 +192,6 @@ const BatchAllocationButton: React.FC<InvoiceRowProps> = ({ item }) => {
                       {formatDate(alloc.batch.expiryDate)}
                     </Typography>
                   </Box>
-
-                  <Box
-                    sx={{ display: "flex", justifyContent: "space-between" }}
-                  ></Box>
 
                   <Box
                     sx={{
@@ -209,7 +237,7 @@ const BatchAllocationButton: React.FC<InvoiceRowProps> = ({ item }) => {
             color="text.secondary"
             sx={{ textAlign: "center", py: 1 }}
           >
-            لا توجد معلومات تشغيلة.
+            لا توجد معلومات تشغيلة لهذا العنصر.
           </Typography>
         )}
       </Popover>

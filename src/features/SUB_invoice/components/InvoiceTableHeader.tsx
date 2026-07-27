@@ -1,11 +1,13 @@
 import { Box } from "@mui/material";
-
-const InvoiceTableHeader = () => {
+interface Props {
+  isReturn: boolean;
+}
+const InvoiceTableHeader = ({ isReturn }: Props) => {
   return (
     <Box
       sx={{
         display: "grid",
-        gridTemplateColumns: "1fr 3fr 2fr 2fr 2fr 2fr 3fr 3fr 3fr",
+        gridTemplateColumns: "1fr 3fr 3fr 2fr 2fr 2fr 2fr 3fr 3fr",
         p: 1.2,
         bgcolor: "#F8FAFC",
         borderBottom: "1px solid #E2E8F0",
@@ -23,9 +25,15 @@ const InvoiceTableHeader = () => {
       <Box sx={{ display: "flex", justifyContent: "center" }}>الوحدة</Box>
       <Box sx={{ display: "flex", justifyContent: "center" }}>الكمية</Box>
       <Box sx={{ display: "flex", justifyContent: "center" }}>سعر المفرد</Box>
-      <Box sx={{ display: "flex", justifyContent: "center" }}>
-        النسبة المضافة{" "}
-      </Box>
+      {isReturn ? (
+        <Box sx={{ display: "flex", justifyContent: "center" }}>
+          إعادة تخزين
+        </Box>
+      ) : (
+        <Box sx={{ display: "flex", justifyContent: "center" }}>
+          النسبة المضافة
+        </Box>
+      )}
       <Box sx={{ display: "flex", justifyContent: "center" }}>
         السعر الإجمالي
       </Box>

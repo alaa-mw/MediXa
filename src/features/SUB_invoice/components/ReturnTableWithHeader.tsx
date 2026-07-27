@@ -1,14 +1,13 @@
 import { Box, Paper, Typography } from "@mui/material";
 import { format } from "date-fns/format";
 import InvoiceReturnsTable from "./InvoicReturnsTable";
-import type { ReturnInvoice } from "../Types/saleInvoiceDetailsTypes";
+import type { ReturnInvoiceBySale } from "../return-invoice/Types/returnInvoiceList";
 
 interface Props {
-  returnInvoice: ReturnInvoice; // يمكنك تعديل النوع حسب الحاجة
+  returnInvoice: ReturnInvoiceBySale;
 }
 
 const ReturnTableWithHeader = ({ returnInvoice }: Props) => {
-  console.log("------------------", returnInvoice);
   return (
     <Paper
       key={returnInvoice.returnInvoiceId}
@@ -21,14 +20,14 @@ const ReturnTableWithHeader = ({ returnInvoice }: Props) => {
         overflow: "hidden",
       }}
     >
-      {/* البوكس الأحمر (أصبح الهيدر الفعلي للـ Paper) */}
+      {/* الهيدر العلوي لجدول المرتجع */}
       <Box
         sx={{
           width: "100%",
           px: 3,
           py: 1,
           bgcolor: "#fae6e6",
-          color: "error.contrasredText",
+          color: "error.contrastText",
           display: "flex",
           flexDirection: "row",
           alignItems: "center",

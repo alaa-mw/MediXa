@@ -6,17 +6,14 @@ import {
   Box,
   Divider,
   Stack,
-  Grow,
 } from "@mui/material";
 import { InfoOutlined as InfoIcon } from "@mui/icons-material";
-import type { SaleInvoiceItemBatch } from "../Types/saleInvoiceDetailsTypes";
-
+import type { ReturnInvoiceItem } from "../return-invoice/Types/returnInvoiceList";
 interface InvoiceRowProps {
-  item: SaleInvoiceItemBatch;
+  item: NonNullable<ReturnInvoiceItem["saleInvoiceItemBatch"]>;
 }
 
 const ReturnBatchAllocationButton: React.FC<InvoiceRowProps> = ({ item }) => {
-  // استخدام anchorEl للتحكم بمكان ظهور الـ Popover بجانب الزر تماماً
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
   const handleOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -30,7 +27,6 @@ const ReturnBatchAllocationButton: React.FC<InvoiceRowProps> = ({ item }) => {
   const open = Boolean(anchorEl);
   const id = open ? "batch-popover" : undefined;
 
-  // تنسيق التاريخ
   const formatDate = (dateString?: string) => {
     if (!dateString) return "-";
     return new Date(dateString).toLocaleDateString("ar-EG", {
@@ -42,7 +38,6 @@ const ReturnBatchAllocationButton: React.FC<InvoiceRowProps> = ({ item }) => {
 
   return (
     <Box>
-      {/* زر "تفاصيل" */}
       <Button
         aria-describedby={id}
         variant="text"
@@ -73,7 +68,6 @@ const ReturnBatchAllocationButton: React.FC<InvoiceRowProps> = ({ item }) => {
           vertical: "top",
           horizontal: "center",
         }}
-        // 💡 قمنا بحذف الـ TransitionProps من هنا نهائياً لتجنب خطأ التايب سكريبت
         slotProps={{
           paper: {
             sx: {
@@ -83,7 +77,6 @@ const ReturnBatchAllocationButton: React.FC<InvoiceRowProps> = ({ item }) => {
               border: "1px solid #E2E8F0",
               p: 2,
               direction: "rtl",
-              // إذا كنت ترغب بالتحكم في سرعة تأثير الظهور (الأنيميشن) بدون مشاكل types:
               transition: "all 0.3s ease-in-out",
             },
           },
@@ -97,22 +90,8 @@ const ReturnBatchAllocationButton: React.FC<InvoiceRowProps> = ({ item }) => {
         </Typography>
         <Divider sx={{ mb: 1.5 }} />
 
-        {/* {item.batchAllocations && item.batchAllocations.length > 0 ? ( */}
         <Stack spacing={2}>
-          {/* {item.batchAllocations.map((alloc, index) => ( */}
-          <Box
-            key={item.saleInvoiceItemBatchId}
-            sx={
-              {
-                //   pb: index !== item.batchAllocations!.length - 1 ? 1.5 : 0,
-                //   borderBottom:
-                //     index !== item.batchAllocations!.length - 1
-                //       ? "1px dashed #E2E8F0"
-                //       : "none",
-              }
-            }
-          >
-            {/* عرض البيانات بشكل طولي تتابعي */}
+          <Box key={item.saleInvoiceItemBatchId}>
             <Stack spacing={0.8}>
               <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                 <Typography variant="body2" color="text.secondary">
@@ -143,6 +122,7 @@ const ReturnBatchAllocationButton: React.FC<InvoiceRowProps> = ({ item }) => {
                   {formatDate(item.batch.receivedDate)}
                 </Typography>
               </Box>
+
               <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                 <Typography variant="body2" color="text.secondary">
                   تاريخ انتهاء الصلاحية:
@@ -154,10 +134,6 @@ const ReturnBatchAllocationButton: React.FC<InvoiceRowProps> = ({ item }) => {
                   {formatDate(item.batch.expiryDate)}
                 </Typography>
               </Box>
-
-              <Box
-                sx={{ display: "flex", justifyContent: "space-between" }}
-              ></Box>
 
               <Box
                 sx={{
@@ -189,7 +165,6 @@ const ReturnBatchAllocationButton: React.FC<InvoiceRowProps> = ({ item }) => {
               </Box>
             </Stack>
           </Box>
-          {/* ))} */}
         </Stack>
       </Popover>
     </Box>

@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Box, CircularProgress, Typography, Alert } from "@mui/material"; // أضفنا Alert هنا
 
@@ -7,6 +6,7 @@ import { MedicineSearchResult } from "../components/AddMedicine/MedicineSearchRe
 import { FoundMedicineDialog } from "../components/AddMedicine/MedicineFoundDialog";
 import { NotFoundMedicineDialog } from "../components/AddMedicine/MedicineNotFoundDialog";
 import { useSearchCentralDrug } from "../hooks/useSearchCentralDrug";
+import { useBarcodeScanner } from "../../../shared/services/useBarcodeScanner";
 
 export const AddMedicinePage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -18,13 +18,30 @@ export const AddMedicinePage: React.FC = () => {
   const { searchDrugByBarcode, loading, foundDrug, searchResult, error } =
     useSearchCentralDrug();
 
+  const executeSearch = (codeToSearch: string) => {
+    if (!codeToSearch.trim()) return;
+    setHasSearched(true);
+    searchDrugByBarcode(codeToSearch);
+  };
+
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!searchQuery.trim()) return;
-
-    setHasSearched(true);
-    searchDrugByBarcode(searchQuery);
+    executeSearch(searchQuery);
   };
+
+  useBarcodeScanner({
+    onScan: (scannedCode) => {
+      console.log("تم تلقي الباركود من القارئ الإلكتروني:", scannedCode);
+      setSearchQuery(scannedCode);
+      executeSearch(scannedCode);
+    },
+  });
+  //   e.preventDefault();
+  //   if (!searchQuery.trim()) return;
+
+  //   setHasSearched(true);
+  //   searchDrugByBarcode(searchQuery);
+  // };
 
   return (
     <Box

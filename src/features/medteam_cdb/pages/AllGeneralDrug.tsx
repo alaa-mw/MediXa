@@ -1,26 +1,50 @@
 import {
-  LocalPharmacyOutlined,
-  MedicalInformation,
-  SearchOutlined,
-} from "@mui/icons-material";
-import {
   Box,
   Card,
-  Divider,
   Grid,
-  InputAdornment,
   Pagination,
   Paper,
   Stack,
-  TextField,
   Typography,
 } from "@mui/material";
-import React from "react";
-import type { GeneralDrugsResponse } from "../types/generalDrugType";
 import GeneralDrugTable from "../components/GeneralDrugTable";
-import PharmaStatsCards from "../../pharma_account/components/PharmaStats";
+import useGetWithParams from "../../../shared/hooks/useGetWithParams";
+import type { GeneralDrug, PaginatedData } from "../types/allGeneralDrugType";
+import { useState } from "react";
+import type { DosageForm } from "../types/dosageFormType";
 
 const AllGeneralDrug = () => {
+  // 1. تعريف حالة الصفحة الحالية (تفتتح بالصفحة 1 وبحد 10 عناصر لكل صفحة)
+  const [queryParams, setQueryParams] = useState({
+    page: 1,
+    limit: 10,
+  });
+
+  // 2. استخدام الهوك لجلب البيانات الحقيقية من السيرفر
+  const {
+    data: response,
+    isLoading,
+    isError,
+  } = useGetWithParams<PaginatedData<GeneralDrug>>(
+    "/general-drugs",
+    queryParams,
+  );
+
+  const paginatedResult = response?.data;
+  const drugsList = paginatedResult?.data || [];
+  const totalPages = paginatedResult?.pages || 1;
+  const totalItems = paginatedResult?.total || 0;
+
+  const handlePageChange = (
+    _event: React.ChangeEvent<unknown>,
+    newPage: number,
+  ) => {
+    setQueryParams((prev) => ({
+      ...prev,
+      page: newPage,
+    }));
+  };
+
   return (
     <Box>
       <Box>
@@ -93,7 +117,7 @@ const AllGeneralDrug = () => {
                   display: "inline-block",
                 }}
               >
-                {100}
+                {totalItems}
               </Typography>
 
               <Typography
@@ -143,11 +167,9 @@ const AllGeneralDrug = () => {
               sx={{ border: "1px solid #E2E8F0", borderRadius: "8px" }}
             >
               <GeneralDrugTable
-              // isLoading={isLoading}
-              // data={filteredPharmacies}
-              // onShowDetails={handleShowDetails}
-              // refetch={refetch}
-              // isLoading={isLoading}
+                drugs={drugsList}
+                isLoading={isLoading}
+                isError={isError}
               />
             </Paper>
             <Box
@@ -157,12 +179,14 @@ const AllGeneralDrug = () => {
                 py: 2,
               }}
             >
-              <Pagination
-                page={1}
-                count={2}
-                color="primary"
-                onChange={() => {}}
-              />
+              {totalPages > 1 && (
+                <Pagination
+                  page={paginatedResult?.page || 1}
+                  count={totalPages}
+                  color="primary"
+                  onChange={handlePageChange}
+                />
+              )}
             </Box>
           </Grid>
         </Grid>
