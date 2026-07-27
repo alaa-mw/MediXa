@@ -14,6 +14,8 @@ interface SearchBarProps<T> {
 
   getOptionLabel?: (item: T) => string;
   startAdornment?: React.ReactNode;
+  /** Optional barcode reader component (e.g. <BarcodeAllDrugs />). If provided, it will receive `onFindResult` injected. */
+  barcodeComponent?: React.ReactElement;
 }
 
 export default function SearchBarDynamic<T>({
@@ -23,6 +25,7 @@ export default function SearchBarDynamic<T>({
   onSelect,
   getOptionLabel,
   startAdornment,
+  barcodeComponent,
 }: SearchBarProps<T>) {
   const [open, setOpen] = React.useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -88,8 +91,33 @@ export default function SearchBarDynamic<T>({
             textAlign: "right",
           }}
         />
+
+        {startAdornment && <Box>{startAdornment}</Box>}
         
-        {startAdornment && <Box >{startAdornment}</Box>}
+        {barcodeComponent && <Box>{barcodeComponent}</Box>}
+        {/* {barcodeComponent && React.isValidElement(barcodeComponent) && (
+          <Box sx={{ ml: 1 }}>
+            {(() => {
+              const existingHandler = (barcodeComponent.props as any)
+                ?.onFindResult;
+              if (typeof existingHandler === "function") {
+                // If the component already handles onFindResult, render as-is and let it control behavior
+                return barcodeComponent;
+              }
+
+              // Otherwise inject a handler that updates this search bar and forwards to onBarcodeFind
+              return React.cloneElement(barcodeComponent, {
+                onFindResult: (result: any) => {
+                  const name = result?.tradeName || "";
+                  setValue(name);
+                  onChange(name);
+                  if (onSelect) onSelect(result as unknown as T);
+                  setOpen(false);
+                },
+              });
+            })()}
+          </Box>
+        )} */}
       </Box>
 
       {open && results.length > 0 && (

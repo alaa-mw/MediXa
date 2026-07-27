@@ -8,7 +8,8 @@ import {
   Paper,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { usePostData } from "../../../shared/hooks/usePostData";
 import { useGetWithParams } from "../../../shared/hooks/useGetWithParams";
 import { CustomCounterField } from "../../../shared/layout/CustomCounterField";
@@ -51,6 +52,32 @@ const AddDamageInvoice = () => {
   >(undefined);
 
   const [openBatchesDialog, setOpenBatchesDialog] = useState(false);
+
+  const location = useLocation();
+
+  useEffect(() => {
+    const state = (location.state ?? {}) as any;
+    if (state && state.pharmacyDrugId) {
+      setForm((s) => ({
+        ...s,
+        pharmacyDrugId: state.pharmacyDrugId,
+        batchAllocations: Array.isArray(state.batchAllocations)
+          ? state.batchAllocations.map((b: any) => ({
+              batchId: String(b.batchId),
+              expiryDate: b.expiryDate,
+              availableQuantity: Number(b.availableQuantity ?? 0),
+              quantityDamaged: Number(b.quantityDamaged ?? 0),
+              notes: b.notes ?? "",
+            }))
+          : [],
+      }));
+
+      // set a lightweight selectedDrug if tradeName provided so UI shows label
+      if (state.tradeName) {
+        setSelectedDrug({ pharmacyDrugId: state.pharmacyDrugId, tradeName: state.tradeName });
+      }
+    }
+  }, [location.state]);
 
   const {showSnackbar} = useSnackbar(); 
   // Search pharmacy drugs by name (triggered after 3 chars by hook options)

@@ -28,6 +28,7 @@ export const SnackbarProvider: React.FC<{ children: React.ReactNode }> = ({
         open={open}
         onClose={hideSnackbar}
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        autoHideDuration={3000}
       >
         <Alert
           onClose={hideSnackbar}

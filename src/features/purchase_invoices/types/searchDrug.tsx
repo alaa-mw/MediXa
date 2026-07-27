@@ -28,3 +28,8 @@ interface GeneralDrug extends Pagination {
   tradeName: string;
   barcode: string;
 }
+
+export interface PharmacyDrugResult {
+  pharmacyDrugId: string;
+  tradeName: string;
+}

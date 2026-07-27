@@ -22,6 +22,7 @@ import { useNavigate } from "react-router-dom";
 import EmptyState from "../../../shared/layout/EmptyState";
 import SearchBarDynamic from "../../../shared/layout/SearchBarDynamic";
 import theme from "../../../shared/styles/mainTheme";
+import BarcodeMyDrugs from "../../../shared/layout/BarcodeMyDrugs";
 
 export interface PharmacyDrugSearch {
   pharmacyDrugId: string;
@@ -41,7 +42,9 @@ const PurchaseInvoiceGrid = () => {
     pharmacyDrugId: "",
   });
   const [searchMode, setSearchMode] = useState<"supplier" | "drug">("supplier");
-
+  const [selectedSearch, setSelectedSearch] = useState<
+    PharmacyDrugSearch | Supplier | null
+  >(null);
   const { data, isLoading, queryParams, setQueryParams } = useGetWithParams<
     PurchaseInvoiceDetails[]
   >("/supplier-invoice", localFilters);
@@ -95,16 +98,16 @@ const PurchaseInvoiceGrid = () => {
       });
     }
 
-    if (localFilters.supplierId) {
+    if (localFilters.supplierId && (selectedSearch as Supplier)) {
       chips.push({
         key: "supplierId",
-        label: `المورد: ${localFilters.supplierId}`,
+        label: `المورد: ${(selectedSearch as Supplier)?.supplierName}`,
       });
     }
-    if (localFilters.pharmacyDrugId) {
+    if (localFilters.pharmacyDrugId && (selectedSearch as PharmacyDrugSearch)) {
       chips.push({
         key: "pharmacyDrugId",
-        label: `الدواء: ${localFilters.pharmacyDrugId}`,
+        label: `الدواء: ${(selectedSearch as PharmacyDrugSearch)?.tradeName}`,
       });
     }
 
@@ -218,6 +221,7 @@ const PurchaseInvoiceGrid = () => {
             getOptionLabel={(supplier) => supplier.supplierName}
             onSelect={(supplier) => {
               handleFilterChange("supplierId", supplier.supplierId);
+              setSelectedSearch(supplier);
             }}
           />
         ) : (
@@ -229,7 +233,23 @@ const PurchaseInvoiceGrid = () => {
             getOptionLabel={(drug) => drug.tradeName}
             onSelect={(drug) => {
               handleFilterChange("pharmacyDrugId", drug.pharmacyDrugId);
+              setSelectedSearch({
+                pharmacyDrugId: drug.pharmacyDrugId,
+                tradeName: drug.tradeName,
+              });
             }}
+            barcodeComponent={
+              <BarcodeMyDrugs
+                onFindResult={(result) => {
+                  console.log("تم العثور على الدواء:", result);
+                  handleFilterChange("pharmacyDrugId", result.id);
+                  setSelectedSearch({
+                    pharmacyDrugId: result.id,
+                    tradeName: result.tradeName,
+                  });
+                }}
+              />
+            }
           />
         )}
         <Button
@@ -292,18 +312,18 @@ const PurchaseInvoiceGrid = () => {
           )}
         </Box>
         {/* {(data?.meta?.totalPages ?? 1) > 1 && ( */}
-          <Box sx={{ direction: "rtl" }}>
-            <Box sx={{ display: "flex", alignItems: "center" }}>
-              <Pagination
-                count={data?.meta?.totalPages ?? 1}
-                page={data?.meta?.page ?? 1}
-                size="small"
-                onChange={(_, value) =>
-                  setQueryParams({ ...queryParams, page: value })
-                }
-              />
-            </Box>
+        <Box sx={{ direction: "rtl" }}>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Pagination
+              count={data?.meta?.totalPages ?? 1}
+              page={data?.meta?.page ?? 1}
+              size="small"
+              onChange={(_, value) =>
+                setQueryParams({ ...queryParams, page: value })
+              }
+            />
           </Box>
+        </Box>
         {/* )} */}
       </Stack>
       <Box

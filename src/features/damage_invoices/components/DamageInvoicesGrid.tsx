@@ -6,13 +6,12 @@ import useGetWithParams from "../../../shared/hooks/useGetWithParams";
 import EmptyState from "../../../shared/layout/EmptyState";
 import SearchBarDynamic from "../../../shared/layout/SearchBarDynamic";
 import type { PharmacyDrugSearch } from "../../purchase_invoices/components/PurchaseInvoiceGrid";
-import type {
-  DamageInvoice,
-} from "../types/damageInvoice";
+import type { DamageInvoice } from "../types/damageInvoice";
 import type { PharmacyInvoiceStatus } from "../types/enums";
 import DamageInvoiceCard from "./DamageInvoiceCard";
 import DamageInvoiceCardSkeleton from "./DamageInvoiceCardSkeleton";
 import FilterDropDown from "./FilterDropDown";
+import BarcodeMyDrugs from "../../../shared/layout/BarcodeMyDrugs";
 
 const DamageInvoicesGrid = () => {
   const navigate = useNavigate();
@@ -28,6 +27,9 @@ const DamageInvoicesGrid = () => {
     pharmacyDrugId: "",
   });
 
+  const [selectedDrug, setSelectedDrug] = useState<PharmacyDrugSearch | null>(
+    null,
+  );
   const { data, isLoading, setQueryParams, queryParams } = useGetWithParams<
     DamageInvoice[]
   >("/damage-invoices", localFilters);
@@ -90,10 +92,10 @@ const DamageInvoicesGrid = () => {
       });
     }
 
-    if (localFilters.pharmacyDrugId) {
+    if (localFilters.pharmacyDrugId && selectedDrug) {
       chips.push({
         key: "pharmacyDrugId",
-        label: `الدواء: ${localFilters.pharmacyDrugId}`,
+        label: `الدواء: ${selectedDrug?.tradeName}`,
       });
     }
 
@@ -124,7 +126,23 @@ const DamageInvoicesGrid = () => {
           getOptionLabel={(drug) => drug.tradeName}
           onSelect={(drug) => {
             handleFilterChange("pharmacyDrugId", drug.pharmacyDrugId);
+            setSelectedDrug({
+              pharmacyDrugId: drug.pharmacyDrugId,
+              tradeName: drug.tradeName,
+            });
           }}
+          barcodeComponent={
+            <BarcodeMyDrugs
+              onFindResult={(result) => {
+                console.log("تم العثور على الدواء:", result);
+                handleFilterChange("pharmacyDrugId", result.id);
+                setSelectedDrug({
+                  pharmacyDrugId: result.id,
+                  tradeName: result.tradeName,
+                });
+              }}
+            />
+          }
         />
 
         <Button
