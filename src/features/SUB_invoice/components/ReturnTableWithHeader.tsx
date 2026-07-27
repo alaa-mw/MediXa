@@ -4,11 +4,10 @@ import InvoiceReturnsTable from "./InvoicReturnsTable";
 import type { ReturnInvoiceBySale } from "../return-invoice/Types/returnInvoiceList";
 
 interface Props {
-  returnInvoice: ReturnInvoiceBySale; 
+  returnInvoice: ReturnInvoiceBySale;
 }
 
 const ReturnTableWithHeader = ({ returnInvoice }: Props) => {
-  console.log("------------------", returnInvoice);
   return (
     <Paper
       key={returnInvoice.returnInvoiceId}

@@ -11,12 +11,12 @@ import {
   Box,
   Chip,
 } from "@mui/material";
-import type { PrivateOffer } from "../../types/pharmacyOfferTypes";
+import type { UnexpiredPrivateOffer } from "../../types/allPrivateOfferTypes";
 
 interface OffersDialogProps {
   open: boolean;
   onClose: () => void;
-  offers: PrivateOffer[];
+  offers: UnexpiredPrivateOffer[];
   onSelectOffer: (offerId: number) => void;
 }
 
@@ -41,7 +41,7 @@ const OffersDialog: React.FC<OffersDialogProps> = ({
           ) : (
             offers.map((item) => (
               <Card
-                key={item.pharmacyOfferGrantId}
+                key={item.offerId} // استخدام item.offerId مباشرة
                 variant="outlined"
                 sx={{
                   transition: "transform 0.2s, box-shadow 0.2s",
@@ -63,9 +63,9 @@ const OffersDialog: React.FC<OffersDialogProps> = ({
                   >
                     <Typography
                       variant="h6"
-                      sx={{ color: "primary", fontWeight: "bold" }}
+                      sx={{ color: "primary.main", fontWeight: "bold" }}
                     >
-                      {item.offer.title}
+                      {item.title} {/* الوصول المباشر للعنوان */}
                     </Typography>
                     <Chip
                       label={`${item.pricing.discountValue}% خصم`}
@@ -78,7 +78,7 @@ const OffersDialog: React.FC<OffersDialogProps> = ({
                     variant="body2"
                     sx={{ mb: 2, color: "text.secondary" }}
                   >
-                    {item.offer.description}
+                    {item.description} {/* الوصول المباشر للوصف */}
                   </Typography>
 
                   <Box
@@ -126,7 +126,7 @@ const OffersDialog: React.FC<OffersDialogProps> = ({
                     fullWidth
                     variant="contained"
                     color="primary"
-                    onClick={() => onSelectOffer(item.offer.offerId)} // هنا يتم إرجاع الـ ID المختار
+                    onClick={() => onSelectOffer(item.offerId)} // استخدام item.offerId مباشرة
                   >
                     اختيار العرض
                   </Button>

@@ -193,7 +193,6 @@ export interface SaleInvoiceItem {
   createdAt?: string;
   updatedAt?: string;
   pharmacyDrug?: PharmacyDrug;
-  batchAllocations?: BatchAllocation[];
   displayQuantity: number;
 }
 

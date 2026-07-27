@@ -12,7 +12,6 @@ export interface FetchResponse<T> {
   statusCode: number;
   message: string;
   data: T;
-  meta?: Meta;
   error?: string;
   timestamp?: string;
   path?: string;

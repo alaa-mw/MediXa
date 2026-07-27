@@ -5,11 +5,11 @@ import type { ReturnInvoiceItem } from "../return-invoice/Types/returnInvoiceLis
 
 interface Props {
   item: ReturnInvoiceItem;
-  discount : number
+  discount: number;
   itemIndex: number;
 }
 
-const ReturnInvoiceTableRow = ({ item, itemIndex , discount}: Props) => {
+const ReturnInvoiceTableRow = ({ item, itemIndex, discount }: Props) => {
   // باقي الكود يبقى كما هو دون أي تغيير
   const qty = item.baseQuantity / item.unitFactorToBase;
 
@@ -17,7 +17,7 @@ const ReturnInvoiceTableRow = ({ item, itemIndex , discount}: Props) => {
     <Box
       sx={{
         display: "grid",
-        gridTemplateColumns: "1fr 2fr 1fr 1fr 2fr 2fr 3fr 1fr 2fr",
+        gridTemplateColumns: "0.7fr 2fr 1fr 1fr 2fr 2fr 3fr 1fr 2fr",
         p: 1.2,
         borderBottom: "1px solid #F1F5F9",
         alignItems: "center",

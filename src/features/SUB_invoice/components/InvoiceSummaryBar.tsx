@@ -1,6 +1,6 @@
 import { Save } from "@mui/icons-material";
 import Button from "@mui/material/Button";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import type { SaleInvoiceItem } from "../Types/saleInvoiceDetailsTypes";
 
 interface CreatReturnInvoiceProps {
@@ -12,8 +12,9 @@ const CreatReturnInvoice = ({
   items,
   saleInvoiceDiscount,
 }: CreatReturnInvoiceProps) => {
-  console.log("before navigate ", saleInvoiceDiscount);
   const navigate = useNavigate();
+  const { invoiceId } = useParams<{ invoiceId: string }>();
+
   return (
     <Button
       variant="contained"
@@ -32,7 +33,7 @@ const CreatReturnInvoice = ({
         boxShadow: "0px 8px 16px rgba(0, 0, 0, 0.2)",
       }}
       onClick={() => {
-        navigate("/pharmacy/sales-details/create-return", {
+        navigate(`/pharmacy/sales-details/${invoiceId}/create-return`, {
           state: { items, saleInvoiceDiscount },
         });
       }}

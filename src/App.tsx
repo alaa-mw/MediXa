@@ -41,6 +41,7 @@ import PharmacySubscriptionSchedule from "./features/finance/pages/PharmacySubsc
 import RenewSubscriptionPage from "./features/finance/pages/RenewSubscriptionPage";
 import OrderLayout from "./features/orders/OrderLayout";
 import CustomerOrderGrid from "./features/customer_order/components/CustomerOrderGrid";
+import ReturnInvoiceDetailsPage from "./features/SUB_invoice/return-invoice/ReturnInvoiceDetailsPage";
 
 function App() {
   const pharmacyPaths = ["/pharmacy", "/pharmacy_owner"];
@@ -128,15 +129,19 @@ function App() {
             {pharmacyPaths.map((path) => (
               <Route path={path} key={path} element={<DashboardTemplate />}>
                 <Route index element={<div>hello</div>} />
-
                 <Route path="sales" element={<SalesLayout />}>
                   <Route index element={<Navigate to="sales" replace />} />
                   <Route path="sales" element={<SaleInvoicesPage />} />
                   <Route path="return" element={<ReturnInvoicesPage />} />
                 </Route>
-                                  <Route path="sales/sales/create" element={<CreateSaleInvoicePage/>} />
-
-
+                <Route
+                  path="sales/return-details/:invoiceId"
+                  element={<ReturnInvoiceDetailsPage />}
+                />
+                <Route
+                  path="sales/sales/create"
+                  element={<CreateSaleInvoicePage />}
+                />
                 <Route path="invoices" element={<InvoiceLayout />}>
                   {/* Redirect from /invoices to /invoices/purchase */}
                   <Route index element={<Navigate to="purchase" replace />} />
@@ -145,7 +150,6 @@ function App() {
                   {/* damage */}
                   <Route path="damage" element={<DamageInvoicesGrid />} />
                 </Route>
-
                 <Route
                   path="invoices/purchase/details/:invoiceId"
                   element={<PurchaseInvoiceDetails />}
@@ -158,7 +162,6 @@ function App() {
                   path="invoices/purchase/complete/:invoiceId"
                   element={<CompleteBatches />}
                 />
-
                 <Route
                   path="invoices/damage/add"
                   element={<AddDamageInvoiceDialog />}
@@ -167,7 +170,6 @@ function App() {
                   path="invoices/damage/details/:invoiceId"
                   element={<DamageInvoiceDetails />}
                 />
-
                 {/* inventory */}
                 <Route path="inventory" element={<InventoryPage />} />
                 <Route path="inventory/add" element={<AddMedicinePage />} />
@@ -175,25 +177,25 @@ function App() {
                   path="inventory/batches/:drugId"
                   element={<DrugBatchesPage />}
                 />
-
                 <Route path="orders" element={<OrderLayout />}>
                   <Route index element={<Navigate to="purchase" replace />} />
                   <Route path="purchase" element={<div>purchase orders</div>} />
-                  <Route path="customer" element={<CustomerOrderGrid/>} />
+                  <Route path="customer" element={<CustomerOrderGrid />} />
                 </Route>
-
                 <Route path="suppliers" element={<SuppliersList />} />
                 <Route path="suppliers/add" element={<AddSupplier />} />
                 <Route
                   path="medicine-search"
                   element={<div>medicine-search</div>}
                 />
-
                 <Route path="support" element={<div>support</div>} />
-                <Route path="sales-details" element={<SaleInvoiceDetails />} />
+                <Route
+                  path="sales-details/:invoiceId"
+                  element={<SaleInvoiceDetails />}
+                />
                 {/* return */}
                 <Route
-                  path="sales-details/create-return"
+                  path="sales-details/:invoiceId/create-return"
                   element={<CreateReturnInvoicePage />}
                 />
               </Route>

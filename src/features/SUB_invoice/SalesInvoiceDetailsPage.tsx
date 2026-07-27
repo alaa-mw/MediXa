@@ -6,23 +6,28 @@ import CreatReturnInvoice from "./components/InvoiceSummaryBar";
 import useSaleInvoiceDetails from "./hooks/useSaleInvoiceDetails";
 import useReturnInvoicesBySale from "./return-invoice/hooks/useAllReturnInvoice";
 import type { ReturnInvoiceBySale } from "./return-invoice/Types/returnInvoiceList";
+import { useParams } from "react-router-dom";
 
 const SaleInvoiceDetails = () => {
-  // 1. استدعاء الـ Hooks في المستوى الأعلى ودون أي شروط تسبقها
+  const { invoiceId } = useParams<{ invoiceId: string }>();
+  const parsedId = invoiceId ? parseInt(invoiceId) : 1;
+
   const {
     data: response,
     isLoading: isSaleLoading,
     error,
-  } = useSaleInvoiceDetails(1);
-  const { returnInvoices, isLoading: isReturnsLoading } =
-    useReturnInvoicesBySale(1);
+  } = useSaleInvoiceDetails(parsedId);
 
-  // 2. شروط التحميل والإرجاع تكون *بعد* استدعاء جميع الـ Hooks
+  const { returnInvoices, isLoading: isReturnsLoading } =
+    useReturnInvoicesBySale(parsedId);
+
   if (isSaleLoading || isReturnsLoading) return <CircularProgress />;
   if (error)
     return <Typography color="error">حدث خطأ أثناء تحميل الفاتورة</Typography>;
 
   const invoice = response?.data;
+  // جلب بيانات المريض من مسار الـ pharmacyInvoice
+  const patient = invoice?.pharmacyInvoice?.patient;
 
   return (
     <Box sx={{ p: 1, width: "100%" }}>
@@ -36,6 +41,8 @@ const SaleInvoiceDetails = () => {
         subTotal={invoice?.subtotal!}
         discount={invoice?.discount!}
         isFive={invoice?.paymentStatus == "PARTIAL" ? true : false}
+        patient={patient}
+        isReturnInvoice={false}
       />
 
       {/* 3. تفاصيل محتوى الفاتورة والمرتجع */}
@@ -50,7 +57,7 @@ const SaleInvoiceDetails = () => {
               mb: 3,
             }}
           >
-            <InvoiceSaleTable data={invoice?.items!} />
+            <InvoiceSaleTable data={invoice?.items!} isReturnInvoice={false} />
           </Paper>
 
           {/* جدول المرتجعات */}

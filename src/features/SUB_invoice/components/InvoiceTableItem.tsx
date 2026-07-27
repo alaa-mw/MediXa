@@ -2,16 +2,18 @@ import { Box } from "@mui/material";
 import InvoiceTableHeader from "./InvoiceTableHeader";
 import InvoiceTableRow from "./InvoiceTableRow";
 import type { SaleInvoiceItem } from "../Types/saleInvoiceDetailsTypes";
-
+import type { ReturnInvoiceItem } from "../return-invoice/Types/returnInvoiceDetailsType";
 interface Props {
-  data: SaleInvoiceItem[];
-  // isLoading: boolean;
-  // refetch: () => void;
-  // onShowDetails: (pharmacy: Pharmacy) => void;
+  data?: SaleInvoiceItem[];
+  returnInvoiceData?: ReturnInvoiceItem[];
+  isReturnInvoice: boolean;
 }
 
-const InvoiceSaleTable = ({ data }: Props) => {
-  console.log("InvoiceSaleTable data:", data); // Debugging line to check the data being passed
+const InvoiceSaleTable = ({
+  data,
+  returnInvoiceData,
+  isReturnInvoice,
+}: Props) => {
   return (
     <Box
       sx={{
@@ -20,20 +22,25 @@ const InvoiceSaleTable = ({ data }: Props) => {
         overflow: "hidden",
       }}
     >
-      <InvoiceTableHeader />
+      <InvoiceTableHeader isReturn={isReturnInvoice} />
 
-      {/* {isLoading ? (
-        <LoadingState />
-      ) : data.length === 0 ? (
-        <EmptyState />
-      ) : ( */}
-      {data.map((pharmacy, index) => (
-        <InvoiceTableRow
-          key={pharmacy.saleInvoiceItemId}
-          item={pharmacy}
-          itemIndex={index}
-        />
-      ))}
+      {isReturnInvoice
+        ? returnInvoiceData?.map((pharmacy, index) => (
+            <InvoiceTableRow
+              key={pharmacy.returnInvoiceItemId}
+              returnItem={pharmacy}
+              itemIndex={index}
+              isReturnInvoice={true}
+            />
+          ))
+        : data?.map((pharmacy, index) => (
+            <InvoiceTableRow
+              key={pharmacy.saleInvoiceItemId}
+              saleItem={pharmacy}
+              itemIndex={index}
+              isReturnInvoice={false}
+            />
+          ))}
     </Box>
   );
 };

@@ -1,10 +1,17 @@
 import React from "react";
-import { Box, Grid, Typography, CircularProgress, Alert, Pagination } from "@mui/material";
+import {
+  Box,
+  Grid,
+  Typography,
+  CircularProgress,
+  Alert,
+  Pagination,
+} from "@mui/material";
 
 import { useReturnInvoicesData } from "../hooks/useReturnInvoicesData";
 import { ReturnInvoiceHeader } from "../components/return/ReturnInvoiceHeader";
 import { ReturnInvoiceCard } from "../components/return/ReturnInvoiceCard";
-
+import { useNavigate } from "react-router-dom";
 
 export const ReturnInvoicesPage: React.FC = () => {
   const {
@@ -22,6 +29,7 @@ export const ReturnInvoicesPage: React.FC = () => {
     handleClearAllFilters,
   } = useReturnInvoicesData(20);
 
+  const navigate = useNavigate();
   return (
     <Box sx={{ minHeight: "100vh" }}>
       {/* ربط هيدر المرتجعات المطور بكامل صلاحيات الفلترة */}
@@ -44,7 +52,9 @@ export const ReturnInvoicesPage: React.FC = () => {
       {/* معالجة حالة الخطأ */}
       {isError && (
         <Alert severity="error" sx={{ mt: 2, borderRadius: "8px" }}>
-          {error instanceof Error ? error.message : "فشل في جلب فواتير المرتجعات من السيرفر."}
+          {error instanceof Error
+            ? error.message
+            : "فشل في جلب فواتير المرتجعات من السيرفر."}
         </Alert>
       )}
 
@@ -56,10 +66,15 @@ export const ReturnInvoicesPage: React.FC = () => {
               {/* شبكة الكروت مع الـ Grid المطور */}
               <Grid container spacing={2.5}>
                 {returnInvoicesList.map((invoice) => (
-                  <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={invoice.returnInvoiceId}>
+                  <Grid
+                    size={{ xs: 12, sm: 6, md: 4, lg: 3 }}
+                    key={invoice.returnInvoiceId}
+                  >
                     <ReturnInvoiceCard
                       invoice={invoice}
-                        onDetailsClick={(id) => console.log(`فتح تفاصيل الفاتورة رقم ${id}`)} 
+                      onDetailsClick={(id) =>
+                        navigate(`/pharmacy/sales/return-details/${id}`)
+                      }
                     />
                   </Grid>
                 ))}
@@ -67,7 +82,14 @@ export const ReturnInvoicesPage: React.FC = () => {
 
               {/* الترقيم (Pagination) */}
               {totalPages > 1 && (
-                <Box sx={{ display: "flex", justifyContent: "center", mt: 5, direction: "ltr" }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    mt: 5,
+                    direction: "ltr",
+                  }}
+                >
                   <Pagination
                     count={totalPages}
                     page={currentPage}
@@ -80,7 +102,16 @@ export const ReturnInvoicesPage: React.FC = () => {
             </>
           ) : (
             /* حالة عدم وجود نتائج */
-            <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyBox: "center", py: 12, mt: 2 }}>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyBox: "center",
+                py: 12,
+                mt: 2,
+              }}
+            >
               <Typography sx={{ mb: 0.5 }}>
                 لا توجد فواتير مرتجعات مطابقة للفلاتر النشطة.
               </Typography>

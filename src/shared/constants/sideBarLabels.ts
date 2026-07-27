@@ -112,11 +112,6 @@ export const sideBarLabels: Record<
       path: "/support",
       icon: SupportAgentIcon,
     },
-    {
-      title: "تفاصيل فاتورة",
-      path: "/sales-details",
-      icon: SupportAgentIcon,
-    },
   ],
   ADMIN: [
     {

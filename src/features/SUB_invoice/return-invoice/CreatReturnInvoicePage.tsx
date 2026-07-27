@@ -1,3 +1,21 @@
+/*
+  === ملخص الطريقة الحسابية لعملية المرتجع والخصومات ===
+  
+  1. حصة الخصم لكل وحدة (على مستوى الصنف الأساسي):
+     unitDiscountShare = (إجمالي قيمة الصنف الأصلي / إجمالي الفاتورة الأصلية × خصم الفاتورة الكلي) / الكمية الأساسية
+     
+  2. قيمة الخصم اللحظي (حسب الكمية المختارة للإرجاع):
+     instantDiscount = unitDiscountShare × قيمة العداد (selectedQuantity)
+     
+  3. السعر اللحظي (قبل الخصم اللحظي):
+     instantGrossPrice = السعر المفرد (unitPrice) × قيمة العداد (selectedQuantity)
+     
+  4. السعر النهائي بعد الخصم اللحظي (لكل صنف):
+     netTotalPrice = instantGrossPrice - instantDiscount
+     
+  5. المبلغ المسترد للعميل (المبلغ الإجمالي النهائي):
+     finalRefundAmount = مجموع (netTotalPrice) لجميع العناصر المحددة (checked)
+*/
 import {
   Box,
   Grid,
@@ -6,8 +24,6 @@ import {
   Typography,
   TextField,
   MenuItem,
-  Snackbar,
-  Alert,
 } from "@mui/material";
 import InvoiceReturnSummary from "./components/InvoiceReturnSummary";
 import { format } from "date-fns";
@@ -24,12 +40,14 @@ interface Props {
   items?: SaleInvoiceItem[];
   saleInvoiceDiscount?: number;
 }
-type ReturnInvoiceItem = SaleInvoiceItem & {
+
+export type ReturnInvoiceItem = SaleInvoiceItem & {
   checked: boolean;
   selectedQuantity: number;
   netTotalPrice: string;
-  batches?: any[]; // قائمة الدفعات القادمة من الـ API
-  selectedBatchId?: number; // الدفعة المختارة حالياً للإرسال
+  batches?: any[];
+  selectedBatchId?: number;
+  totalPrice?: string;
 };
 
 const toNumber = (value: string | number | undefined) =>
@@ -41,6 +59,7 @@ const CreateReturnInvoicePage = ({
 }: Props) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { showSnackbar } = useSnackbar();
 
   const saleInvoiceDiscount =
     propsDiscount ??
@@ -54,8 +73,6 @@ const CreateReturnInvoicePage = ({
     "CUSTOMER_CHANGED_MIND",
   );
 
-  const { showSnackbar } = useSnackbar();
-
   const returnReasonsList = [
     {
       value: "CUSTOMER_CHANGED_MIND",
@@ -66,30 +83,38 @@ const CreateReturnInvoicePage = ({
     { value: "EXPIRED", label: "منتهي الصلاحية (Expired)" },
   ];
 
-  const recalculateItemsWithDiscount = (itemsList: any[], discount: number) => {
-    const totalItemsValue = itemsList.reduce((sum, item) => {
-      const qty = item.selectedQuantity || 1;
+  const recalculateItemsWithDiscount = (
+    itemsList: any[],
+    invoiceDiscount: number,
+  ) => {
+    const totalOriginalAmount = itemsList.reduce((sum, item) => {
+      const originalDisplayQty = toNumber(item.displayQuantity) || 1;
       const unitPrice = toNumber(item.finalUnitPrice);
-      return sum + qty * unitPrice;
+      return sum + originalDisplayQty * unitPrice;
     }, 0);
 
     return itemsList.map((item) => {
-      const qty = item.selectedQuantity || 1;
+      const originalDisplayQty = toNumber(item.displayQuantity) || 1;
       const unitPrice = toNumber(item.finalUnitPrice);
-      const rowOriginalTotal = qty * unitPrice;
+      const selectedQty = item.selectedQuantity || 1;
 
-      let rowDiscountShare = 0;
-      if (totalItemsValue > 0) {
-        rowDiscountShare = (rowOriginalTotal / totalItemsValue) * discount;
+      let unitDiscountShare = 0;
+      if (totalOriginalAmount > 0) {
+        const itemTotalOriginal = originalDisplayQty * unitPrice;
+        const itemTotalDiscountShare =
+          (itemTotalOriginal / totalOriginalAmount) * invoiceDiscount;
+        unitDiscountShare = itemTotalDiscountShare / originalDisplayQty;
       }
 
-      const netTotal = Math.max(0, rowOriginalTotal - rowDiscountShare);
+      const instantDiscount = unitDiscountShare * selectedQty;
+      const instantGrossPrice = unitPrice * selectedQty;
+      const netTotal = Math.max(0, instantGrossPrice - instantDiscount);
 
       return {
         ...item,
-        displayQuantity: item.displayQuantity || qty,
-        selectedQuantity: qty,
-        totalPrice: rowOriginalTotal.toString(),
+        displayQuantity: originalDisplayQty,
+        selectedQuantity: selectedQty,
+        totalPrice: instantGrossPrice.toString(),
         netTotalPrice: netTotal.toFixed(2),
       };
     });
@@ -101,13 +126,6 @@ const CreateReturnInvoicePage = ({
         const qty = toNumber(item.displayQuantity) || 1;
         const unitPrice = toNumber(item.finalUnitPrice);
 
-        const itemBatches = item.batches || item.batchAllocations || [];
-
-        const defaultBatchId =
-          itemBatches.length === 1
-            ? itemBatches[0].saleInvoiceItemBatchId || itemBatches[0].batchId
-            : undefined;
-
         return {
           ...item,
           displayQuantity: qty,
@@ -115,8 +133,8 @@ const CreateReturnInvoicePage = ({
           totalPrice: (qty * unitPrice).toString(),
           netTotalPrice: "0",
           checked: false,
-          batches: itemBatches,
-          selectedBatchId: defaultBatchId,
+          batches: [],
+          selectedBatchId: undefined,
         };
       });
 
@@ -168,11 +186,12 @@ const CreateReturnInvoicePage = ({
     });
   };
 
-  const totalReturnValues = invoiceItems.reduce(
-    (sum, item) => sum + toNumber(item.totalPrice),
-    0,
-  );
+  // إجمالي قيمة المرتجعات (مجموع الأسعار اللحظية للعناصر المختارة)
+  const totalReturnValues = invoiceItems
+    .filter((item) => item.checked)
+    .reduce((sum, item) => sum + toNumber(item.totalPrice), 0);
 
+  // المبلغ المسترد للعميل (مجموع الأسعار بعد الخصم اللحظي لكل العناصر المحددة)
   const finalRefundAmount = invoiceItems
     .filter((item) => item.checked)
     .reduce((sum, item) => sum + toNumber(item.netTotalPrice), 0);
@@ -265,7 +284,7 @@ const CreateReturnInvoicePage = ({
             items={invoiceItems}
             onToggleCheck={handleToggleCheck}
             onUpdateQuantity={handleUpdateQuantity}
-            onSelectBatch={handleSelectBatch} // <-- تأكد من وجود هذا السطر هنا
+            onSelectBatch={handleSelectBatch}
             saleInvoiceDiscount={saleInvoiceDiscount}
           />
         </Paper>
@@ -306,40 +325,28 @@ const CreateReturnInvoicePage = ({
               referenceSaleInvoiceId: items[0]?.saleInvoiceId,
               invoiceDate: new Date().toISOString(),
               notes: notesValue || "مرتجع من فاتورة بيع",
-              items: selectedItems.map((item) => {
-                // التحقق من أن المستخدم قد اختار دفعة إذا كان هناك أكثر من دفعة
-                const batchId =
-                  item.selectedBatchId ||
-                  item.batches?.[0]?.saleInvoiceItemBatchId ||
-                  item.saleInvoiceItemId;
-
-                return {
-                  saleInvoiceItemBatchId: batchId, // إرسال الـ ID الصحيح للدفعة المختارة
-                  unitType: item.unitType,
-                  displayQuantity: item.selectedQuantity,
-                  returnReason: finalReason,
-                  restockToInventory: true,
-                };
-              }),
+              items: selectedItems.map((item) => ({
+                saleInvoiceItemBatchId: item.selectedBatchId,
+                unitType: item.unitType,
+                displayQuantity: item.selectedQuantity,
+                returnReason: finalReason,
+                restockToInventory: true,
+              })),
             };
 
             try {
-              // 2. إرسال الريكوست باستخدام mutateAsync وعرض رسالة النجاح
               await mutateAsync(requestBody);
-              clearKey(); // مسح الـ idempotency key عند النجاح
-
+              clearKey();
               showSnackbar("تم إنشاء فاتورة المرتجع بنجاح", "success");
-
-              // يمكنك توجيه المستخدم لصفحة أخرى بعد النجاح إن أردت
-              // setTimeout(() => navigate(-1), 1500);
             } catch (error: any) {
               console.error("Error creating return invoice:", error.message);
               if (
-                error.message ===
-                "Returned quantity exceeds sold quantity for saleInvoiceItemBatchId 1"
+                error.message.includes(
+                  "Returned quantity exceeds sold quantity",
+                )
               ) {
                 showSnackbar(
-                  `الكمية المرتجعة للصنف أكبر من الكمية المباعة `,
+                  `الكمية المرتجعة لأحد الأصناف تتجاوز الكمية المباعة المسموح بها`,
                   "error",
                 );
               } else {

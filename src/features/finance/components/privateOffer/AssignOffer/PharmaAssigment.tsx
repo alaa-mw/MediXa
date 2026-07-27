@@ -4,7 +4,7 @@ import {
   Button,
   Card,
   Chip,
-  Divider,
+  CircularProgress,
   Grid,
   Stack,
   Typography,
@@ -13,41 +13,13 @@ import { useForm } from "react-hook-form";
 import AssignmentFields from "./AssignmentField";
 import PrimaryButton from "../../PrimaryButton";
 import type { PharmacyAssignmentModel } from "../../../types/offerTypes";
-import type { PrivateOffer } from "../../../types/pharmacyOfferTypes";
 import OffersDialog from "../OfferDialog";
 import PharmaciesSearchandSelectDialog from "./PharamcySearchandSelectDialog";
 import { useAssignOfferToPharmacies } from "../../../hooks/useAssignOfferToPharmacies";
 import { useSnackbar } from "../../../../../shared/providers/useSnackbar";
-const dummyResponse = {
-  success: true,
-  statusCode: 200,
-  data: [
-    {
-      pharmacyOfferGrantId: 1,
-      grantReason: "LOYALTY_4_YEARS",
-      validFrom: "2026-07-08T02:30:56.917Z",
-      validUntil: "2026-10-31T23:59:59.000Z",
-      note: "عرض ولاء خاص للصيدلية",
-      offer: {
-        offerId: 7,
-        code: "LOYALTY_4_YEARS_30",
-        title: "عرض ولاء 4 سنوات",
-        description:
-          "عرض خاص للصيدليات المشتركة في Medixa منذ أكثر من أربع سنوات",
-        startsAt: "2026-07-08T00:00:00.000Z",
-        endsAt: "2026-10-31T23:59:59.000Z",
-      },
-      plan: { planId: 1, code: "STARTER", name: "Starter", durationMonths: 12 },
-      pricing: {
-        basePrice: 1500000,
-        discountType: "PERCENTAGE",
-        discountValue: 30,
-        finalPrice: 1050000,
-        currency: "SP",
-      },
-    },
-  ],
-};
+import useGetData from "../../../../../shared/hooks/useGetData";
+import type { UnexpiredPrivateOffer } from "../../../types/allPrivateOfferTypes";
+
 export interface SelectedPharmacy {
   id: number;
   name: string;
@@ -57,14 +29,23 @@ const PharmacyAssignment = () => {
   const [isOffersOpen, setIsOffersOpen] = useState<boolean>(false);
   const [isPharmaciesOpen, setIsPharmaciesOpen] = useState<boolean>(false);
   const [selectedOfferId, setSelectedOfferId] = useState<number | null>(null);
-  const [offersList] = useState<PrivateOffer[]>(dummyResponse.data);
   const [selectedPharmacies, setSelectedPharmacies] = useState<
     SelectedPharmacy[]
   >([]);
   const { showSnackbar } = useSnackbar();
+
+  // جلب البيانات مع تمرير الـ Type الجديد
+  const { data: offersResponse, isLoading: isOffersLoading } = useGetData<
+    UnexpiredPrivateOffer[]
+  >("/subscriptions/admin/private-offers");
+
+  const offersList = offersResponse?.data || [];
+
+  // البحث يعتمد على offerId المباشر
   const selectedOffer = offersList.find(
-    (offer) => offer.offer.offerId === selectedOfferId,
+    (offer) => offer.offerId === selectedOfferId,
   );
+
   const handleSelectOffer = (id: number) => {
     setSelectedOfferId(id);
     setIsOffersOpen(false);
@@ -77,6 +58,7 @@ const PharmacyAssignment = () => {
       grantReason: "",
     },
   });
+
   const { mutate, isPending } = useAssignOfferToPharmacies(selectedOfferId!);
 
   const onAssignHandler = (data: PharmacyAssignmentModel) => {
@@ -99,13 +81,8 @@ const PharmacyAssignment = () => {
       },
       {
         onSuccess: (message) => {
-          console.log("Offer assigned payload:", data);
           showSnackbar("تم إسناد العرض للصيدليات بنجاح", "success");
-          console.log('request response:', message.data);
-          console.log(
-            "idddds",
-            selectedPharmacies.map((p) => p.id),
-          );
+          console.log("request response:", message.data);
         },
         onError: (err) => {
           showSnackbar(err.message, "error");
@@ -164,6 +141,7 @@ const PharmacyAssignment = () => {
               borderWidth: "1.5px",
             }}
           >
+            {isOffersLoading && <CircularProgress size={20} sx={{ mr: 1 }} />}
             اختيار عرض محدد
           </Button>
 
@@ -183,6 +161,7 @@ const PharmacyAssignment = () => {
               : "اختيار الصيدليات المطلوبة"}
           </Button>
         </Box>
+
         {/* حاوية الـ Chips */}
         <Box
           sx={{
@@ -198,7 +177,7 @@ const PharmacyAssignment = () => {
           {selectedOffer && (
             <Chip
               color="secondary"
-              label={selectedOffer.offer.title}
+              label={selectedOffer.title} // الوصول المباشر للعنوان
               sx={{ fontWeight: 600 }}
             />
           )}
@@ -249,7 +228,7 @@ const PharmacyAssignment = () => {
       {isPharmaciesOpen && (
         <PharmaciesSearchandSelectDialog
           open={isPharmaciesOpen}
-          onClose={() => setIsPharmaciesOpen(false)} // تم تصحيح الـ State هنا لتغلق الدايلوج الصحيح
+          onClose={() => setIsPharmaciesOpen(false)}
           selectedPharmacies={selectedPharmacies}
           onConfirm={setSelectedPharmacies}
         />
