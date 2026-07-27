@@ -11,14 +11,20 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import { BarcodeReader, PlusOne, Search } from "@mui/icons-material";
 import useGetWithParams from "../../../../shared/hooks/useGetWithParams";
-import type { PharmacyDrug, SearchDrugResponse } from "../../types/searchDrug";
+import type {
+  PharmacyDrug,
+  PharmacyDrugResult,
+  SearchDrugResponse,
+} from "../../types/searchDrug";
 import type { FetchResponse } from "../../../../shared/api/api-types";
+import BarcodeAllDrugs from "../../../../shared/layout/BarcodeAllDrugs";
+import SearchBarDynamic from "../../../../shared/layout/SearchBarDynamic";
 
 const DrugSearch = ({
   onSelect,
   width,
 }: {
-  onSelect: (pharmacyDrug: PharmacyDrug) => void;
+  onSelect: (pharmacyDrug: PharmacyDrugResult) => void;
   width: number | undefined;
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -79,7 +85,7 @@ const DrugSearch = ({
   }, []);
 
   // 1. Add item from Local Stock ("Panadol")
-  const handleAddDrugToInvoice = (drug: PharmacyDrug) => {
+  const handleAddDrugToInvoice = (drug: PharmacyDrugResult) => {
     console.log("Adding drug with ID:", drug);
     onSelect(drug);
     setIsDropdownOpen(false);
@@ -135,8 +141,7 @@ const DrugSearch = ({
     return merged;
   }, [canSearch, queryClient, searchName]);
 
-  const generalResults
-   = useMemo(() => {
+  const generalResults = useMemo(() => {
     if (!canSearch) return [] as GeneralDrugItem[];
 
     const cached = queryClient.getQueriesData<
@@ -154,13 +159,13 @@ const DrugSearch = ({
         return { name, page, items };
       })
       .filter((p) => p.name === searchName)
-      .sort((a, b) => a.page - b.page); 
+      .sort((a, b) => a.page - b.page);
 
     const seen = new Set<string>();
     const merged: GeneralDrugItem[] = [];
     pages.forEach((p) => {
       p.items.forEach((item) => {
-        if (seen.has(item.generalDrugId)) return; 
+        if (seen.has(item.generalDrugId)) return;
         seen.add(item.generalDrugId);
         merged.push(item);
       });
@@ -267,70 +272,44 @@ const DrugSearch = ({
     <Box
       sx={{
         position: "fixed",
-        top: "22vh",
+        top: { xs: "30vh", md: "22vh" },
         width,
         zIndex: 100,
         mb: 2,
       }}
       ref={dropdownRef}
     >
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          bgcolor: "#FFFFFF",
-          border: "1.5px solid #E2E8F0",
-          borderRadius: "16px",
-          px: 2,
-          py: 1.5,
-          height: 48,
-          transition: "all 0.2s ease-in-out",
-          boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.05)",
-          "&:hover, &:focus-within": {
-            borderColor: "#2C6470",
-            boxShadow: "0 10px 15px -3px rgba(44, 100, 112, 0.1)",
-          },
+      <SearchBarDynamic<SearchDrugResponse>
+        placeholder="ابحث عن دواء (اسم أو باركود)..."
+        onChange={(term) => {
+          setQueryParams((prev) => ({
+            ...prev,
+            name: term,
+            page: 1,
+            generalPage: 1,
+          }));
+          setIsDropdownOpen(true);
         }}
-      >
-        <Box sx={{ mr: 1, display: "flex", alignItems: "center" }}>
-          <Search />
-        </Box>
-        <input
-          type="text"
-          placeholder="ابحث عن دواء (اسم أو باركود)..."
-          value={queryParams.name}
-          onFocus={() => setIsDropdownOpen(true)}
-          onChange={(e) => {
-            setQueryParams((prev) => ({
-              ...prev,
-              name: e.target.value,
-              page: 1,
-              generalPage: 1,
-            }));
-            setIsDropdownOpen(true);
-          }}
-          style={{
-            width: "100%",
-            border: "none",
-            outline: "none",
-            fontSize: "15px",
-            fontFamily: "inherit",
-            color: "#1E293B",
-            backgroundColor: "transparent",
-            textAlign: "right",
-          }}
-        />
-        {/* Left side scanner button */}
-        <Tooltip title="المسح بالباركود">
-          <IconButton
-            size="small"
-            sx={{ ml: 1, bgcolor: "#F0F5F6", borderRadius: "10px", p: 1 }}
-          >
-            <BarcodeReader />
-          </IconButton>
-        </Tooltip>
-      </Box>
-
+        barcodeComponent={
+          <BarcodeAllDrugs
+            onFindResult={(result) => {
+              console.log("تم العثور على الدواء:", result);
+              if (result && result.type === "PHARMACY") {
+                const convertedResult: PharmacyDrugResult = {
+                  pharmacyDrugId: result.id,
+                  tradeName: result.tradeName,
+                };
+                handleAddDrugToInvoice(convertedResult);
+              } else if (result && result.type === "GENERAL") {
+                console.log(
+                  "تم العثور على دواء عام من قاعدة البيانات المركزية:",
+                  result,
+                );
+              }
+            }}
+          />
+        }
+      />
       {/* ==========================================
           THE CORE DROPDOWN COMPONENT (High Fidelity Style)
           ========================================== */}

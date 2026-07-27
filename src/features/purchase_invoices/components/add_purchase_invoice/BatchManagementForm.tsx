@@ -21,7 +21,7 @@ import type { RootState } from "../../store";
 import type { PurchaseInvoiceItemRequest } from "../../types/purchaseInvoiceStore";
 import DrugSearch from "./DrugSearch";
 import BatchItemCard from "./BatchItemCard";
-import type { PharmacyDrug } from "../../types/searchDrug";
+import type { PharmacyDrug, PharmacyDrugResult } from "../../types/searchDrug";
 
 export default function BatchManagementForm() {
   const dispatch = useDispatch();
@@ -34,7 +34,7 @@ export default function BatchManagementForm() {
   // ============ معالجات العناصر (Items) ============
 
   // إضافة دواء جديد
-  const handleAddDrug = (pharmacyDrug: PharmacyDrug) => {
+  const handleAddDrug = (pharmacyDrug: PharmacyDrugResult) => {
     if (!pharmacyDrug) return;
 
     const newItem: PurchaseInvoiceItemRequest = {
