@@ -4,12 +4,16 @@ import SupplierInfo from "./details/SupplierInfo";
 import InvoiceSummary from "./details/InvoiceSummary";
 import { useParams } from "react-router-dom";
 import useGetData from "../../../shared/hooks/useGetData";
-import type { PurchaseInvoiceDetails } from "../types/purchaseInvoice";
+// import type { PurchaseInvoiceDetails } from "../types/purchaseInvoice";
+import type {
+  PurchaseInvoiceDetails as PurchaseInvoiceDetailsDto,
+} from "../types/purchaseInvoice";
 import PurchaseInvoiceItems from "./details/PurchaseInvoiceItems";
 
 const PurchaseInvoiceDetails = () => {
   const { invoiceId } = useParams();
-  const { data } = useGetData<PurchaseInvoiceDetails>(
+  // const { data } = useGetData<PurchaseInvoiceDetails>(
+  const { data } = useGetData<PurchaseInvoiceDetailsDto>(
     `/supplier-invoice/${invoiceId}`,
   );
 

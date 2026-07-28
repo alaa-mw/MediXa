@@ -4,7 +4,8 @@ import CustomAutocompleteWithPagination from "../../../../shared/layout/CustomAu
 import textfieldStyle from "../../../../shared/constants/textFieldStyle";
 import useActiveIngredients from "../../hook/useFetchActiveIngrediant";
 import { AddCircle, Delete } from "@mui/icons-material";
-import type { DrugFormData } from "../../types/drugFormType";
+// import type { DrugFormData } from "../../types/drugFormType";
+import type { DrugFormData } from "../../types/generalDrugFormType";
 import DynamicQuickAddModal from "../../../../shared/layout/CustomAutoCompleteWithPagination/DynamicQuickAddModel";
 import { useState } from "react";
 import type { ActiveIngredientApiResponse } from "../../types/activeIngrediantType";

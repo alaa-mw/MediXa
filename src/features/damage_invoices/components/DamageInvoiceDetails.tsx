@@ -13,10 +13,14 @@ import {
 } from "@mui/material";
 import { useParams } from "react-router-dom";
 import { useGetData } from "../../../shared/hooks/useGetData";
-import type { DamageInvoiceDetails } from "../types/damageInvoice";
+// import type { DamageInvoiceDetails } from "../types/damageInvoice";
+import type {
+  DamageInvoiceDetails as DamageInvoiceDetailsDto,
+} from "../types/damageInvoice";
 const DamageInvoiceDetails = () => {
   const { invoiceId } = useParams();
-  const { data } = useGetData<DamageInvoiceDetails>(
+  // const { data } = useGetData<DamageInvoiceDetails>(
+  const { data } = useGetData<DamageInvoiceDetailsDto>(
     `/damage-invoices/${invoiceId}`,
   );
 

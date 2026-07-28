@@ -2,10 +2,14 @@ import { useState, useMemo } from "react";
 import { Card, CardContent, Grid, Typography, Box, alpha } from "@mui/material";
 import CustomTextField from "./CustomTextField";
 import useGetWithParams from "../../../shared/hooks/useGetWithParams";
+// import type {
+//   OwnerForm,
+//   PharmacyRegistrationForm,
+// } from "../pages/CreatePharmacyAccount";
 import type {
   OwnerForm,
   PharmacyRegistrationForm,
-} from "../pages/CreatePharmacyAccount";
+} from "../types/createPharamacyFormTypes";
 
 import type { PharmacyOwnersPaginationData } from "../types/allOwnersResponse";
 import OwnerActionButtons from "./OwnerActionButtons";

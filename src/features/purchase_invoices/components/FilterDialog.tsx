@@ -6,6 +6,7 @@ import { CustomDatePickerField } from "../../sales-and-return/components/CustomD
 interface FilterValues {
   status: SupplierInvoiceStatus;
   supplierId: string;
+  pharmacyDrugId: string;
   paymentStatus: PaymentStatus | "";
   fromDate: string;
   toDate: string;

@@ -1,11 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import { useCallback, useRef } from "react";
 import APIClient from "../api/api-client";
-import type { FetchResponse } from "../api/api-types";
+// import type { FetchResponse } from "../api/api-types";
+import type {
+  FetchResponse,
+  QueryParams,
+} from "../api/api-types";
 
-interface QueryParams {
-  page?: number;
-}
+// interface QueryParams {
+//   page?: number;
+// }
 
 export const useLazyGet = <TData>(endpoint: string, options = {}) => {
   const apiClient = useRef(new APIClient<TData>(endpoint)).current; //useRef: يضمن إنشاء الـ client مرة واحدة فقط (يحسن الأداء)

@@ -6,7 +6,10 @@ import {
   Divider,
   Container,
 } from "@mui/material";
-import type PurchaseInvoiceDetails from "../PurchaseInvoiceDetails";
+// import type PurchaseInvoiceDetails from "../PurchaseInvoiceDetails";
+import type {
+  PurchaseInvoiceDetails,
+} from "../../types/purchaseInvoice";
 
 type Props = {
   detailData: PurchaseInvoiceDetails;
