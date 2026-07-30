@@ -3,13 +3,11 @@ import {
   Box,
   Typography,
   Paper,
-  IconButton,
   Button,
-  Tooltip,
   Chip,
 } from "@mui/material";
 import { useQueryClient } from "@tanstack/react-query";
-import { BarcodeReader, PlusOne, Search } from "@mui/icons-material";
+import { PlusOne } from "@mui/icons-material";
 import useGetWithParams from "../../../../shared/hooks/useGetWithParams";
 import type {
   PharmacyDrug,
@@ -19,6 +17,10 @@ import type {
 import type { FetchResponse } from "../../../../shared/api/api-types";
 import BarcodeAllDrugs from "../../../../shared/layout/BarcodeAllDrugs";
 import SearchBarDynamic from "../../../../shared/layout/SearchBarDynamic";
+import {
+  FoundMedicineDialog,
+  type FoundDrugPreview,
+} from "../../../inventory/components/AddMedicine/MedicineFoundDialog";
 
 const DrugSearch = ({
   onSelect,
@@ -29,6 +31,9 @@ const DrugSearch = ({
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [, setIsManualModalOpen] = useState(false);
+  const [openFoundDialog, setOpenFoundDialog] = useState(false);
+  const [selectedGeneralDrug, setSelectedGeneralDrug] =
+    useState<FoundDrugPreview | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const localScrollRootRef = useRef<HTMLDivElement | null>(null);
   const generalScrollRootRef = useRef<HTMLDivElement | null>(null);
@@ -93,10 +98,34 @@ const DrugSearch = ({
   };
 
   // 2. Add item from Central Database ("Augmentin")
-  const handleAddCentralDB = () => {
-    console.log("handleAddCentralDB");
+  const handleAddCentralDB = (generalDrug: GeneralDrugItem) => {
+    setSelectedGeneralDrug({
+      generalDrugId: Number(generalDrug.generalDrugId),
+      tradeName: generalDrug.tradeName,
+      dosageForm: generalDrug.dosageForm,
+    });
     setIsDropdownOpen(false);
-    resetSearch();
+    setOpenFoundDialog(true);
+  };
+
+  const handleCentralDrugSaved = (createdDrug: unknown) => {
+    const created = createdDrug as {
+      pharmacyDrugId?: string | number;
+      id?: string | number;
+      tradeName?: string;
+    } | null;
+
+    const pharmacyDrugId = created?.pharmacyDrugId ?? created?.id;
+    if (!pharmacyDrugId) {
+      return;
+    }
+
+    handleAddDrugToInvoice({
+      pharmacyDrugId: String(pharmacyDrugId),
+      tradeName: created?.tradeName || selectedGeneralDrug?.tradeName || "",
+    });
+
+    setOpenFoundDialog(false);
   };
 
   const readParamsFromQueryKey = (
@@ -583,7 +612,7 @@ const DrugSearch = ({
                   </Box>
                   <Button
                     variant="contained"
-                    onClick={handleAddCentralDB}
+                    onClick={() => handleAddCentralDB(general)}
                     sx={{
                       borderRadius: "24px",
                       px: 3,
@@ -680,6 +709,17 @@ const DrugSearch = ({
           </Box>
         </Paper>
       )}
+
+      <FoundMedicineDialog
+        open={openFoundDialog}
+        onClose={() => {
+          setOpenFoundDialog(false);
+          setSelectedGeneralDrug(null);
+          resetSearch();
+        }}
+        foundDrug={selectedGeneralDrug}
+        onSuccess={handleCentralDrugSaved}
+      />
     </Box>
   );
 };

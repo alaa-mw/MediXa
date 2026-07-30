@@ -27,6 +27,9 @@ interface GeneralDrug extends Pagination {
   drugId: string;
   tradeName: string;
   barcode: string;
+  dosageForm?: {
+    dosageFormName?: string;
+  };
 }
 
 export interface PharmacyDrugResult {

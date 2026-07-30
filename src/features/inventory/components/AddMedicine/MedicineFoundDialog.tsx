@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Dialog,
   DialogContent,
@@ -22,16 +22,26 @@ import { useCreatePharmacyDrug } from "../../hooks/useCreatePharmacyDrug";
 import { useSnackbar } from "../../../../shared/providers/useSnackbar";
 import { useMedicineBatches } from "../../hooks/useAddMedicineBatche";
 
+export interface FoundDrugPreview {
+  generalDrugId: number;
+  tradeName?: string;
+  dosageForm?: {
+    dosageFormName?: string;
+  } | null;
+}
+
 interface FoundMedicineDialogProps {
   open: boolean;
   onClose: () => void;
-  foundDrug: CentralDrugData | null;
+  foundDrug: FoundDrugPreview | CentralDrugData | null;
+  onSuccess?: (createdDrug: unknown) => void;
 }
 
 export const FoundMedicineDialog: React.FC<FoundMedicineDialogProps> = ({
   open,
   onClose,
   foundDrug,
+  onSuccess,
 }) => {
   const [alertLimit, setAlertLimit] = useState<number>(10);
   const [expiryAlertMonths, setExpiryAlertMonths] = useState<number>(3);
@@ -59,6 +69,7 @@ export const FoundMedicineDialog: React.FC<FoundMedicineDialogProps> = ({
   useEffect(() => {
     if (success) {
       showSnackbar("تمت إضافة الدواء إلى مخزون الصيدلية بنجاح!", "success");
+      // eslint-disable-next-line react-hooks/immutability
       handleClose();      
     }
   }, [success]);
@@ -69,7 +80,9 @@ export const FoundMedicineDialog: React.FC<FoundMedicineDialogProps> = ({
     }
   }, [error]);
 
-  const handleClose = () => {
+  // const handleClose = () => {
+  // eslint-disable-next-line react-hooks/preserve-manual-memoization
+  const handleClose = useCallback(() => {
     resetBatches();
     setPurchasePrice("");
     setSalePrice("");
@@ -77,7 +90,13 @@ export const FoundMedicineDialog: React.FC<FoundMedicineDialogProps> = ({
     setNote("");
     setAllowRetail(false);
     onClose();
-  };
+  }, [onClose, resetBatches]);
+
+  useEffect(() => {
+    if (error) {
+      showSnackbar(error, "error");
+    }
+  }, [error, showSnackbar]);
 
   const handleSubmitSave = async () => {
     if (!foundDrug?.generalDrugId) {
@@ -115,7 +134,12 @@ export const FoundMedicineDialog: React.FC<FoundMedicineDialogProps> = ({
     };
 
     try {
-      await createPharmacyDrug(payload);
+      const createdDrug = await createPharmacyDrug(payload);
+      if (onSuccess) {
+        onSuccess(createdDrug);
+      }
+      showSnackbar("تمت إضافة الدواء إلى مخزون الصيدلية بنجاح!", "success");
+      handleClose();
     } catch (err) {
       console.error("طلب الـ POST واجه مشكلة:", err);
     }
