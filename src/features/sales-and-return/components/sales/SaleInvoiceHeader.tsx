@@ -51,7 +51,10 @@ export const SaleInvoiceHeader: React.FC<SaleInvoiceHeaderProps> = ({
       onApplyFilters({ fromDate: "", toDate: "" });
     } else if (key === "minTotal" || key === "maxTotal") {
       onApplyFilters({ minTotal: "", maxTotal: "" });
-    } else {
+    }
+    else if (key === "pharmacyDrugId") {
+      onApplyFilters({ pharmacyDrugId: "", drugName: "" });}
+       else {
       onApplyFilters({ [key]: "" });
     }
   };
@@ -59,10 +62,10 @@ export const SaleInvoiceHeader: React.FC<SaleInvoiceHeaderProps> = ({
   const activeFiltersCount = useMemo(() => {
     let count = 0;
     if (rawFilters.paymentStatus && rawFilters.paymentStatus !== "ALL") count++;
-    if (rawFilters.unitType) count++;
-    if (rawFilters.saleType) count++;
-    if (rawFilters.fromDate || rawFilters.toDate) count++;
+      if (rawFilters.saleType) count++;
+        if (rawFilters.fromDate || rawFilters.toDate) count++;
     if (rawFilters.minTotal || rawFilters.maxTotal) count++;
+    if (rawFilters.pharmacyDrugId) count++; 
     return count;
   }, [rawFilters]);
 
@@ -71,12 +74,7 @@ export const SaleInvoiceHeader: React.FC<SaleInvoiceHeaderProps> = ({
     PARTIAL: "جزئية",
     PAID: "مدفوعة",
   };
-  const unitLabels: Record<string, string> = {
-    BOX: "علبة",
-    STRIP: "ظرف",
-    TABLET: "حبة",
-  };
-  const saleTypeLabels: Record<string, string> = {
+    const saleTypeLabels: Record<string, string> = {
     NORMAL: "بيع طبيعي",
     CUSTOMER_REQUEST: "طلب عميل",
   };
@@ -132,7 +130,8 @@ export const SaleInvoiceHeader: React.FC<SaleInvoiceHeaderProps> = ({
       <Box
         sx={{ display: "flex", alignItems: "center", gap: 1.5, width: "100%" }}
       >
-        <SearchBar value={searchValue} onChange={onSearchChange} />
+        {/* حقل السيرش*/}
+        <SearchBar value={searchValue} onChange={onSearchChange} placeholder="ابحث عن اسم المريض أو امسح الباركود" />
 
         <Box
           sx={
@@ -160,6 +159,7 @@ export const SaleInvoiceHeader: React.FC<SaleInvoiceHeaderProps> = ({
           onApplyFilters={onApplyFilters}
         />
 
+        {/* زر إنشاء فاتورة */}
         <AddMedicineButton onClick={onAddInvoiceClick} label="إنشاء فاتورة" />
       </Box>
 
@@ -168,16 +168,12 @@ export const SaleInvoiceHeader: React.FC<SaleInvoiceHeaderProps> = ({
         <Box
           sx={{
             display: "flex",
-            //   alignItems: "center",
             gap: 1.2,
             flexWrap: "wrap",
-            // p: 1.5,
-            //   bgcolor: "#ffffff", // خلفية بيضاء نقية لتبرز كبسولات الفلاتر الداكنة
-            //   borderRadius: "16px",
-            //   border: "1px solid #e2e8f0",
+           
           }}
         >
-          {/* Chip حالة الدفع */}
+          {/*  حالة الدفع */}
           {rawFilters.paymentStatus && rawFilters.paymentStatus !== "ALL" && (
             <Chip
               label={`الحالة: ${statusLabels[rawFilters.paymentStatus] || rawFilters.paymentStatus}`}
@@ -187,17 +183,8 @@ export const SaleInvoiceHeader: React.FC<SaleInvoiceHeaderProps> = ({
             />
           )}
 
-          {/* Chip نوع الوحدة */}
-          {rawFilters.unitType && (
-            <Chip
-              label={`الوحدة: ${unitLabels[rawFilters.unitType] || rawFilters.unitType}`}
-              onDelete={() => handleRemoveSingleFilter("unitType")}
-              deleteIcon={<CloseIcon />}
-              sx={premiumChipStyles}
-            />
-          )}
 
-          {/* Chip نوع البيع */}
+          {/*  حالة الدفع */}
           {rawFilters.saleType && (
             <Chip
               label={`النوع: ${saleTypeLabels[rawFilters.saleType] || rawFilters.saleType}`}
@@ -207,7 +194,8 @@ export const SaleInvoiceHeader: React.FC<SaleInvoiceHeaderProps> = ({
             />
           )}
 
-          {/* Chip المدى الزمني بالتصميم السهمي الاحترافي الموحد */}
+            
+          {/*  المدى الزمني بالتصميم السهمي   */}
           {(rawFilters.fromDate || rawFilters.toDate) && (
             <Chip
               label={
@@ -235,7 +223,20 @@ export const SaleInvoiceHeader: React.FC<SaleInvoiceHeaderProps> = ({
             />
           )}
 
-          {/* Chip مدى إجمالي الفاتورة المالي */}
+
+           {/* 💊  الدواء المحدد */}
+          {rawFilters.pharmacyDrugId && (
+            <Chip
+              label={`الدواء: ${rawFilters.drugName || "دواء محدد"}`}
+              onDelete={() => handleRemoveSingleFilter("pharmacyDrugId")}
+              deleteIcon={<CloseIcon />}
+              sx={premiumChipStyles}
+            />
+          )}
+
+
+
+          {/*  مدى إجمالي الفاتورة المالي */}
           {(rawFilters.minTotal || rawFilters.maxTotal) && (
             <Chip
               label={
@@ -267,6 +268,7 @@ export const SaleInvoiceHeader: React.FC<SaleInvoiceHeaderProps> = ({
             />
           )}
 
+
           {/* زر مسح الكل */}
           <Button
             variant="text"
@@ -290,6 +292,8 @@ export const SaleInvoiceHeader: React.FC<SaleInvoiceHeaderProps> = ({
           >
             مسح الكل
           </Button>
+
+
         </Box>
       )}
     </Box>

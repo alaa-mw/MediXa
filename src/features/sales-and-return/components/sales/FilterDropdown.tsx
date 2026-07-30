@@ -1,5 +1,4 @@
 
-
 import React, { useState, useEffect } from "react";
 import {
   Popover,
@@ -8,17 +7,23 @@ import {
   IconButton,
   TextField,
   Button,
+  Autocomplete,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { CustomDatePickerField} from "../CustomDatePickerField";
+import { CustomDatePickerField } from "../../../../shared/components/FiltterDatePicker";
 import type { SaleInvoiceFilters } from "../../hooks/useSaleInvoicesData";
+
+// 1. استيراد الهوكس
+import { useDebounce } from "../../../../shared/hooks/useDebounce"; // عدّل مسار هوك الـ Debounce الخاص بك
+import { useTradeDrugSearch } from "../../hooks/useTradeNameSearch";
+import type { DrugItem } from "../../hooks/useTradeNameSearch";
 
 interface FilterDropdownProps {
   anchorEl: HTMLButtonElement | null;
   onClose: () => void;
-  rawFilters: SaleInvoiceFilters;
+  rawFilters: SaleInvoiceFilters & { drugId?: string; drugName?: string };
   onApplyFilters: (
-    filters: Partial<Record<keyof SaleInvoiceFilters, string>>,
+    filters: Partial<Record<keyof SaleInvoiceFilters | "drugId", string>>,
   ) => void;
 }
 
@@ -31,44 +36,64 @@ export const FilterDropdown: React.FC<FilterDropdownProps> = ({
   const open = Boolean(anchorEl);
   const id = open ? "filter-popover" : undefined;
 
-  // 💡 نربط الـ local states بالـ rawFilters القادمة حياً من الرابط مباشرة لمنع التضارب
+  // 💡 States الفلتر الحالية
   const [selectedStatus, setSelectedStatus] = useState<string>("");
-  const [selectedUnit, setSelectedUnit] = useState<string>("");
-  // const [selectedSaleType, setSelectedSaleType] = useState<string>("");
+    const [selectedSaleType, setSelectedSaleType] = useState<string>("");
   const [fromDate, setFromDate] = useState<string | null>(null);
   const [toDate, setToDate] = useState<string | null>(null);
   const [minAmount, setMinAmount] = useState<string>("");
   const [maxAmount, setMaxAmount] = useState<string>("");
-  // التحقق مما إذا كان الحد الأعلى أصغر من الحد الأدنى
+
+  // 💡 States الخاصة بالدواء
+  const [drugInputValue, setDrugInputValue] = useState<string>("");
+  const [selectedDrug, setSelectedDrug] = useState<DrugItem | null>(null);
+
+  // ⏳ استخدام الهوك الخاص بك للـ Debounce (تأخير 400ms)
+  const debouncedSearch = useDebounce(drugInputValue, 400);
+
+  // 🔍 هوك البحث عن الأدوية بالكلمة المُأخّرة
+  const { allResults, isLoading, isFetching, hasMore, loadMore } =
+    useTradeDrugSearch(debouncedSearch, 10);
+
+  // تحقق من خطأ الحدود
   const isError = Boolean(
     minAmount && maxAmount && Number(maxAmount) < Number(minAmount),
   );
 
-  // مزامنة البيانات وتعبئتها داخل الفورم تلقائياً عند قيام المستخدم بفتح الفلتر
+  // مزامنة البيانات وتعبئتها عند فتح الفلتر
   useEffect(() => {
     if (open) {
       setSelectedStatus(
         rawFilters.paymentStatus === "ALL" ? "" : rawFilters.paymentStatus,
       );
-      setSelectedUnit(rawFilters.unitType || "");
-      // setSelectedSaleType(rawFilters.saleType || "");
       setFromDate(rawFilters.fromDate || null);
+      setSelectedSaleType(rawFilters.saleType || "");
       setToDate(rawFilters.toDate || null);
       setMinAmount(rawFilters.minTotal || "");
       setMaxAmount(rawFilters.maxTotal || "");
+
+      if (rawFilters.drugId) {
+        setSelectedDrug({
+          pharmacyDrugId: rawFilters.drugId,
+          tradeName: rawFilters.drugName || "دواء محدد",
+        });
+      } else {
+        setSelectedDrug(null);
+      }
     }
   }, [open, rawFilters]);
 
-  // دالة تجميع الحقول وتمريرها للأعلى لتحديث الـ URL دفعة واحدة
+  // دالة تطبيق الفلتر
   const handleApplyClick = () => {
     onApplyFilters({
       paymentStatus: selectedStatus || "ALL",
-      unitType: selectedUnit || "",
-      // saleType: selectedSaleType || "",
+      saleType: selectedSaleType || "",
       fromDate: fromDate || "",
       toDate: toDate || "",
       minTotal: minAmount || "",
       maxTotal: maxAmount || "",
+      pharmacyDrugId: selectedDrug ? String(selectedDrug.pharmacyDrugId) : "",
+      drugName: selectedDrug ? selectedDrug.tradeName : "",
     });
     onClose();
   };
@@ -78,7 +103,7 @@ export const FilterDropdown: React.FC<FilterDropdownProps> = ({
       id={id}
       open={open}
       anchorEl={anchorEl}
-      onClose={( reason) => {
+      onClose={(reason) => {
         if (reason === "backdropClick" || reason === "escapeKeyDown") {
           return;
         }
@@ -100,6 +125,7 @@ export const FilterDropdown: React.FC<FilterDropdownProps> = ({
         },
       }}
     >
+
       {/* الرأس */}
       <Box
         sx={{
@@ -127,6 +153,125 @@ export const FilterDropdown: React.FC<FilterDropdownProps> = ({
         </IconButton>
       </Box>
 
+
+      {/* 💊 فلترة حسب اسم الدواء  */}
+      <Box sx={{ mb: 3 }}>
+        <Typography
+          variant="caption"
+          sx={{
+            display: "block",
+            color: "#64748b",
+            fontWeight: "600",
+            mb: 1.5,
+            fontSize: "12px",
+          }}
+        >
+          اسم الدواء
+        </Typography>
+
+        <Autocomplete
+          value={selectedDrug}
+          onChange={(_, newValue: DrugItem | null) => {
+            setSelectedDrug(newValue);
+          }}
+          inputValue={drugInputValue}
+          onInputChange={(_, newInputValue) => {
+            setDrugInputValue(newInputValue);
+          }}
+          options={allResults || []}
+          loading={isLoading || isFetching}
+          getOptionLabel={(option) => option.tradeName}
+          isOptionEqualToValue={(option, value) =>
+            option.pharmacyDrugId === value.pharmacyDrugId
+          }
+          renderOption={(props, option) => (
+            <li {...props} key={option.pharmacyDrugId}>
+              {option.tradeName}
+            </li>
+          )}
+          noOptionsText={
+            debouncedSearch ? "لا توجد نتائج" : "ابحث بكتابة اسم الدواء..."
+          }
+          loadingText="جاري البحث..."
+          slotProps={{
+            paper: {
+              sx: {
+                borderRadius: "12px",
+                boxShadow: "0px 10px 25px rgba(0, 0, 0, 0.08)",
+                mt: 1,
+                direction: "rtl",
+              },
+            },
+            listbox: {
+              onScroll: (event: React.SyntheticEvent) => {
+                const listboxNode = event.currentTarget;
+                if (
+                  listboxNode.scrollTop + listboxNode.clientHeight >=
+                  listboxNode.scrollHeight - 10
+                ) {
+                  if (hasMore && !isFetching) {
+                    loadMore();
+                  }
+                }
+              },
+              sx: {
+                maxHeight: "200px",
+                fontSize: "13px",
+                "& .MuiAutocomplete-option": {
+                  py: 1,
+                  px: 2,
+                },
+              },
+            },
+          }}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              placeholder="ابحث عن دواء..."
+              variant="outlined"
+              sx={{
+                direction: "rtl",
+                "& .MuiOutlinedInput-root": {
+                  backgroundColor: "#ffffff",
+                  borderRadius: "10px",
+                  transition: "all 0.2s ease-in-out",
+                  minHeight: "44px !important",
+                  display: "flex !important",
+                  alignItems: "center !important",
+                  paddingLeft: "12px !important",
+                  paddingRight: "12px !important",
+                  "& .MuiAutocomplete-endAdornment": {
+                    position: "absolute",
+                    left: "12px !important",
+                    right: "auto !important",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "4px",
+                  },
+                  "& fieldset": {
+                    borderColor: "#e2e8f0",
+                    borderRadius: "10px",
+                  },
+                  "&:hover fieldset": {
+                    borderColor: "#cbd5e1",
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "primary.main",
+                    borderWidth: "1.5px",
+                  },
+                },
+                "& .MuiOutlinedInput-input": {
+                  textAlign: "right",
+                  fontSize: "13px",
+                  padding: "8px 0 !important",
+                },
+              }}
+            />
+          )}
+        />
+      </Box>
+
+
       {/* فلترة حسب حالة الدفع */}
       <Box sx={{ mb: 3 }}>
         <Typography
@@ -152,7 +297,7 @@ export const FilterDropdown: React.FC<FilterDropdownProps> = ({
               <Button
                 key={item.key}
                 variant="outlined"
-                onClick={() => setSelectedStatus(isSelected ? "" : item.key)} // ضغطة ثانية تلغي التحديد
+                onClick={() => setSelectedStatus(isSelected ? "" : item.key)}
                 sx={{
                   borderRadius: "20px",
                   px: 2.5,
@@ -176,55 +321,8 @@ export const FilterDropdown: React.FC<FilterDropdownProps> = ({
         </Box>
       </Box>
 
-      {/* فلترة حسب نوع الوحدة */}
-      <Box sx={{ mb: 3 }}>
-        <Typography
-          variant="caption"
-          sx={{
-            display: "block",
-            color: "#64748b",
-            fontWeight: "600",
-            mb: 1.5,
-            fontSize: "12px",
-          }}
-        >
-          فلترة حسب نوع الوحدة
-        </Typography>
-        <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
-          {[
-            { key: "BOX", label: "علبة" },
-            { key: "STRIP", label: "ظرف" },
-            { key: "TABLET", label: "حبة" },
-          ].map((item) => {
-            const isSelected = selectedUnit === item.key;
-            return (
-              <Button
-                key={item.key}
-                variant="outlined"
-                onClick={() => setSelectedUnit(isSelected ? "" : item.key)}
-                sx={{
-                  borderRadius: "20px",
-                  px: 2.5,
-                  py: 0.5,
-                  fontSize: "13px",
-                  fontWeight: "500",
-                  textTransform: "none",
-                  borderColor: isSelected ? "primary.main" : "#e2e8f0",
-                  backgroundColor: isSelected ? "primary.lighter" : "#ffffff",
-                  color: isSelected ? "primary.main" : "#475569",
-                  "&:hover": {
-                    borderColor: "primary.main",
-                    backgroundColor: isSelected ? "primary.lighter" : "#f8fafc",
-                  },
-                }}
-              >
-                {item.label}
-              </Button>
-            );
-          })}
-        </Box>
-      </Box>
-{/* 
+
+      {/* فلترة حسب نوع البيع  */}
       <Box sx={{ mb: 3 }}>
         <Typography
           variant="caption"
@@ -269,7 +367,8 @@ export const FilterDropdown: React.FC<FilterDropdownProps> = ({
             );
           })}
         </Box>
-      </Box>  */}
+      </Box> 
+
 
       {/* تصفية المدة الزمنية */}
       <Box sx={{ mb: 3 }}>
@@ -317,6 +416,7 @@ export const FilterDropdown: React.FC<FilterDropdownProps> = ({
           />
         </Box>
       </Box>
+
 
       {/* قيمة الإجمالي */}
       <Box sx={{ mb: 4 }}>
@@ -384,7 +484,9 @@ export const FilterDropdown: React.FC<FilterDropdownProps> = ({
           />
         </Box>
       </Box>
-      {/* أزرار العمليات للـ Popover */}
+
+
+      {/* أزرار العمليات */}
       <Box sx={{ display: "flex", gap: 1.5, alignItems: "center" }}>
         <Button
           variant="outlined"
@@ -426,6 +528,8 @@ export const FilterDropdown: React.FC<FilterDropdownProps> = ({
           تطبيق
         </Button>
       </Box>
+
+
     </Popover>
   );
 };

@@ -1,8 +1,8 @@
 // features/saleInvoice/types/invoice.ts
 
-export type PaymentStatus = "PAID" | "PENDING" | "PARTIAL";
-export type SaleType = "NORMAL" | "CUSTOMER_REQUEST";
-export type PricingMode = "SUGGESTED" | "EXTRA_PERCENTAGE" | "MANUAL";
+import type { PaymentStatus, PricingMode, SaleType } from "./enums";
+
+
 
 // GET /pharmacy-drugs/:id/sale-units
 export interface SaleUnit {

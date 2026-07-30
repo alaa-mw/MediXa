@@ -3,7 +3,7 @@ import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
 import MedicationOutlinedIcon from "@mui/icons-material/MedicationOutlined";
 import ReceiptOutlinedIcon from "@mui/icons-material/ReceiptOutlined";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import type { RootState } from "../../store";
+import type { RootState } from "../../../../shared/store";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getTotalItemsPrice,

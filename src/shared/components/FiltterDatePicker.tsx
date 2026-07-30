@@ -58,7 +58,7 @@ export function CustomDatePickerField({
             size: "small",
             sx: {
               direction: "rtl",
-              width: "100%", // ملء المساحة المخصصة له من الأب فقط
+              width: "100%", 
 
               "& .MuiPickersOutlinedInput-root": {
                 backgroundColor: "transparent",
@@ -102,7 +102,7 @@ export function CustomDatePickerField({
           },
         }}
         sx={{
-          width: "100%", // الاعتماد على عرض حاوية الأب المرنة
+          width: "100%", 
           "& .MuiInputBase-root": {
             "& .MuiInputAdornment-root": {
               marginLeft: 0,

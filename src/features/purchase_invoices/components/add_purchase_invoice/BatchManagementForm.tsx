@@ -17,7 +17,7 @@ import {
   updateItemQuantity,
 } from "../../store/purchaseInvoiceSlice";
 // import type { RootState } from "../store";
-import type { RootState } from "../../store";
+import type { RootState } from "../../../../shared/store";
 import type { PurchaseInvoiceItemRequest } from "../../types/purchaseInvoiceStore";
 import DrugSearch from "./DrugSearch";
 import BatchItemCard from "./BatchItemCard";

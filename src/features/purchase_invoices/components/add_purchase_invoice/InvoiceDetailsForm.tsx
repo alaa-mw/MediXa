@@ -5,7 +5,7 @@ import type { Supplier } from "../../types/purchaseInvoice";
 import { CustomAutocomplete } from "../../../../shared/layout/CustomAutocomplete";
 import { useEffect } from "react";
 import { RTLDatePicker } from "../../../../shared/layout/RTLDatePicker";
-import type { RootState } from "../../store";
+import type { RootState } from "../../../../shared/store";
 import { useDispatch, useSelector } from "react-redux";
 import type { SliceState } from "../../types/purchaseInvoiceStore";
 import {

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Box,
   Select,
@@ -25,6 +25,14 @@ export const PricingEditor: React.FC<PricingEditorProps> = ({
   item,
   changePricingMode,
 }) => {
+  const isStripUnit = item.selectedUnit.unitType === "STRIP";
+
+  useEffect(() => {
+    if (!isStripUnit && item.pricingMode === "EXTRA_PERCENTAGE") {
+      changePricingMode(item.pharmacyDrugId, "SUGGESTED");
+    }
+  }, [isStripUnit, item.pricingMode, item.pharmacyDrugId, changePricingMode]);
+
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 0.75 }}>
       <Select
@@ -36,28 +44,36 @@ export const PricingEditor: React.FC<PricingEditorProps> = ({
         <MenuItem value="SUGGESTED" sx={{ fontSize: 13 }}>
           سعر مقترح
         </MenuItem>
-        <MenuItem value="EXTRA_PERCENTAGE" sx={{ fontSize: 13 }}>
-          زيادة %
-        </MenuItem>
+
+        {isStripUnit && (
+          <MenuItem value="EXTRA_PERCENTAGE" sx={{ fontSize: 13 }}>
+            زيادة %
+          </MenuItem>
+        )}
+
         <MenuItem value="MANUAL" sx={{ fontSize: 13 }}>
           سعر يدوي
         </MenuItem>
       </Select>
 
-      {item.pricingMode === "EXTRA_PERCENTAGE" && (
+      {item.pricingMode === "EXTRA_PERCENTAGE" && isStripUnit && (
         <TextField
           size="small"
           type="number"
           placeholder="نسبة الزيادة"
           value={item.extraPercentage || ""}
-          onChange={(e) =>
+          onChange={(e) => {
+            const val = Number(e.target.value);
+            // 2️⃣ تقييد الإدخال بالواجهة بحيث لا يتجاوز 20%
+            const clampedVal = Math.min(20, Math.max(0, val));
             changePricingMode(
               item.pharmacyDrugId,
               "EXTRA_PERCENTAGE",
-              Number(e.target.value),
-            )
-          }
+              clampedVal
+            );
+          }}
           slotProps={{
+            htmlInput: { max: 20, min: 0 }, 
             input: {
               endAdornment: <InputAdornment position="end">%</InputAdornment>,
               style: smallInputSx,
@@ -77,7 +93,7 @@ export const PricingEditor: React.FC<PricingEditorProps> = ({
             changePricingMode(
               item.pharmacyDrugId,
               "MANUAL",
-              Number(e.target.value),
+              Number(e.target.value)
             )
           }
           slotProps={{

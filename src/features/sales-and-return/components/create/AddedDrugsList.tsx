@@ -30,13 +30,14 @@ const TABLE_COLUMNS = "2.2fr 1fr 1.6fr 1.4fr 1.3fr 1.2fr 0.5fr";
 
 export const AddedDrugsList: React.FC = () => {
   const {
-    items,
-    increaseQuantity, 
-    decreaseQuantity, 
-    changeUnit,
-    changePricingMode,
-    removeDrug,
-    setBatchAllocations,
+selectors: { items },    actions: {
+      increaseQuantity,
+      decreaseQuantity,
+      changeUnit,
+      changePricingMode,
+      removeDrug,
+      setBatchAllocations,
+    },
   } = useSaleInvoice();
 
   const [selectedItemForBatch, setSelectedItemForBatch] =
@@ -46,8 +47,7 @@ export const AddedDrugsList: React.FC = () => {
     return <EmptyInvoiceState />;
   }
 
-  // --- Render Functions ---
-
+  // اسم الدواء والمتاح منه
   const renderDrugInfo = (item: InvoiceItem) => (
     <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, minWidth: 0 }}>
       <Box
@@ -72,6 +72,7 @@ export const AddedDrugsList: React.FC = () => {
     </Box>
   );
 
+  // تحديد نوع الوحدة
   const renderUnitSelector = (item: InvoiceItem) => (
     <Box sx={{ textAlign: "center" }}>
       <FormControl size="small" fullWidth>
@@ -81,32 +82,43 @@ export const AddedDrugsList: React.FC = () => {
           sx={{ borderRadius: 2, fontSize: 14, height: 38, bgcolor: "white" }}
         >
           {item.availableSaleUnits.map((unit) => {
-  const isOutOfStock = unit.availableDisplayQuantity === 0;
-  return (
-    <MenuItem
-      key={unit.unitType}
-      value={unit.unitType}
-      disabled={isOutOfStock} 
-      sx={{ 
-        fontSize: 14, 
-        opacity: isOutOfStock ? 0.5 : 1 
-      }}
-    >
-      {unit.label} {isOutOfStock && "(غير متاح)"}
-    </MenuItem>
-  );
-})}
+            const isOutOfStock = unit.availableDisplayQuantity === 0;
+            return (
+              <MenuItem
+                key={unit.unitType}
+                value={unit.unitType}
+                disabled={isOutOfStock}
+                sx={{
+                  fontSize: 14,
+                  opacity: isOutOfStock ? 0.5 : 1,
+                }}
+              >
+                {unit.label} {isOutOfStock && "(غير متاح)"}
+              </MenuItem>
+            );
+          })}
         </Select>
       </FormControl>
     </Box>
   );
 
+  // الكمية المحددة
   const renderQuantityControl = (item: InvoiceItem) => {
-    const hasBatches = Boolean(item.batchAllocations && item.batchAllocations.length > 0);
+    const hasBatches = Boolean(
+      item.batchAllocations && item.batchAllocations.length > 0
+    );
 
     if (hasBatches) {
       return (
-        <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 0.2 }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justify: "center",
+            gap: 0.2,
+          }}
+        >
           <Typography
             sx={{
               fontWeight: 700,
@@ -116,7 +128,10 @@ export const AddedDrugsList: React.FC = () => {
           >
             {item.displayQuantity}
           </Typography>
-          <Typography variant="caption" sx={{ color: "#64748B", fontSize: 11 }}>
+          <Typography
+            variant="caption"
+            sx={{ color: "#64748B", fontSize: 11 }}
+          >
             من دفعات محددة
           </Typography>
         </Box>
@@ -163,10 +178,12 @@ export const AddedDrugsList: React.FC = () => {
     );
   };
 
+  // تحديد السعر
   const renderPricingEditor = (item: InvoiceItem) => (
     <PricingEditor item={item} changePricingMode={changePricingMode} />
   );
 
+  // الإجمالي للدواء الواحد
   const renderSubtotal = (item: InvoiceItem) => (
     <Typography
       sx={{
@@ -180,6 +197,7 @@ export const AddedDrugsList: React.FC = () => {
     </Typography>
   );
 
+  // تحديد الكمية من دفعات معينة
   const renderBatchButton = (item: InvoiceItem) => {
     const hasBatches = Boolean(item.batchAllocations?.length);
     return (
@@ -199,7 +217,7 @@ export const AddedDrugsList: React.FC = () => {
         >
           {item.batchAllocations?.length
             ? `محدد (${item.batchAllocations.length})`
-            : "تخصيص"}{" "}
+            : "تخصيص"}
         </Button>
       </Box>
     );
@@ -320,7 +338,7 @@ export const AddedDrugsList: React.FC = () => {
             onSaveAllocations={(allocations) => {
               setBatchAllocations(
                 selectedItemForBatch.pharmacyDrugId,
-                allocations,
+                allocations
               );
             }}
           />

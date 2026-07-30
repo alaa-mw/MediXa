@@ -5,6 +5,7 @@ import { Box, Typography, Button, Paper, styled } from "@mui/material";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutlined";
 import type { SaleInvoiceData } from "../../types/saleInvoice";
 
+{/*ستايل الكارد  */}
 const PremiumCard = styled(Paper)(({ theme }) => ({
   backgroundColor: "#ffffff",
   borderRadius: "16px",
@@ -23,7 +24,7 @@ const PremiumCard = styled(Paper)(({ theme }) => ({
   },
 }));
 
-// 1. تم تكبير حجم الدائرة هنا لتصبح أكثر وضوحاً بجانب رقم الفاتورة
+{/*ستايل النقطة التي توضح حالة الفاتورة */}
 const StatusDot = styled(Box)<{ dotColor: string }>(({ dotColor }) => ({
   width: "12px",
   height: "12px",
@@ -39,7 +40,8 @@ interface SaleInvoiceCardProps {
 }
 
 export const SaleInvoiceCard: React.FC<SaleInvoiceCardProps> = ({ invoice, onDetailsClick }) => {
-  // تطبيق الـ switch لإعطاء ألوان الحالات بناءً على حالة الدفع المتاحة الفاتورة ✨
+
+  {/*إعطاء لون للنقطة التي تعبر عن حالة الفاتورة */}
   const getStatusColor = (): string => {
     switch (invoice.paymentStatus) {
       case "PENDING":
@@ -61,7 +63,8 @@ export const SaleInvoiceCard: React.FC<SaleInvoiceCardProps> = ({ invoice, onDet
 
   const total = parseFloat(invoice.totalAmount);
   
-  // حساب المدفوع والمتبقي ديناميكياً بناءً على حالة الفاتورة وبإستخدام subTotal للمدفوعات الجزئية
+
+  //ارجاع قيمة كل من المدفوع و الجزئي و المتبقي 
   const getFinancials = () => {
     if (invoice.paymentStatus === "PAID") {
       return { paid: total, remaining: 0 };
@@ -69,13 +72,12 @@ export const SaleInvoiceCard: React.FC<SaleInvoiceCardProps> = ({ invoice, onDet
     if (invoice.paymentStatus === "PENDING") {
       return { paid: 0, remaining: total };
     }
-    // حالة الدفع الجزئي PARTIAL
     const paid = invoice.subtotal ? parseFloat(invoice.subtotal) : 0;
     return { paid: paid, remaining: Math.max(0, total - paid) };
   };
-
   const { paid: paidAmount, remaining: remainingAmount } = getFinancials();
 
+//التأكد من أن المريض موجود
   const hasPatient = !!invoice.pharmacyInvoice.patient?.fullName;
 
   return (

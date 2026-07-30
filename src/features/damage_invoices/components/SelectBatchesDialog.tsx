@@ -14,7 +14,7 @@ import {
 import React, { useEffect, useState, useMemo } from "react";
 import useGetWithParams from "../../../shared/hooks/useGetWithParams";
 import type { Batch } from "../types/Batch";
-import { CustomDatePickerField } from "../../sales-and-return/components/CustomDatePickerField";
+import { CustomDatePickerField } from "../../../shared/components/FiltterDatePicker";
 import type { BatchAllocation } from "./AddDamageInvoice";
 
 interface Props {

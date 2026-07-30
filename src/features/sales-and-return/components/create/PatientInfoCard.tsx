@@ -37,7 +37,10 @@ export const PatientInfoCard: React.FC<PatientInfoCardProps> = ({
       <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1.5 }}>
         <PersonOutlinedIcon sx={{ color: "#316A75", fontSize: 20 }} />
         <Typography sx={{ fontWeight: 800, fontSize: 13.5, color: "#0F172A" }}>
-          بيانات المريض {requiresPrescriptionAny ? "(مطلوبة - دواء بوصفة)" : "(مطلوبة لحالة الدفع)"}
+          بيانات المريض{" "}
+          {requiresPrescriptionAny
+            ? "(مطلوبة - دواء بوصفة)"
+            : "(مطلوبة لحالة الدفع)"}
         </Typography>
       </Box>
 

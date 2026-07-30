@@ -1,23 +1,18 @@
 
-
 export interface SaleInvoiceFilters {
   page: string;
   limit: string;
   paymentStatus: PaymentStatus | "ALL"; 
   search: string;
-  saleInvoiceId: string;
-  pharmacyInvoiceId: string;
-  patientId: string;
   pharmacyDrugId: string;
-  unitType: string;
-  saleType: SaleType | "";
-  invoiceStatus: InvoiceStatus | "";
+  drugName?: string; // 💡 إضافة اسم الدواء لعرضه في الـ Chip
   fromDate: string;
   toDate: string;
   minTotal: string;
   maxTotal: string;
   sortBy: string;
   sortOrder: "asc" | "desc";
+  saleType: SaleType | "";
 }
 
 // src/hooks/useSaleInvoicesData.ts
@@ -26,25 +21,20 @@ import { useSearchParams } from "react-router-dom";
 import { useDebounce } from "../../../shared/hooks/useDebounce"; 
 import useGetWithParamsWithoutState from "../../../shared/hooks/useGetWithParamsWithoutState";
 import type { SaleInvoiceApiResponse, SaleInvoiceData } from "../types/saleInvoice";
-import type { InvoiceStatus, PaymentStatus, SaleType } from "../types/enums";
+import type { PaymentStatus, SaleType} from "../types/enums";
 
 export const useSaleInvoicesData = (defaultLimit = 20) => {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // 1. القراءة الحية من الـ URL (إذا كان فارغاً، تعود القيم افتراضية ونظيفة)
   const urlParams = useMemo<SaleInvoiceFilters>(() => {
     return {
       page: searchParams.get("page") || "1",
       limit: searchParams.get("limit") || String(defaultLimit),
       paymentStatus: (searchParams.get("paymentStatus") as any) || "ALL",
-      search: searchParams.get("search") || "",
-      saleInvoiceId: searchParams.get("saleInvoiceId") || "",
-      pharmacyInvoiceId: searchParams.get("pharmacyInvoiceId") || "",
-      patientId: searchParams.get("patientId") || "",
-      pharmacyDrugId: searchParams.get("pharmacyDrugId") || "",
-      unitType: searchParams.get("unitType") || "",
       saleType: (searchParams.get("saleType") as any) || "",
-      invoiceStatus: (searchParams.get("invoiceStatus") as any) || "",
+      search: searchParams.get("search") || "",
+      pharmacyDrugId: searchParams.get("pharmacyDrugId") || "",
+      drugName: searchParams.get("drugName") || "", // 💡 استخراج اسم الدواء
       fromDate: searchParams.get("fromDate") || "",
       toDate: searchParams.get("toDate") || "",
       minTotal: searchParams.get("minTotal") || "",
@@ -117,22 +107,14 @@ export const useSaleInvoicesData = (defaultLimit = 20) => {
 
     // إرسال الحقول فقط إذا كانت تحتوي على قيم فعلية
     if (urlParams.search.trim()) params.search = urlParams.search.trim();
-    if (urlParams.unitType) params.unitType = urlParams.unitType;
-    if (urlParams.saleType) params.saleType = urlParams.saleType;
-    if (urlParams.invoiceStatus) params.invoiceStatus = urlParams.invoiceStatus;
     if (urlParams.fromDate) params.fromDate = urlParams.fromDate;
     if (urlParams.toDate) params.toDate = urlParams.toDate;
-    
-    if (urlParams.saleInvoiceId) params.saleInvoiceId = Number(urlParams.saleInvoiceId);
-    if (urlParams.pharmacyInvoiceId) params.pharmacyInvoiceId = Number(urlParams.pharmacyInvoiceId);
-    if (urlParams.patientId) params.patientId = Number(urlParams.patientId);
     if (urlParams.pharmacyDrugId) params.pharmacyDrugId = Number(urlParams.pharmacyDrugId);
     if (urlParams.minTotal) params.minTotal = Number(urlParams.minTotal);
     if (urlParams.maxTotal) params.maxTotal = Number(urlParams.maxTotal);
-    
     if (urlParams.sortBy) params.sortBy = urlParams.sortBy;
     if (urlParams.sortOrder) params.sortOrder = urlParams.sortOrder;
-
+    if (urlParams.saleType) params.saleType = urlParams.saleType;
     return params;
   }, [urlParams, defaultLimit]);
 

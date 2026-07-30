@@ -14,7 +14,7 @@ import {
   selectBatchesRequest,
   resetForm,
 } from "../../store/completeBatchItemSlice";
-import type { RootState } from "../../store";
+import type { RootState } from "../../../../shared/store";
 import CompleteBatchItemCard from "./CompleteBatchItemCard";
 import usePostData from "../../../../shared/hooks/usePostData";
 import { useSnackbar } from "../../../../shared/providers/useSnackbar";

@@ -1,5 +1,5 @@
 import { Box, Typography, Chip } from "@mui/material";
-import { getMatchStyle } from "../../helper/GetMatchStyle";
+import { getMatchStyle } from "../../utils/GetMatchStyle";
 import type { PharmacyDrug } from "../../types/drug";
 
 interface AlternativeDrugCardProps {

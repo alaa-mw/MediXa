@@ -1,53 +1,13 @@
-// import { Box } from "@mui/material";
 
-// import { DrugSearchArea } from "../components/create/DrugSearchArea";
-// import { AddedDrugsList } from "../components/create/AddedDrugsList";
-// import { InvoiceSummary } from "../components/create/InvoiceSummary";
-
-// // 1. استيراد الـ Provider (تأكد من صحة المسار بالنسبة لملفك)
-// import { SaleInvoiceProvider } from "../context/SaleInvoiceContext"; 
-
-// export const CreateSaleInvoicePage = () => {
-//   return (
-//     // 2. تغليف الصفحة بالـ Provider
-//     <SaleInvoiceProvider>
-//       <Box sx={{ display: "flex", height: "100%", gap: 2, overflow: "hidden" }}>
-//         <Box
-//           sx={{
-//             flex: 1,
-//             display: "flex",
-//             flexDirection: "column",
-//             gap: 2,
-//             overflow: "hidden",
-//           }}
-//         >
-//           <DrugSearchArea />
-
-//           <Box sx={{ flex: 1, overflowY: "auto" }}>
-//             <AddedDrugsList />
-//           </Box>
-//         </Box>
-
-//         <Box sx={{ width: "350px", flexShrink: 0 }}>
-//           <InvoiceSummary />
-//         </Box>
-//       </Box>
-//     </SaleInvoiceProvider>
-//   );
-// };
-
-// export default CreateSaleInvoicePage;
 
 import { Box } from "@mui/material";
 
 import { DrugSearchArea } from "../components/create/DrugSearchArea";
 import { AddedDrugsList } from "../components/create/AddedDrugsList";
 import { InvoiceSummary } from "../components/create/InvoiceSummary";
-import { SaleInvoiceProvider } from "../context/SaleInvoiceContext"; 
 
 export const CreateSaleInvoicePage = () => {
   return (
-    <SaleInvoiceProvider>
       <Box 
         sx={{ 
           display: "flex", 
@@ -86,7 +46,6 @@ export const CreateSaleInvoicePage = () => {
           <InvoiceSummary />
         </Box>
       </Box>
-    </SaleInvoiceProvider>
   );
 };
 
