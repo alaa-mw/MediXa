@@ -1,10 +1,11 @@
 import { Button, Popover, Box, Typography, IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { CustomDatePickerField } from "../../sales-and-return/components/CustomDatePickerField";
-import type { OrderStatus } from "../types/customerOrder";
+import type { CustomerRequestStatus } from "../types/customerOrder";
+import getOrderStatusLabel from "../utils/getOrderStatusLabel";
 
 interface FilterValues {
-  status: OrderStatus;
+  status: CustomerRequestStatus;
   fromDate: string;
   toDate: string;
 }
@@ -17,13 +18,21 @@ interface FilterDialogProps {
   onClose?: () => void;
   anchorEl?: HTMLButtonElement | null;
 }
-const InvoiceStatuses: { value: OrderStatus | ""; label: string }[] = [
-  { value: "PENDING", label: "قيد الانتظار" },
-  { value: "CONFIRMED", label: "مؤكدة" },
-  { value: "RECEIVED", label: "مستلمة" },
-  { value: "CANCELLED", label: "ملغاة" },
-  { value: "", label: "❌" }, // "جميع حالات الفواتير"
-];
+const InvoiceStatuses: { value: CustomerRequestStatus | ""; label: string }[] =
+  [
+    { value: "PENDING", label: getOrderStatusLabel("PENDING") },
+    {
+      value: "PARTIALLY_FULFILLED",
+      label: getOrderStatusLabel("PARTIALLY_FULFILLED"),
+    },
+    {
+      value: "READY_FOR_PICKUP",
+      label: getOrderStatusLabel("READY_FOR_PICKUP"),
+    },
+    { value: "COMPLETED", label: getOrderStatusLabel("COMPLETED") },
+    { value: "CANCELLED", label: getOrderStatusLabel("CANCELLED") },
+    { value: "", label: "❌" }, // "جميع حالات الفواتير"
+  ];
 
 const FilterDropDown = ({
   // open,

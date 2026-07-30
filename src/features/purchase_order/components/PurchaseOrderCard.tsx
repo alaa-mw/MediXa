@@ -1,35 +1,34 @@
+import CalendarTodayRounded from "@mui/icons-material/CalendarTodayRounded";
+import LocalShippingRounded from "@mui/icons-material/LocalShippingRounded";
+import VisibilityRounded from "@mui/icons-material/VisibilityRounded";
 import {
-  CalendarTodayRounded,
-  Person2Rounded,
-  PhoneRounded,
-  VisibilityRounded
-} from "@mui/icons-material";
-import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  Chip,
-  Stack,
-  Typography,
+    Box,
+    Button,
+    Card,
+    CardContent,
+    Chip,
+    Stack,
+    Typography,
 } from "@mui/material";
+import type { PurchaseOrder } from "../types/purchaseOrder";
+import getPurchaseOrderStatusLabel from "../utils/getPurchaseOrderStatusLabel";
 
-import type { CustomerOrder } from "../types/customerOrder";
-import getOrderStatusLabel from "../utils/getOrderStatusLabel";
-import OrderStatusProgress from "./OrderStatusProgress";
+const statusColor: Record<
+  string,
+  "default" | "warning" | "success" | "error" | "info"
+> = {
+  PENDING: "warning",
+  CONFIRMED: "info",
+  PARTIALLY_RECEIVED: "info",
+  RECEIVED: "success",
+  CANCELLED: "error",
+};
 
-const statusColor: Record<string, "default" | "warning" | "success" | "error"> =
-  {
-    PENDING: "warning",
-    CONFIRMED: "success",
-    CANCELLED: "error",
-  };
-
-const CustomerOrderCard = ({
+const PurchaseOrderCard = ({
   data,
   onView,
 }: {
-  data: CustomerOrder;
+  data: PurchaseOrder;
   onView?: (id: string) => void;
 }) => {
   return (
@@ -48,7 +47,6 @@ const CustomerOrderCard = ({
     >
       <CardContent sx={{ p: 2.5 }}>
         <Stack spacing={2}>
-          {/* Header */}
           <Stack
             sx={{
               flexDirection: "row",
@@ -62,28 +60,20 @@ const CustomerOrderCard = ({
               />
               <Typography
                 variant="caption"
-                sx={{
-                  color: "text.secondary",
-                  fontWeight: 600,
-                }}
+                sx={{ color: "text.secondary", fontWeight: 600 }}
               >
-                {data.createdAt.split("T")[0]}
+                {data.orderDate?.split("T")[0]}
               </Typography>
             </Stack>
 
             <Chip
-              label={getOrderStatusLabel(data.status)}
-              color={statusColor[data.status] ?? "default"}
+              label={getPurchaseOrderStatusLabel(data.orderStatus)}
+              color={statusColor[data.orderStatus] ?? "default"}
               size="small"
-              sx={{
-                color: `${statusColor[data.status]}.dark`,
-                fontWeight: 700,
-                borderRadius: 2,
-              }}
+              sx={{ fontWeight: 700, borderRadius: 2 }}
             />
           </Stack>
 
-          {/* Customer */}
           <Stack
             sx={{
               flexDirection: "row",
@@ -92,7 +82,7 @@ const CustomerOrderCard = ({
             }}
           >
             <Stack
-              sx={{ flexDirection: "row", gap: 1.5, alignItems: "center" }}
+              sx={{ flexDirection: "row", alignItems: "center", gap: 1.5 }}
             >
               <Box
                 sx={{
@@ -105,7 +95,7 @@ const CustomerOrderCard = ({
                   alignItems: "center",
                 }}
               >
-                <Person2Rounded sx={{ fontSize: 24, color: "#506680" }} />
+                <LocalShippingRounded sx={{ fontSize: 24, color: "#506680" }} />
               </Box>
 
               <Box>
@@ -113,49 +103,35 @@ const CustomerOrderCard = ({
                   variant="subtitle1"
                   sx={{ fontWeight: 700, color: "#34495E" }}
                 >
-                  {data.customerName}
+                  {data.supplier?.supplierName ?? "-"}
                 </Typography>
-                <Stack
-                  sx={{ flexDirection: "row", alignItems: "center", gap: 0.5 }}
+                <Typography
+                  variant="caption"
+                  sx={{ color: "text.secondary", fontWeight: 600 }}
                 >
-                  <PhoneRounded
-                    sx={{ fontSize: 14, color: "text.secondary" }}
-                  />
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      color: "text.secondary",
-                      fontWeight: 600,
-                    }}
-                  >
-                    {data.customerPhone}
-                  </Typography>
-                </Stack>
+                  المورد
+                </Typography>
               </Box>
             </Stack>
+
             <Box
               sx={{
                 bgcolor: "grey.100",
                 p: 1,
                 borderRadius: 2,
                 textAlign: "center",
-                minWidth: 60,
+                minWidth: 64,
               }}
             >
               <Typography variant="caption" color="text.secondary">
-                عدد الأصناف
+                الأصناف
               </Typography>
-              <Typography variant="h6" sx={{ fontWeight: 700, mt: 0.5 }}>
+              <Typography variant="h6" sx={{ fontWeight: 700 }}>
                 {data.itemsCount}
               </Typography>
             </Box>
           </Stack>
 
-          <Box sx={{ pt: 1 }}>
-            <OrderStatusProgress data={data} />
-          </Box>
-
-          {/* Action */}
           <Button
             fullWidth
             variant="contained"
@@ -167,7 +143,7 @@ const CustomerOrderCard = ({
               fontWeight: 700,
               textTransform: "none",
             }}
-            onClick={() => onView?.(`details/${String(data.customerRequestId)}`)}
+            onClick={() => onView?.(`details/${String(data.purchaseOrderId)}`)}
           >
             عرض الطلب
           </Button>
@@ -177,4 +153,4 @@ const CustomerOrderCard = ({
   );
 };
 
-export default CustomerOrderCard;
+export default PurchaseOrderCard;

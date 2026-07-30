@@ -1,7 +1,6 @@
-import { Box, List, ListItemButton, ListItemText, Paper } from "@mui/material";
 import { Search } from "@mui/icons-material";
-import { useEffect, useRef, useState } from "react";
-import React from "react";
+import { Box, List, ListItemButton, ListItemText, Paper } from "@mui/material";
+import React, { useEffect, useRef, useState } from "react";
 
 interface SearchBarProps<T> {
   placeholder?: string;
@@ -93,31 +92,8 @@ export default function SearchBarDynamic<T>({
         />
 
         {startAdornment && <Box>{startAdornment}</Box>}
-        
-        {barcodeComponent && <Box>{barcodeComponent}</Box>}
-        {/* {barcodeComponent && React.isValidElement(barcodeComponent) && (
-          <Box sx={{ ml: 1 }}>
-            {(() => {
-              const existingHandler = (barcodeComponent.props as any)
-                ?.onFindResult;
-              if (typeof existingHandler === "function") {
-                // If the component already handles onFindResult, render as-is and let it control behavior
-                return barcodeComponent;
-              }
 
-              // Otherwise inject a handler that updates this search bar and forwards to onBarcodeFind
-              return React.cloneElement(barcodeComponent, {
-                onFindResult: (result: any) => {
-                  const name = result?.tradeName || "";
-                  setValue(name);
-                  onChange(name);
-                  if (onSelect) onSelect(result as unknown as T);
-                  setOpen(false);
-                },
-              });
-            })()}
-          </Box>
-        )} */}
+        {barcodeComponent && <Box>{barcodeComponent}</Box>}
       </Box>
 
       {open && results.length > 0 && (
@@ -135,20 +111,32 @@ export default function SearchBarDynamic<T>({
         >
           <List>
             {results.map((item, index) => (
+              
               <ListItemButton
-                key={index}
-                onClick={() => {
-                  if (onSelect) {
-                    onSelect(item);
-                  }
-                  setOpen(false);
+                  key={index}
+                  onClick={() => {
+                    if (onSelect) {
+                      onSelect(item);
+                    }
+                    setOpen(false);
+                  }}
+                  sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  bgcolor: "#EBF8FA",
+                  border: "1px solid #D2ECF0",
+                  borderRadius: "8px",
+                  gap: 2,
+                  flexDirection: { xs: "column", sm: "row" },
+                  cursor: "pointer",
                 }}
-              >
-                <ListItemText
-                  sx={{ my: 0 }}
-                  primary={getOptionLabel ? getOptionLabel(item) : ""}
-                />
-              </ListItemButton>
+                >
+                  <ListItemText
+                    sx={{ my: 0 }}
+                    primary={getOptionLabel ? getOptionLabel(item) : ""}
+                  />
+                </ListItemButton>
             ))}
           </List>
         </Paper>

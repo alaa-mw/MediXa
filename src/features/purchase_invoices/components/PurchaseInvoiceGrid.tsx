@@ -151,6 +151,7 @@ const PurchaseInvoiceGrid = () => {
     const newFilters = {
       ...localFilters,
       [key]: "",
+      page: "", // reset page to 1 when removing a filter
     };
     setLocalFilters(newFilters);
     setQueryParams(newFilters);

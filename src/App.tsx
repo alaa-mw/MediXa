@@ -1,5 +1,5 @@
 import { ThemeProvider } from "@mui/material/styles";
-import { CssBaseline } from "@mui/material";
+import AddCustomerOrder from "./features/customer_order/components/AddCustomerOrder";
 import { Routes, Route, Navigate } from "react-router-dom";
 import arabicTheme from "./shared/styles/arabicTheme";
 import { LandingPage } from "./dashboards/LandingPage";
@@ -42,6 +42,11 @@ import RenewSubscriptionPage from "./features/finance/pages/RenewSubscriptionPag
 import OrderLayout from "./features/orders/OrderLayout";
 import CustomerOrderGrid from "./features/customer_order/components/CustomerOrderGrid";
 import ReturnInvoiceDetailsPage from "./features/SUB_invoice/return-invoice/ReturnInvoiceDetailsPage";
+import CustomerOrderDetails from "./features/customer_order/components/CustomerOrderDetails";
+import { CssBaseline } from "@mui/material";
+import PurchaseOrderGrid from "./features/purchase_order/components/PurchaseOrderGrid";
+import AddPurchaseOrder from "./features/purchase_order/components/AddPurchaseOrder";
+import PurchaseOrderDetailsPage from "./features/purchase_order/components/PurchaseOrderDetails";
 
 function App() {
   const pharmacyPaths = ["/pharmacy", "/pharmacy_owner"];
@@ -177,11 +182,30 @@ function App() {
                   path="inventory/batches/:drugId"
                   element={<DrugBatchesPage />}
                 />
+                {/* orders */}
                 <Route path="orders" element={<OrderLayout />}>
                   <Route index element={<Navigate to="purchase" replace />} />
-                  <Route path="purchase" element={<div>purchase orders</div>} />
+                  <Route path="purchase" element={<PurchaseOrderGrid />} />
                   <Route path="customer" element={<CustomerOrderGrid />} />
                 </Route>
+                <Route
+                  path="orders/purchase/details/:orderId"
+                  element={<PurchaseOrderDetailsPage />}
+                />
+                <Route
+                  path="orders/purchase/add"
+                  element={<AddPurchaseOrder />}
+                />
+                <Route
+                  path="orders/customer/details/:orderId"
+                  element={<CustomerOrderDetails />}
+                />
+                <Route
+                  path="orders/customer/add"
+                  element={<AddCustomerOrder />}
+                />
+
+                {/* suppliers */}
                 <Route path="suppliers" element={<SuppliersList />} />
                 <Route path="suppliers/add" element={<AddSupplier />} />
                 <Route

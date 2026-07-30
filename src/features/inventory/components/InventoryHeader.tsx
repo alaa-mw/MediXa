@@ -5,6 +5,8 @@ import { AddMedicineButton } from "./AddMedicineButton";
 import { FilterButton } from "./FilterButton";
 import { SearchBar } from "./SearchBar";
 import { CategoryTabs } from "./inventory/CategoryTabs";
+import SearchBarDynamic from "../../../shared/layout/SearchBarDynamic";
+import BarcodeMyDrugs from "../../../shared/layout/BarcodeMyDrugs";
 
 interface InventoryHeaderProps {
   onAddClick: () => void;
@@ -34,9 +36,22 @@ export const InventoryHeader: React.FC<InventoryHeaderProps> = ({
       <Box
         sx={{ display: "flex", alignItems: "center", gap: 1, width: "100%" }}
       >
-        <SearchBar value={searchValue} onChange={onSearchChange} />
+        {/* <SearchBar value={searchValue} onChange={onSearchChange} /> */}
+        <SearchBarDynamic
+          placeholder="ابحث عن الدواء (عبر الاسم أو الباركود)..."
+          onChange={onSearchChange} 
+          barcodeComponent={
+            <BarcodeMyDrugs 
+              onFindResult={(result) => {
+                console.log("تم العثور على الدواء:", result);
+                onSearchChange(result.tradeName); 
+                // later ask oula
+              }}
+            />
+          }
+        />
         <FilterButton />
-        <AddMedicineButton onClick={onAddClick}  label="إضافة دواء جديد" />
+        <AddMedicineButton onClick={onAddClick} label="إضافة دواء جديد" />
       </Box>
       <CategoryTabs activeTab={activeTab} onChange={setActiveTab} />
     </Box>

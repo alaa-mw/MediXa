@@ -101,16 +101,16 @@ const theme = createTheme({
     },
     // Override the default color palette tokens
     success: {
-      main: "#d2f9de",
-      dark: "#5ea97a",
+      main: "#abfdc3",
+      dark: "#036c2a",
     },
     error: {
       main: "#ffc9c8",
       dark: "#d32f2f",
     },
     warning: {
-      main: "#fbe6c7",
-      dark: "#e0760c",
+      main: "#ffdca7",
+      dark: "#a95704",
     },
     info: {
       main: "#bfecfa",

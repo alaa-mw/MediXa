@@ -2,6 +2,8 @@ import React from "react";
 import { Box, Typography } from "@mui/material";
 import { SearchBar } from "../SearchBar";
 import { useBarcodeScanner } from "../../../../shared/services/useBarcodeScanner";
+import SearchBarDynamic from "../../../../shared/layout/SearchBarDynamic";
+import BarcodeMyDrugs from "../../../../shared/layout/BarcodeMyDrugs";
 
 interface AddMedicineSearchBarProps {
   searchQuery: string;
@@ -39,6 +41,20 @@ export const AddMedicineSearchBar: React.FC<AddMedicineSearchBarProps> = ({
 
       <Box sx={{ mt: 3, width: "100%", maxWidth: "1200px" }}>
         <form onSubmit={onSubmit} style={{ width: "100%" }}>
+          {/* <SearchBarDynamic
+            placeholder="ابحث عن الدواء (عبر الاسم أو الباركود)..."
+            onChange={setSearchQuery}
+            barcodeComponent={
+              <BarcodeMyDrugs
+                onFindResult={(result) => {
+                  console.log("تم العثور على الدواء:", result);
+                  setSearchQuery(result.tradeName);
+                  // later ask oula
+                }}
+              />
+            }
+          /> */}
+
           <SearchBar
             value={searchQuery}
             onChange={setSearchQuery}
