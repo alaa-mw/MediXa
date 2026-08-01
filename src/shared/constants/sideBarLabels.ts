@@ -112,6 +112,16 @@ export const sideBarLabels: Record<
       path: "/support",
       icon: SupportAgentIcon,
     },
+    // temp - later 
+    {
+      title: "مؤقت ",
+      path: "/r1",
+      icon: SupportAgentIcon,
+    },{
+      title: "مؤقت2",
+      path: "/r2",
+      icon: SupportAgentIcon,
+    },
   ],
   ADMIN: [
     {

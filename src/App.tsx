@@ -47,6 +47,8 @@ import { CssBaseline } from "@mui/material";
 import PurchaseOrderGrid from "./features/purchase_order/components/PurchaseOrderGrid";
 import AddPurchaseOrder from "./features/purchase_order/components/AddPurchaseOrder";
 import PurchaseOrderDetailsPage from "./features/purchase_order/components/PurchaseOrderDetails";
+import DashboardPage from "./features/dashboard/components/DashboardPage";
+import AnalysisInventoryPage from "./features/analysis_inventory/components/AnalysisInventoryPage";
 
 function App() {
   const pharmacyPaths = ["/pharmacy", "/pharmacy_owner"];
@@ -133,7 +135,7 @@ function App() {
           >
             {pharmacyPaths.map((path) => (
               <Route path={path} key={path} element={<DashboardTemplate />}>
-                <Route index element={<div>hello</div>} />
+                <Route index element={<>hello</>} />
                 <Route path="sales" element={<SalesLayout />}>
                   <Route index element={<Navigate to="sales" replace />} />
                   <Route path="sales" element={<SaleInvoicesPage />} />
@@ -222,6 +224,10 @@ function App() {
                   path="sales-details/:invoiceId/create-return"
                   element={<CreateReturnInvoicePage />}
                 />
+
+                {/* tests reports */}
+                <Route path="r1" element={<DashboardPage/>} />
+                <Route path="r2" element={<AnalysisInventoryPage/>} />
               </Route>
             ))}
           </Route>
