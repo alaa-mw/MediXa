@@ -1,4 +1,4 @@
-import { Box, CircularProgress, Grid, Paper, Typography } from "@mui/material";
+import { Box, CircularProgress, Paper, Typography } from "@mui/material";
 import React from "react";
 import { useParams } from "react-router-dom";
 import useReturnInvoiceDetails from "./hooks/useReturnInvoiceDetails";
@@ -24,7 +24,7 @@ const ReturnInvoiceDetailsPage = () => {
   const invoiceNotes = invoice?.pharmacyInvoice?.notes;
 
   return (
-    <Box sx={{ p: 1, width: "100%" }}>
+    <Box sx={{ p: 2, width: "100%", boxSizing: "border-box" }}>
       {/* 1. الهيدر العلوي */}
       <InvoiceHeader
         invoiceId={invoice?.returnInvoiceId!}
@@ -44,17 +44,18 @@ const ReturnInvoiceDetailsPage = () => {
         isReturnInvoice={true}
       />
 
-      {/* كارد الملاحظات الصغير فوق الجدول */}
-      {/* كارد الملاحظات الصغير فوق الجدول في سطر واحد */}
+      {/* كارد الملاحظات */}
       {invoiceNotes && (
         <Paper
           elevation={0}
           sx={{
             display: "flex",
             alignItems: "center",
-            gap: 1, // مسافة بسيطة بين الأيقونة والعنوان والنص
+            gap: 1,
             p: 1.5,
             mb: 2,
+            width: "100%",
+            boxSizing: "border-box",
             backgroundColor: "#F8FAFC",
             border: "1px solid #E2E8F0",
             borderRadius: "8px",
@@ -77,25 +78,23 @@ const ReturnInvoiceDetailsPage = () => {
         </Paper>
       )}
 
-      {/* 3. تفاصيل محتوى الفاتورة والمرتجع */}
-      <Grid container spacing={3} sx={{ width: "100%", m: 0 }}>
-        <Grid sx={{ p: "0px !important", xs: 12, md: 12 }}>
-          <Paper
-            elevation={0}
-            sx={{
-              border: "1px solid #E2E8F0",
-              borderRadius: "8px",
-              width: "100%",
-              mb: 3,
-            }}
-          >
-            <InvoiceSaleTable
-              returnInvoiceData={invoice?.items}
-              isReturnInvoice={true}
-            />
-          </Paper>
-        </Grid>
-      </Grid>
+      {/* 3. تفاصيل محتوى الفاتورة والمرتجع (باستخدام Box مباشرة لملء العرض 100%) */}
+      <Paper
+        elevation={0}
+        sx={{
+          border: "1px solid #E2E8F0",
+          borderRadius: "8px",
+          width: "100%",
+          overflow: "hidden",
+          mb: 3,
+          boxSizing: "border-box",
+        }}
+      >
+        <InvoiceSaleTable
+          returnInvoiceData={invoice?.items}
+          isReturnInvoice={true}
+        />
+      </Paper>
     </Box>
   );
 };

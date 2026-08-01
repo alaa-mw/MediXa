@@ -14,7 +14,6 @@ import AuthGateway from "./features/auth/components/AuthGateway";
 import SuppliersList from "./features/suppliers/components/SuppliersList";
 import AddSupplier from "./features/suppliers/components/AddSupplier";
 import InvoiceLayout from "./features/invoices/InvoiceLayout";
-// import PharmacyManagement from "./features/pharma_account/pages/pharamcy-account-management";
 import { CreatePharmacyAccount } from "./features/pharma_account/pages/CreatePharmacyAccount";
 import InventoryPage from "./features/inventory/pages/InventoryPage";
 import AddMedicinePage from "./features/inventory/pages/AddMedicinePage";
@@ -49,7 +48,7 @@ import AddPurchaseOrder from "./features/purchase_order/components/AddPurchaseOr
 import PurchaseOrderDetailsPage from "./features/purchase_order/components/PurchaseOrderDetails";
 import DashboardPage from "./features/dashboard/components/DashboardPage";
 import AnalysisInventoryPage from "./features/analysis_inventory/components/AnalysisInventoryPage";
-
+import AssistantPage from "./features/ai_assistant/AIAssistantPage";
 function App() {
   const pharmacyPaths = ["/pharmacy", "/pharmacy_owner"];
   return (
@@ -215,6 +214,7 @@ function App() {
                   element={<div>medicine-search</div>}
                 />
                 <Route path="support" element={<div>support</div>} />
+                <Route path="ai-assistant" element={<AssistantPage />} />
                 <Route
                   path="sales-details/:invoiceId"
                   element={<SaleInvoiceDetails />}

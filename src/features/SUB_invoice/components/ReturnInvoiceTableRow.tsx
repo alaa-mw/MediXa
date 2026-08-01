@@ -2,6 +2,7 @@ import { Box, Typography } from "@mui/material";
 import { CheckIcon } from "lucide-react";
 import ReturnBatchAllocationButton from "./ReturnBatchAllocationButton";
 import type { ReturnInvoiceItem } from "../return-invoice/Types/returnInvoiceList";
+import { RETURN_INVOICE_COLUMN } from "./ReturnInvoiceTableHeader";
 
 interface Props {
   item: ReturnInvoiceItem;
@@ -11,13 +12,16 @@ interface Props {
 
 const ReturnInvoiceTableRow = ({ item, itemIndex, discount }: Props) => {
   // باقي الكود يبقى كما هو دون أي تغيير
+  console.log(
+    "-------jjj-----------",
+    item.pharmacyDrug.drug.generalDrug?.tradeName,
+  );
   const qty = item.baseQuantity / item.unitFactorToBase;
-
   return (
     <Box
       sx={{
         display: "grid",
-        gridTemplateColumns: "0.7fr 2fr 1fr 1fr 2fr 2fr 3fr 1fr 2fr",
+        gridTemplateColumns: RETURN_INVOICE_COLUMN,
         p: 1.2,
         borderBottom: "1px solid #F1F5F9",
         alignItems: "center",
@@ -34,7 +38,8 @@ const ReturnInvoiceTableRow = ({ item, itemIndex, discount }: Props) => {
       <Box
         sx={{ display: "flex", justifyContent: "flex-start", fontWeight: 500 }}
       >
-        {item.pharmacyDrug?.drug?.generalDrug?.tradeName || "دواء غير معروف"}
+        {item.pharmacyDrug.drug.privateDrug?.tradeName ||
+          item.pharmacyDrug.drug.generalDrug?.tradeName}
       </Box>
 
       {/* نوع الوحدة */}
