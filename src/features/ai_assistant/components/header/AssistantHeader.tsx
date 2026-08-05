@@ -11,6 +11,7 @@ const AssistantHeader = () => {
         justifyContent: "center",
         textAlign: "center",
         my: "auto",
+        pr: 24,
         pt: 3,
       }}
     >

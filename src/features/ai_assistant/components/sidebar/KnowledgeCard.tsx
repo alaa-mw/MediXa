@@ -13,8 +13,10 @@ const KnowledgeCard = () => {
         border: "1px solid",
         borderColor: "divider",
         direction: "rtl",
-        bgcolor: "primary.main",
+        background:
+          "linear-gradient(135deg, #5f8d8f 0%, #7B1FA2 50%, #9C27B0 100%)",
         color: "white",
+        boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
       }}
     >
       <Stack

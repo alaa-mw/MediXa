@@ -1,20 +1,27 @@
 import AttachFileRoundedIcon from "@mui/icons-material/AttachFileRounded";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import TuneRoundedIcon from "@mui/icons-material/TuneRounded";
-import { Box, IconButton, OutlinedInput, Stack } from "@mui/material";
+import {
+  Box,
+  IconButton,
+  OutlinedInput,
+  Stack,
+  CircularProgress,
+} from "@mui/material";
 import { useState } from "react";
 
 interface ChatInputProps {
   onSend: (text: string) => void;
+  isLoading?: boolean;
 }
 
-const ChatInput = ({ onSend }: ChatInputProps) => {
+const ChatInput = ({ onSend, isLoading }: ChatInputProps) => {
   const [text, setText] = useState("");
 
   const handleSendClick = () => {
-    if (text.trim()) {
+    if (text.trim() && !isLoading) {
       onSend(text);
-      setText("") 
+      setText("");
     }
   };
 
@@ -38,20 +45,25 @@ const ChatInput = ({ onSend }: ChatInputProps) => {
       }}
     >
       <Stack direction="row" sx={{ alignItems: "center" }}>
-        <IconButton>
+        <IconButton disabled={isLoading}>
           <AttachFileRoundedIcon />
         </IconButton>
 
-        <IconButton>
+        <IconButton disabled={isLoading}>
           <TuneRoundedIcon />
         </IconButton>
 
         <OutlinedInput
           fullWidth
-          placeholder="اكتب سؤالك هنا..."
+          placeholder={
+            isLoading
+              ? "جاري إنشاء الجلسة وإرسال الرسالة..."
+              : "اكتب سؤالك هنا..."
+          }
           multiline
           maxRows={4}
           value={text}
+          disabled={isLoading}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={handleKeyDown}
           sx={{
@@ -63,13 +75,22 @@ const ChatInput = ({ onSend }: ChatInputProps) => {
         <IconButton
           color="primary"
           onClick={handleSendClick}
+          disabled={isLoading || !text.trim()}
           sx={{
             bgcolor: "primary.main",
             color: "white",
             "&:hover": { bgcolor: "primary.dark" },
+            "&.Mui-disabled": {
+              bgcolor: "action.disabledBackground",
+              color: "action.disabled",
+            },
           }}
         >
-          <SendRoundedIcon />
+          {isLoading ? (
+            <CircularProgress size={20} color="inherit" />
+          ) : (
+            <SendRoundedIcon />
+          )}
         </IconButton>
       </Stack>
     </Box>

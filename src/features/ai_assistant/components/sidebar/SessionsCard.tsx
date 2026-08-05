@@ -1,28 +1,52 @@
 import HistoryRoundedIcon from "@mui/icons-material/HistoryRounded";
-import AddRoundedIcon from "@mui/icons-material/AddRounded";
-
-import { Button, Card, Stack, Typography } from "@mui/material";
-
+import { Box, Card, CircularProgress, Stack, Typography } from "@mui/material";
 import SessionItem from "./SessionItem";
+import type { ConversationItem } from "../../types/conversationLitstTypes";
+import AddSessionItem from "./AddSessionItem";
+
 interface SessionsCardProps {
   onNewSession: () => void;
+  conversations?: ConversationItem[];
+  isLoading?: boolean;
+  onSelectSession?: (conversationId: number) => void;
+  activeSessionId?: number;
 }
-const SessionsCard = ({ onNewSession }: SessionsCardProps) => {
+
+const SessionsCard = ({
+  onNewSession,
+  conversations = [],
+  isLoading = false,
+  onSelectSession,
+  activeSessionId,
+}: SessionsCardProps) => {
+  const formatTimeLabel = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+
+    if (date.toDateString() === now.toDateString()) {
+      return date.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    }
+
+    return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  };
+
   return (
     <Card
       elevation={0}
       sx={{
         borderRadius: 3,
+        bgcolor: "transparent",
       }}
     >
       <Stack
         direction="row"
         sx={{
-          mb: 3,
+          mb: 2,
           mt: 1,
           gap: 1,
-          direction: "row",
-          justifyContent: "flex-start",
           alignItems: "center",
         }}
       >
@@ -33,44 +57,57 @@ const SessionsCard = ({ onNewSession }: SessionsCardProps) => {
       </Stack>
 
       <Stack spacing={1.5}>
-        <SessionItem
+        {/* زر إنشاء جلسة جديدة */}
+        <AddSessionItem
           title="جلسة جديدة"
-          time="10:15 AM"
-          isItAddCard={true}
+          subtitle="+ إضافة"
           onClick={onNewSession}
         />
 
-        <SessionItem title="تداخل دوائي بين أدوية الضغط" time="Yesterday" />
+        {/* عرض المحادثات */}
+        {conversations.map((conv) => (
+          <Box
+            key={conv.ragConversationId}
+            onClick={() => onSelectSession?.(conv.ragConversationId)}
+            sx={{
+              cursor: "pointer",
+              borderRadius: 2,
+              bgcolor:
+                activeSessionId === conv.ragConversationId
+                  ? "action.selected"
+                  : "transparent",
+              "&:hover": {
+                bgcolor: "action.hover",
+              },
+            }}
+          >
+            <SessionItem
+              title={conv.title}
+              time={formatTimeLabel(conv.createdAt)}
+              isActive={activeSessionId === conv.ragConversationId}
+            />
+          </Box>
+        ))}
 
-        <SessionItem title="آلية عمل Azithromycin" time="25 Jul" />
-        <SessionItem title="ما هي جرعة Cetamol؟" time="10:15 AM" />
+        {/* مؤشر التحميل عند جلب المزيد من العناصر أو التحميل الأولي */}
+        {isLoading && (
+          <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
+            <CircularProgress size={22} />
+          </Box>
+        )}
 
-        <SessionItem title="تداخل دوائي بين أدوية الضغط" time="Yesterday" />
-
-        <SessionItem title="آلية عمل Azithromycin" time="25 Jul" />
-        <SessionItem title="ما هي جرعة Cetamol؟" time="10:15 AM" />
-
-        <SessionItem title="تداخل دوائي بين أدوية الضغط" time="Yesterday" />
-
-        <SessionItem title="آلية عمل Azithromycin" time="25 Jul" />
-        <SessionItem title="ما هي جرعة Cetamol؟" time="10:15 AM" />
-
-        <SessionItem title="تداخل دوائي بين أدوية الضغط" time="Yesterday" />
-
-        <SessionItem title="آلية عمل Azithromycin" time="25 Jul" />
+        {/* في حال الفراغ تماماً */}
+        {!isLoading && conversations.length === 0 && (
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            align="center"
+            sx={{ py: 2 }}
+          >
+            لا توجد جلسات سابقة.
+          </Typography>
+        )}
       </Stack>
-
-      {/* <Button
-        fullWidth
-        startIcon={<AddRoundedIcon />}
-        variant="outlined"
-        sx={{
-          mt: 3,
-          height: 48,
-        }}
-      >
-        جلسة جديدة
-      </Button> */}
     </Card>
   );
 };
