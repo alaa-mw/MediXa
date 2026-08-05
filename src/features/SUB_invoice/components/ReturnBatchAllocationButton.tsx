@@ -91,25 +91,25 @@ const ReturnBatchAllocationButton: React.FC<InvoiceRowProps> = ({ item }) => {
         <Divider sx={{ mb: 1.5 }} />
 
         <Stack spacing={2}>
-          <Box key={item.saleInvoiceItemBatchId}>
+          <Box key={item.batchId}>
             <Stack spacing={0.8}>
               <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                 <Typography variant="body2" color="text.secondary">
                   رقم الدفعة:
                 </Typography>
                 <Typography variant="body2" sx={{ fontWeight: 700 }}>
-                  #{item.saleInvoiceItemId}
+                  #{item.batchId}
                 </Typography>
               </Box>
 
-              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+              {/* <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                 <Typography variant="body2" color="text.secondary">
                   الكميات المباعة:
                 </Typography>
                 <Typography variant="body2">
                   {item.batch.soldQuantity}/{item.batch.initialQuantity}
                 </Typography>
-              </Box>
+              </Box> */}
 
               <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                 <Typography variant="body2" color="text.secondary">

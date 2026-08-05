@@ -3,6 +3,7 @@ import InvoiceTableHeader from "./InvoiceTableHeader";
 import InvoiceTableRow from "./InvoiceTableRow";
 import type { SaleInvoiceItem } from "../Types/saleInvoiceDetailsTypes";
 import type { ReturnInvoiceItem } from "../return-invoice/Types/returnInvoiceDetailsType";
+
 interface Props {
   data?: SaleInvoiceItem[];
   returnInvoiceData?: ReturnInvoiceItem[];
@@ -17,9 +18,13 @@ const InvoiceSaleTable = ({
   return (
     <Box
       sx={{
+        width: "100%",
+        maxWidth: "100%",
+        minWidth: "900px", // لضمان عدم تداخل الأعمدة بشكل سيء على الشاشات الصغيرة مع إمكانية التمرير الأفقي السلس
         border: "1px solid #E2E8F0",
         borderRadius: 2,
-        overflow: "hidden",
+        overflowX: "auto",
+        boxSizing: "border-box",
       }}
     >
       <InvoiceTableHeader isReturn={isReturnInvoice} />

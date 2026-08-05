@@ -190,6 +190,7 @@ export interface SaleInvoiceItem {
   totalPrice: string;
   discountAmount: string;
   netTotalPrice: string;
+  tradeName : String;
   createdAt?: string;
   updatedAt?: string;
   pharmacyDrug?: PharmacyDrug;

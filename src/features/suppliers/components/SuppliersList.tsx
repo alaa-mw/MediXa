@@ -11,6 +11,7 @@ import SupplierCard from "./SupplierCard";
 import EmptyState from "../../../shared/layout/EmptyState";
 
 const SuppliersList = () => {
+  console.log("SuppliersList rendered");
   const { data, isLoading, refetch, queryParams, setQueryParams } =
     useGetWithParams<Supplier[]>("/supplier", {
       searchQuery: null,

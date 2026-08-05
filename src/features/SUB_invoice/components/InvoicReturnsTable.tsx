@@ -9,6 +9,7 @@ interface ReturnsProps {
 }
 
 const InvoiceReturnsTable: React.FC<ReturnsProps> = ({ returns }) => {
+  console.log("the return --", returns);
   return (
     <Box
       sx={{

@@ -65,77 +65,100 @@ export interface ReturnInvoiceItem {
   returnReason: string;
   restockToInventory: boolean;
   createdAt: string;
-  pharmacyDrug: {
-    pharmacyDrugId: number;
-    pharmacyId: number;
-    drugId: number;
-    minStockAlert: number;
-    sellPart: boolean;
-    netPrice: string;
-    consumerPrice: string;
-    expiryDateAlarm: number;
-    isActive: boolean;
-    notes: string | null;
-    createdAt: string;
-    updatedAt: string;
-    drug: {
-      drugId: number;
-      source: string;
-      createdAt: string;
-      updatedAt: string;
-      generalDrug: {
-        generalDrugId: number;
-        drugId: number;
-        dosageFormId: number;
-        tradeName: string;
-        barcode: string;
-        unitsPerBox: number;
-        netPrice: string;
-        consumerPrice: string;
-        isRx: boolean;
-        isActive: boolean;
-        createdAt: string;
-        updatedAt: string;
-      } | null;
-      privateDrug: any | null;
-    };
-  };
-  saleInvoiceItemBatch: {
-    saleInvoiceItemBatchId: number;
-    saleInvoiceItemId: number;
-    batchId: number;
-    baseQuantity: number;
-    unitCostAtSale: string | null;
-    createdAt: string;
-    batch: {
-      batchId: number;
-      pharmacyDrugId: number;
-      supplierInvoiceItemId: number | null;
-      expiryDate: string;
-      initialQuantity: number;
-      soldQuantity: number;
-      receivedDate: string;
-      status: string;
-      createdAt: string;
-      updatedAt: string;
-    };
-    saleInvoiceItem: {
-      saleInvoiceItemId: number;
-      saleInvoiceId: number;
-      pharmacyDrugId: number;
-      unitType: string;
-      baseQuantity: number;
-      unitFactorToBase: number;
-      baseUnitPrice: string;
-      extraPercentage: string;
-      finalUnitPrice: string;
-      totalPrice: string;
-      discountAmount: string;
-      netTotalPrice: string;
-      createdAt: string;
-      updatedAt: string;
-    };
-  };
+  pharmacyDrug: PharmacyDrug;
+  saleInvoiceItemBatch: SaleInvoiceItemBatch;
   displayQuantity: number;
   originalSoldDisplayQuantity: number;
+}
+
+export interface PharmacyDrug {
+  pharmacyDrugId: number;
+  pharmacyId: number;
+  drugId: number;
+  minStockAlert: number;
+  sellPart: boolean;
+  netPrice: string;
+  consumerPrice: string;
+  expiryDateAlarm: number;
+  isActive: boolean;
+  notes: string;
+  createdAt: string;
+  updatedAt: string;
+  drug: Drug;
+}
+
+export interface Drug {
+  drugId: number;
+  source: string;
+  createdAt: string;
+  updatedAt: string;
+  privateDrug: PrivateDrug | null;
+  generalDrug: GeneralDrug | null;
+}
+
+export interface PrivateDrug {
+  privateDrugId: number;
+  drugId: number;
+  dosageFormId: number;
+  tradeName: string;
+  barcode: string;
+  unitsPerBox: number;
+  isRx: boolean;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+export interface GeneralDrug {
+  privateDrugId: number;
+  drugId: number;
+  dosageFormId: number;
+  tradeName: string;
+  barcode: string;
+  unitsPerBox: number;
+  isRx: boolean;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface SaleInvoiceItemBatch {
+  saleInvoiceItemBatchId: number;
+  saleInvoiceItemId: number;
+  batchId: number;
+  baseQuantity: number;
+  unitCostAtSale: null | string;
+  createdAt: string;
+  batch: Batch;
+  saleInvoiceItem: SaleInvoiceItem;
+}
+
+export interface Batch {
+  batchId: number;
+  pharmacyDrugId: number;
+  supplierInvoiceItemId: null | number;
+  expiryDate: string;
+  initialQuantity: number;
+  soldQuantity: number;
+  receivedDate: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface SaleInvoiceItem {
+  saleInvoiceItemId: number;
+  saleInvoiceId: number;
+  pharmacyDrugId: number;
+  customerRequestItemId: null | number;
+  unitType: string;
+  baseQuantity: number;
+  unitFactorToBase: number;
+  baseUnitPrice: string;
+  extraPercentage: string;
+  finalUnitPrice: string;
+  totalPrice: string;
+  discountAmount: string;
+  netTotalPrice: string;
+  createdAt: string;
+  updatedAt: string;
 }

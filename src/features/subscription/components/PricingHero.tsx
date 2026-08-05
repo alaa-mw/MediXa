@@ -76,10 +76,23 @@ export default function PricingHero({
               value={startsAt ? startsAt.split("T")[0] : ""}
               onChange={(e) => {
                 if (e.target.value) {
-                  const isoString = new Date(e.target.value);
-                  isoString.setMinutes(isoString.getMinutes() + 5);
-                  const startsAt = isoString.toISOString();
-                  onDateChange(startsAt);
+                  // استخراج السنة والشهر واليوم من القيمة المدخلة لمنع مشاكل فروق التوقيت
+                  const [year, month, day] = e.target.value
+                    .split("-")
+                    .map(Number);
+
+                  // إنشاء كاريخ جديد بالوقت المحلي الحالي للساعة والدقيقة والثانية
+                  const now = new Date();
+                  const selectedDate = new Date(
+                    year,
+                    month - 1,
+                    day,
+                    now.getHours() + 3,
+                    now.getMinutes() + 3,
+                    now.getSeconds(),
+                  );
+
+                  onDateChange(selectedDate.toISOString());
                 } else {
                   onDateChange("");
                 }

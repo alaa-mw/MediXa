@@ -1,12 +1,12 @@
 import { Box } from "@mui/material";
 import React from "react";
-
+export const RETURN_INVOICE_COLUMN = "0.7fr 2fr 2fr 1fr 2fr 2fr 3fr 1fr 2fr";
 const ReturnInvoiceTableHeader = () => {
   return (
     <Box
       sx={{
         display: "grid",
-        gridTemplateColumns: "0.7fr 2fr 1fr 1fr 2fr 2fr 3fr 1fr 2fr",
+        gridTemplateColumns: RETURN_INVOICE_COLUMN,
         p: 1.2,
         bgcolor: "#F8FAFC",
         borderBottom: "1px solid #E2E8F0",
