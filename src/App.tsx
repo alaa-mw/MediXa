@@ -49,6 +49,13 @@ import PurchaseOrderDetailsPage from "./features/purchase_order/components/Purch
 import DashboardPage from "./features/dashboard/components/DashboardPage";
 import AnalysisInventoryPage from "./features/analysis_inventory/components/AnalysisInventoryPage";
 import AssistantPage from "./features/ai_assistant/AIAssistantPage";
+import { OwnerSelectPharmacy } from "./features/auth/components/ownerSelectPharmacy";
+import Test from "./features/online_renew_subsrciption/page/temp";
+import { PaymentSuccessPage } from "./features/online_renew_subsrciption/page/SuccessPaymentPage";
+import { PaymentCancelPage } from "./features/online_renew_subsrciption/page/CanclePaymentPage";
+import OwnerRenewSubscriptionPage from "./features/online_renew_subsrciption/page/OwnerPlaneCard";
+import OwnerPharmacySubscriptionSchedule from "./features/online_renew_subsrciption/page/OwnerPharmaSubs";
+
 function App() {
   const pharmacyPaths = ["/pharmacy", "/pharmacy_owner"];
   return (
@@ -64,6 +71,7 @@ function App() {
           <Route path="/auth" element={<AuthGateway />} />
           <Route path="/owner-register" element={<UserRegister ownerMode />} />
           <Route path="/owner-login" element={<UserLogin />} />
+          <Route path="/select-pharmacy" element={<OwnerSelectPharmacy />} />
           <Route path="/pharmacy-register" element={<PharmacyRegister />} />
           <Route path="/pharmacy-login" element={<PharmacyLogin />} />
 
@@ -120,7 +128,28 @@ function App() {
 
               <Route path="reports" element={<div>reports</div>} />
 
-              <Route path="subscription" element={<div>subscription</div>} />
+              {/* <Route
+                path="subscription"
+                // element={<Test />}
+                // element={<PharmacySubscriptionSchedule isItOwner={true} />}
+              /> */}
+              <Route
+                path="subscription-schedule"
+                element={<OwnerPharmacySubscriptionSchedule />}
+              />
+              <Route
+                path="renew-subscription"
+                element={<OwnerRenewSubscriptionPage />}
+              />
+              <Route
+                path="subscription/success"
+                element={<PaymentSuccessPage />}
+              />
+
+              <Route
+                path="subscription/cancel"
+                element={<PaymentCancelPage />}
+              />
             </Route>
           </Route>
 
@@ -205,13 +234,12 @@ function App() {
                   path="orders/customer/add"
                   element={<AddCustomerOrder />}
                 />
-
                 {/* suppliers */}
                 <Route path="suppliers" element={<SuppliersList />} />
                 <Route path="suppliers/add" element={<AddSupplier />} />
                 <Route
                   path="medicine-search"
-                  element={<div>medicine-search</div>}
+                  element={<Test />} // Replace <Test /> with the actual component for medicine search
                 />
                 <Route path="support" element={<div>support</div>} />
                 <Route path="ai-assistant" element={<AssistantPage />} />
@@ -224,10 +252,9 @@ function App() {
                   path="sales-details/:invoiceId/create-return"
                   element={<CreateReturnInvoicePage />}
                 />
-
                 {/* tests reports */}
-                <Route path="r1" element={<DashboardPage/>} />
-                <Route path="r2" element={<AnalysisInventoryPage/>} />
+                <Route path="r1" element={<DashboardPage />} />
+                <Route path="r2" element={<AnalysisInventoryPage />} />
               </Route>
             ))}
           </Route>

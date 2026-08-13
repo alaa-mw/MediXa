@@ -5,8 +5,9 @@ import { CircularProgress, Alert, Box } from "@mui/material";
 import CurrentSubscriptionCard from "../components/subscriptionSchedule/CurrentSubscriptionCard";
 import SubscriptionHistoryTable from "../components/subscriptionSchedule/SubscriptionHistoryTable";
 
-const PharmacySubscriptionSchedule = () => {
+const PharmacySubscriptionSchedule = ({}) => {
   const { id } = useParams<{ id: string }>();
+  // const { storedId }  = localStorage.getItem("pharmacyId") ? { storedId: localStorage.getItem("pharmacyId") } : { storedId: null };
   const queryParams = {
     page: 1,
     limit: 20,
@@ -53,8 +54,9 @@ const PharmacySubscriptionSchedule = () => {
         width: "100%",
       }}
     >
-      {pharmacy && <PharmacySubscriptionHeader pharmacy={pharmacy} />}
-
+      {pharmacy && (
+        <PharmacySubscriptionHeader pharmacy={pharmacy} />
+      )}
       {currentSubscription && (
         <CurrentSubscriptionCard subscription={currentSubscription} />
       )}
@@ -64,6 +66,14 @@ const PharmacySubscriptionSchedule = () => {
         pagination={pagination}
         isLoading={isLoading}
       />
+      {/* !isItOwner && (
+      <SubscriptionHistoryTable
+        subscriptions={subscriptions}
+        pagination={pagination}
+        isLoading={isLoading}
+      />
+      )
+      <PharmacySubscriptionHeader isItOwner={isItOwner} /> */}
     </Box>
   );
 };

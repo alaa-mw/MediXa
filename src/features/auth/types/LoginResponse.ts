@@ -11,4 +11,10 @@ export interface LoginResponse {
   };
   user?: User;
   pharmacy?: Pharmacy;
+  pharmacies?: Pharmacies[];
+}
+
+export interface Pharmacies {
+  pharmacyId: string;
+  pharmacyName: string;
 }

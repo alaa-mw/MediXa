@@ -58,7 +58,7 @@ export interface PrivateOffersResponse {
   description: string;
   durationMonths: number;
   type: string;
-  currency: string;
+  currency: "USD";
   basePrice: number;
   currentPrice: number;
   hasActiveOffer: boolean;

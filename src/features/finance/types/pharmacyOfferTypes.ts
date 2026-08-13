@@ -19,7 +19,7 @@ export interface PricingDetails {
   discountType: string;
   discountValue: number;
   finalPrice: number;
-  currency: string;
+  currency: "USD";
 }
 
 export interface PrivateOffer {
