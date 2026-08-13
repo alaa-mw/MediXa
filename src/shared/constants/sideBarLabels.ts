@@ -57,7 +57,7 @@ export const sideBarLabels: Record<
     },
     {
       title: "اشتراكي",
-      path: "/subscription",
+      path: "/subscription-schedule",
       icon: PaymentsIcon,
     },
     {

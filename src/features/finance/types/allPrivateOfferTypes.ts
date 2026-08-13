@@ -12,7 +12,7 @@ export interface OfferPricing {
   discountType: string;
   discountValue: number;
   finalPrice: number;
-  currency: string;
+  currency: "USD";
 }
 
 export interface UnexpiredPrivateOffer {

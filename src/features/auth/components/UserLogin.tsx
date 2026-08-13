@@ -31,7 +31,6 @@ const UserLogin = () => {
     password: "",
   });
 
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
@@ -50,8 +49,31 @@ const UserLogin = () => {
 
         TokenService.setUserRole(response?.data?.accountType); // change later
         TokenService.setTokens(response?.data?.tokens);
+        const pharmacies = response?.data?.pharmacies;
 
-        navigate(`/${TokenService.getUserRole()?.toLocaleLowerCase()}`);
+        if (
+          TokenService.getUserRole() === "PHARMACY_OWNER" &&
+          pharmacies &&
+          pharmacies.length !== 1
+        ) {
+          navigate(`/select-pharmacy`, {
+            state: { pharmacies: pharmacies },
+          });
+        } else {
+          if (response?.data?.pharmacies?.[0]?.pharmacyId) {
+            localStorage.setItem(
+              "pharmacyId",
+              response?.data?.pharmacies?.[0]?.pharmacyId,
+            );
+          }
+          if (response?.data?.pharmacies?.[0]?.pharmacyName) {
+            localStorage.setItem(
+              "pharmacyName",
+              response?.data?.pharmacies?.[0]?.pharmacyName,
+            );
+          }
+          navigate(`/${TokenService.getUserRole()?.toLocaleLowerCase()}`);
+        }
       },
 
       onError: (error) => {

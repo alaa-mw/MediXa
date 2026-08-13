@@ -1,32 +1,21 @@
 import { Box, Button, Stack } from "@mui/material";
-import type { PharmacyInfo } from "../../types/subscriptionDetailes";
 import { Autorenew } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
+import type PharmacySubscriptionHeader from "../../finance/components/subscriptionSchedule/PharmacySubscriptionHeader";
 
 interface PharmacySubscriptionHeaderProps {
-  pharmacy?: PharmacyInfo;
+  pharmacy?: string;
 }
 
-const PharmacySubscriptionHeader = ({
+const OwnerPharmacySubscriptionHeader = ({
   pharmacy,
 }: PharmacySubscriptionHeaderProps) => {
   const navigate = useNavigate();
 
   const handleRenewClick = () => {
-    // if (isItOwner) {
-    //   //pharmacy id will get from local storage
-    //   navigate(
-    //     `/admin/pharmacies/renew-subscription/${localStorage.getItem("pharmacyId")}`,
-    //     {
-    //       state: {},
-    //     },
-    //   );
-    // } else {
-    navigate(`/admin/pharmacies/renew-subscription/${pharmacy?.pharmacyId}`, {
-      state: {
-        // يمكنك تمرير تاريخ بداية الاشتراك الجديد هنا إذا كان متوفراً ضمن pharmacyInfo
-        // startsAt: pharmacy.endsAt || new Date().toISOString(),
-      },
+    //pharmacy id will get from local storage
+    navigate(`/pharmacy_owner/renew-subscription`, {
+      state: {},
     });
   };
 
@@ -42,7 +31,7 @@ const PharmacySubscriptionHeader = ({
       }}
     >
       <Box sx={{ fontSize: "22px", fontWeight: 700, color: "#000000" }}>
-        {pharmacy?.pharmacyName ?? "pharmacy"}
+        {localStorage.getItem("pharmacyName") || "اشتراكات الصيدلية"}
       </Box>
       <Button
         variant="contained"
@@ -64,10 +53,10 @@ const PharmacySubscriptionHeader = ({
           },
         }}
       >
-        تجديد الاشتراك
+        تجديد اشتراك الصيدلية
       </Button>
     </Stack>
   );
 };
 
-export default PharmacySubscriptionHeader;
+export default OwnerPharmacySubscriptionHeader;
