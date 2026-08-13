@@ -7,10 +7,10 @@ import type {
 
 export const useSubscriptionCheckout = () => {
   const { getKey, clearKey } = useIdempotency();
-
+  const pharmacyId = localStorage.getItem("pharmacyId");
   // نحدد الـ endpoint الخاص بالباك اند
   const mutation = usePostData<CheckoutResponseData>(
-    "/subscription-payments/checkout",
+    `/subscription-payments/pharmacies/${pharmacyId}/checkout`,
   );
 
   const handleCheckout = (planId: number, offerId: number) => {
