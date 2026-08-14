@@ -19,6 +19,7 @@ const AssistantLayout = () => {
     isLoadingConversations,
     isLoadingMoreMessages,
     isPendingAction,
+    lastErrorMessage,
     turns,
   } = useAssistantChatController();
 
@@ -100,6 +101,7 @@ const AssistantLayout = () => {
               onLoadMoreMessages={handleLoadMoreMessages}
               hasMoreMessages={hasMoreMessages}
               isLoadingMore={isLoadingMoreMessages}
+              errorMessage={lastErrorMessage}
             />
           </Box>
           <Box sx={{ flexShrink: 0, width: 960 }}>

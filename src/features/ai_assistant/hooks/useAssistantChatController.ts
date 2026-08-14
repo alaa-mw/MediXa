@@ -20,6 +20,7 @@ export const useAssistantChatController = () => {
   const { showSnackbar } = useSnackbar();
   const [activeSessionId, setActiveSessionId] = useState<number | undefined>();
   const [isNewSessionMode, setIsNewSessionMode] = useState(false);
+  const [lastErrorMessage, setLastErrorMessage] = useState<string | null>(null);
   const accessToken = TokenService.getAccessToken();
 
   const { isSocketReady } = useChatSocket({ accessToken });
@@ -108,7 +109,10 @@ export const useAssistantChatController = () => {
           }
         },
         onError: (error) => {
-          console.error("Failed to start conversation:", error);
+          const msg =
+            error?.message ||
+            "RAG is not available for the current subscription plan.";
+          setLastErrorMessage(msg);
         },
       });
 
@@ -144,6 +148,7 @@ export const useAssistantChatController = () => {
     isLoadingConversations: isLoadingConv || isFetchingNextConv,
     isLoadingMoreMessages: isFetchingNextMessages,
     isPendingAction,
+    lastErrorMessage,
     turns,
   };
 };

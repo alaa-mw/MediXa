@@ -10,6 +10,7 @@ interface ChatContainerProps {
   onLoadMoreMessages: () => void;
   hasMoreMessages: boolean;
   isLoadingMore: boolean;
+  errorMessage?: string | null;
 }
 
 const ChatContainer = ({
@@ -17,6 +18,7 @@ const ChatContainer = ({
   onLoadMoreMessages,
   hasMoreMessages,
   isLoadingMore,
+  errorMessage,
 }: ChatContainerProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const prevScrollHeightRef = useRef<number>(0);
@@ -74,6 +76,28 @@ const ChatContainer = ({
         width: "100%",
       }}
     >
+      {errorMessage && (
+        <Paper
+          elevation={0}
+          sx={{
+            p: 3,
+            m: 2,
+            bgcolor: "error.lighter",
+            border: "1px solid",
+            borderColor: "error.light",
+            borderRadius: 3,
+            display: "flex",
+            alignItems: "center",
+            gap: 2,
+            color: "error.dark",
+          }}
+        >
+          <ErrorOutlineRoundedIcon color="error" />
+          <Typography variant="body1" sx={{ fontWeight: 500 }}>
+            {errorMessage}
+          </Typography>
+        </Paper>
+      )}
       {isLoadingMore && (
         <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
           <CircularProgress size={24} />

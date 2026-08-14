@@ -25,6 +25,7 @@ import { ReturnInvoicesPage } from "./features/sales-and-return/pages/ReturnInvo
 import { DrugBatchesPage } from "./features/inventory/pages/DrugBatchesPage";
 import AddGeneralDrug from "./features/medteam_cdb/pages/AddGeneralDrug";
 import AllGeneralDrug from "./features/medteam_cdb/pages/AllGeneralDrug";
+import DrugPricingPage from "./features/medteam_cdb/pages/DrugPricingPage";
 import SaleInvoiceDetails from "./features/SUB_invoice/SalesInvoiceDetailsPage";
 import PharmacyManagement from "./features/pharma_account/pages/PharamcyAccountManagement";
 import PurchaseInvoiceDetails from "./features/purchase_invoices/components/PurchaseInvoiceDetails";
@@ -97,6 +98,8 @@ function App() {
               />
               <Route path="support" element={<div>support</div>} />
               <Route path="create_offer" element={<CreatePrivateOfferPage />} />
+              <Route path="CDB/allDrugs" element={<AllGeneralDrug />} />
+              <Route path="CDB/pricing" element={<DrugPricingPage />} />
             </Route>
           </Route>
 
@@ -111,6 +114,7 @@ function App() {
               <Route index element={<div>hello</div>} />
               <Route path="CDB/addDrug" element={<AddGeneralDrug />} />
               <Route path="CDB/allDrugs" element={<AllGeneralDrug />} />
+              <Route path="CDB/pricing" element={<DrugPricingPage />} />
             </Route>
           </Route>
 

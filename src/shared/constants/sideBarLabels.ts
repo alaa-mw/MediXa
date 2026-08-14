@@ -141,6 +141,16 @@ export const sideBarLabels: Record<
       icon: Inventory2Icon,
     },
     {
+      title: "مراجعة الأدوية",
+      path: "/CDB/allDrugs",
+      icon: Inventory2Icon,
+    },
+    {
+      title: "تسعير الأدوية",
+      path: "/CDB/pricing",
+      icon: Inventory2Icon,
+    },
+    {
       title: "الدعم الفني",
       path: "/support",
       icon: SupportAgentIcon,
@@ -160,6 +170,11 @@ export const sideBarLabels: Record<
     {
       title: "إدارة الأدوية",
       path: "/CDB/allDrugs",
+      icon: Inventory2Icon,
+    },
+    {
+      title: "تسعير الأدوية",
+      path: "/CDB/pricing",
       icon: Inventory2Icon,
     },
   ],
