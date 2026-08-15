@@ -57,7 +57,7 @@ export const sideBarLabels: Record<
     },
     {
       title: "اشتراكي",
-      path: "/subscription",
+      path: "/subscription-schedule",
       icon: PaymentsIcon,
     },
     {
@@ -112,14 +112,20 @@ export const sideBarLabels: Record<
       path: "/support",
       icon: SupportAgentIcon,
     },
-    // temp - later 
+    // temp - later
     {
       title: "مؤقت ",
       path: "/r1",
       icon: SupportAgentIcon,
-    },{
+    },
+    {
       title: "مؤقت2",
       path: "/r2",
+      icon: SupportAgentIcon,
+    },
+    {
+      title: "المساعد الذكي",
+      path: "/ai-assistant",
       icon: SupportAgentIcon,
     },
   ],
@@ -132,6 +138,16 @@ export const sideBarLabels: Record<
     {
       title: "إدارة الصيدليات",
       path: "/pharmacies",
+      icon: Inventory2Icon,
+    },
+    {
+      title: "مراجعة الأدوية",
+      path: "/CDB/allDrugs",
+      icon: Inventory2Icon,
+    },
+    {
+      title: "تسعير الأدوية",
+      path: "/CDB/pricing",
       icon: Inventory2Icon,
     },
     {
@@ -154,6 +170,11 @@ export const sideBarLabels: Record<
     {
       title: "إدارة الأدوية",
       path: "/CDB/allDrugs",
+      icon: Inventory2Icon,
+    },
+    {
+      title: "تسعير الأدوية",
+      path: "/CDB/pricing",
       icon: Inventory2Icon,
     },
   ],

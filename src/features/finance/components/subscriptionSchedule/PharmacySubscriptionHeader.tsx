@@ -4,7 +4,7 @@ import { Autorenew } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 
 interface PharmacySubscriptionHeaderProps {
-  pharmacy: PharmacyInfo;
+  pharmacy?: PharmacyInfo;
 }
 
 const PharmacySubscriptionHeader = ({
@@ -13,8 +13,16 @@ const PharmacySubscriptionHeader = ({
   const navigate = useNavigate();
 
   const handleRenewClick = () => {
-    // الانتقال إلى صفحة تجديد الاشتراك وتكليف المعرف بالارتباط
-    navigate(`/admin/pharmacies/renew-subscription/${pharmacy.pharmacyId}`, {
+    // if (isItOwner) {
+    //   //pharmacy id will get from local storage
+    //   navigate(
+    //     `/admin/pharmacies/renew-subscription/${localStorage.getItem("pharmacyId")}`,
+    //     {
+    //       state: {},
+    //     },
+    //   );
+    // } else {
+    navigate(`/admin/pharmacies/renew-subscription/${pharmacy?.pharmacyId}`, {
       state: {
         // يمكنك تمرير تاريخ بداية الاشتراك الجديد هنا إذا كان متوفراً ضمن pharmacyInfo
         // startsAt: pharmacy.endsAt || new Date().toISOString(),
@@ -34,7 +42,7 @@ const PharmacySubscriptionHeader = ({
       }}
     >
       <Box sx={{ fontSize: "22px", fontWeight: 700, color: "#000000" }}>
-        {pharmacy.pharmacyName}
+        {pharmacy?.pharmacyName ?? "pharmacy"}
       </Box>
       <Button
         variant="contained"

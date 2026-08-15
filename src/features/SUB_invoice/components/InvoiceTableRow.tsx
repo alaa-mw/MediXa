@@ -12,17 +12,14 @@ interface ItemProps {
   isReturnInvoice: boolean;
   itemIndex: number;
 }
-
+export const RETURN_COLUMN = "5% 15% 10% 8% 10% 12% 13% 12% 15%";
 const InvoiceTableRow: React.FC<ItemProps> = ({
   saleItem,
   returnItem,
   isReturnInvoice,
   itemIndex,
 }) => {
-  const drugName =
-    saleItem?.pharmacyDrug?.drug?.generalDrug?.tradeName || "دواء غير معروف";
-  const drugBarcode =
-    saleItem?.pharmacyDrug?.drug?.generalDrug?.barcode || "دواء غير معروف";
+  const drugName = saleItem?.tradeName || "دواء غير معروف";
 
   const getFormattedDate = () => {
     if (!returnItem?.batch?.receivedDate) return "-";
@@ -36,32 +33,32 @@ const InvoiceTableRow: React.FC<ItemProps> = ({
     <Box
       sx={{
         display: "grid",
-        gridTemplateColumns: "1fr 3fr 3fr 2fr 2fr 2fr 2fr 3fr 3fr",
+        // مطابقة الأعمدة تماماً لملف الـ Header لتثبيت الشكل وعرضه كاملاً
+        gridTemplateColumns: RETURN_COLUMN,
         p: 1.2,
         borderBottom: "1px solid #F1F5F9",
         alignItems: "center",
         direction: "rtl",
+        width: "100%",
+        boxSizing: "border-box",
       }}
     >
-      {/* اسم الدواء */}
+      {/* # */}
       <Box
         sx={{ display: "flex", justifyContent: "flex-start", fontWeight: 500 }}
       >
         {itemIndex + 1}
       </Box>
+
+      {/* اسم الدواء */}
       <Box
         sx={{
           display: "flex",
           justifyContent: "flex-start",
-          fontWeight: 400,
-          fontSize: 14,
-          pl: 5,
+          fontWeight: 500,
+          overflow: "hidden",
+          textOverflow: "ellipsis",
         }}
-      >
-        {isReturnInvoice ? returnItem?.drug?.barcode : drugBarcode}
-      </Box>
-      <Box
-        sx={{ display: "flex", justifyContent: "flex-start", fontWeight: 500 }}
       >
         {isReturnInvoice ? returnItem?.drug?.tradeName : drugName}
       </Box>
@@ -113,7 +110,8 @@ const InvoiceTableRow: React.FC<ItemProps> = ({
           ل.س
         </Typography>
       </Box>
-      {/*restock*/}
+
+      {/* restock أو النسبة المضافة */}
       <Box sx={{ textAlign: "center", color: "#334155" }}>
         {isReturnInvoice ? (
           <Box
@@ -133,7 +131,6 @@ const InvoiceTableRow: React.FC<ItemProps> = ({
                 alignItems: "center",
                 bgcolor: returnItem?.restockToInventory ? "#E6F4EA" : "#F1F5F9",
                 border: `2px solid ${returnItem?.restockToInventory ? "#34A853" : "#CBD5E1"}`,
-                transition: "all 0.3s ease",
               }}
             >
               <CheckIcon
@@ -171,6 +168,35 @@ const InvoiceTableRow: React.FC<ItemProps> = ({
           ل.س
         </Typography>
       </Box>
+
+      {/* السعر بعد الخصم */}
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 0.5,
+          fontWeight: 700,
+          color: "#0F172A",
+        }}
+      >
+        <Typography
+          variant="body2"
+          sx={{ fontSize: 15, fontWeight: "500", color: "text.primary" }}
+        >
+          {isReturnInvoice
+            ? returnItem?.totalPrice
+            : parseInt(saleItem?.netTotalPrice || "0")}
+        </Typography>
+        <Typography
+          variant="body2"
+          sx={{ fontSize: 12, fontWeight: "400", color: "text.secondary" }}
+        >
+          ل.س
+        </Typography>
+      </Box>
+
+      {/* الدفعات المرجعية */}
       <Box sx={{ textAlign: "center", fontWeight: 700, color: "#0F172A" }}>
         {!isReturnInvoice ? (
           <BatchAllocationButton
