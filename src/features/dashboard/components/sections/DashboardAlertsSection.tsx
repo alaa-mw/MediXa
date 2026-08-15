@@ -1,6 +1,7 @@
 import {
   AttachMoneyRounded,
   LocalPharmacyRounded,
+  PointOfSaleRounded,
   RemoveRedEyeRounded,
   WarningAmberRounded,
 } from "@mui/icons-material";
@@ -68,27 +69,8 @@ const DashboardAlertsSection = ({ alerts }: DashboardAlertsSectionProps) => {
                   spacing={1}
                   sx={{ alignItems: "center" }}
                 >
-                  <Box
-                    sx={{
-                      width: 34,
-                      height: 34,
-                      borderRadius: 1.5,
-                      display: "grid",
-                      placeItems: "center",
-                      backgroundColor: alpha(theme.palette.primary.main, 0.12),
-                    }}
-                  >
-                    {index < 2 ? (
-                      <LocalPharmacyRounded
-                        sx={{ fontSize: 18, color: "#8B6C2D" }}
-                      />
-                    ) : (
-                      <AttachMoneyRounded
-                        sx={{ fontSize: 18, color: "#4F78C7" }}
-                      />
-                    )}
-                  </Box>
-                  <Stack spacing={0.35} sx={{ alignItems: "flex-end" }}>
+                  
+                  <Stack spacing={0.35} sx={{ alignItems: "flex-start"}}>
                     <Typography
                       variant="subtitle2"
                       sx={{ fontWeight: 800, color: "#273247" }}

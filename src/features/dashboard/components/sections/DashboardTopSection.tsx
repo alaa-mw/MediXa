@@ -14,7 +14,7 @@ const DashboardTopSection = ({ statCards }: DashboardTopSectionProps) => {
         display: "grid",
         gridTemplateColumns: {
           xs: "1fr",
-          md: "repeat(3, 1fr) 1.35fr",
+          md: "repeat(4, 1fr) 1.84fr",
         },
         gap: 2,
       }}

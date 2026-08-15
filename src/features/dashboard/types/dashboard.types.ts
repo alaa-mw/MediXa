@@ -24,3 +24,54 @@ export type OperationLog = {
   category: string;
   time: string;
 };
+
+export type DailyWindowCardsData = {
+  date: string;
+  cards: {
+    alerts: {
+      count: number;
+    };
+    invoices: {
+      totalCount: number;
+      breakdown: {
+        saleCount: number;
+        returnCount: number;
+        damageCount: number;
+        purchaseCount: number;
+      };
+    };
+    grossSales: {
+      amount: number;
+      currency: string;
+    };
+    grossProfit: {
+      salesRevenue: number;
+      returnAmount: number;
+      netSalesRevenue: number;
+      salesCostOfGoods: number;
+      restoredInventoryCost: number;
+      netCostOfGoodsSold: number;
+      grossProfitAmount: number;
+      missingCostBaseQuantity: number;
+      isComplete: boolean;
+      currency: string;
+    };
+  };
+};
+
+export type DailyWindowAlertItem = {
+  pharmacyDrugId: number;
+  drugName: string;
+  alertType: string;
+  quantity: {
+    fullBoxes: number;
+    remainingUnits: number;
+  };
+  expiryDate: string;
+};
+
+export type DailyWindowActivityItem = {
+  invoiceActivityId: number;
+  message: string;
+  occurredAt: string;
+};

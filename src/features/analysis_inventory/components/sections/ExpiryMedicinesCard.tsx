@@ -1,14 +1,25 @@
-import { ErrorOutlineRounded } from "@mui/icons-material";
-import { Box, Button, Stack, Typography } from "@mui/material";
-import type { InventoryAlertItem } from "../../types/analysisInventory.types";
+import {
+    Box,
+    Button,
+    Stack,
+    Typography
+} from "@mui/material";
+import { useState } from "react";
+import type { AnalysisInventoryViewModel } from "../../types/analysisInventory.types";
+import PeriodPopoverButton from "../PeriodPopoverButton";
 import AnalysisPanel from "./AnalysisPanel";
 
-type InventoryAlertCardProps = {
-  item: InventoryAlertItem;
+type ExpiryMedicinesCardProps = {
+  rows: AnalysisInventoryViewModel["expiryMedicines"]["rows"];
 };
 
-const InventoryAlertCard = ({ item }: InventoryAlertCardProps) => {
-  const toneColor = item.tone === "danger" ? "#D6414E" : "#C08B29";
+const ExpiryMedicinesCard = ({ rows }: ExpiryMedicinesCardProps) => {
+  const [period, setPeriod] = useState<number>(30);
+
+  const handlePeriodChange = (value: number) => {
+    const v = Math.max(7, Math.min(90, Math.floor(value || 0)));
+    setPeriod(v);
+  };
 
   return (
     <AnalysisPanel minHeight={250}>
@@ -18,34 +29,36 @@ const InventoryAlertCard = ({ item }: InventoryAlertCardProps) => {
           sx={{ alignItems: "center", justifyContent: "space-between" }}
         >
           <Typography variant="h6" sx={{ fontWeight: 800, color: "#1C2940" }}>
-            {item.title}
+            الأدوية منتهية الصلاحية
           </Typography>
-          <ErrorOutlineRounded sx={{ color: toneColor, fontSize: 20 }} />
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <PeriodPopoverButton value={period} onChange={handlePeriodChange} />
+          </Box>
         </Stack>
 
         <Typography
           variant="caption"
           sx={{ color: "#7A8EA6", fontWeight: 600 }}
         >
-          {item.subtitle}
+          عناصر يجب متابعتها بشكل عاجل
         </Typography>
 
         <Box sx={{ textAlign: "center", py: 1 }}>
           <Typography
             variant="h4"
-            sx={{ color: toneColor, fontWeight: 800, lineHeight: 1.2 }}
+            sx={{ color: "#D6414E", fontWeight: 800, lineHeight: 1.2 }}
           >
-            {item.value}
+            {rows.length}
           </Typography>
           <Typography variant="body2" sx={{ color: "#697A93" }}>
-            {item.label}
+            صنف يتطلب مراجعة
           </Typography>
         </Box>
 
         <Stack spacing={0.75}>
-          {item.rows.map((row) => (
+          {rows.map((row) => (
             <Box
-              key={row.id}
+              key={`${row.id}-${row.name}`}
               sx={{
                 p: 1,
                 borderRadius: 1.5,
@@ -59,9 +72,9 @@ const InventoryAlertCard = ({ item }: InventoryAlertCardProps) => {
             >
               <Typography
                 variant="body2"
-                sx={{ color: toneColor, fontWeight: 700 }}
+                sx={{ color: "#D6414E", fontWeight: 700 }}
               >
-                {row.note}
+                {row.expiryDate}
               </Typography>
               <Typography
                 variant="body2"
@@ -80,11 +93,11 @@ const InventoryAlertCard = ({ item }: InventoryAlertCardProps) => {
           size="small"
           sx={{ borderRadius: 1.75, fontWeight: 700 }}
         >
-          {item.ctaLabel}
+          عرض الكل
         </Button>
       </Stack>
     </AnalysisPanel>
   );
 };
 
-export default InventoryAlertCard;
+export default ExpiryMedicinesCard;

@@ -1,13 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from "react";
-import {
-  Box,
-  Typography,
-  Paper,
-  Button,
-  Chip,
-} from "@mui/material";
+import { Box } from "@mui/material";
 import { useQueryClient } from "@tanstack/react-query";
-import { PlusOne } from "@mui/icons-material";
 import useGetWithParams from "../../../../shared/hooks/useGetWithParams";
 import type {
   PharmacyDrug,
@@ -21,6 +14,10 @@ import {
   FoundMedicineDialog,
   type FoundDrugPreview,
 } from "../../../inventory/components/AddMedicine/MedicineFoundDialog";
+import SearchDropdown from "./search/SearchDropdown";
+import LocalResultsSection from "./search/LocalResultsSection";
+import GeneralResultsSection from "./search/GeneralResultsSection";
+import ManualAddSection from "./search/ManualAddSection";
 
 const DrugSearch = ({
   onSelect,
@@ -190,18 +187,26 @@ const DrugSearch = ({
       .filter((p) => p.name === searchName)
       .sort((a, b) => a.page - b.page);
 
+    // Build a set of generalDrugIds that already exist in localResults (source === 'GENERAL')
+    const existingGeneralIds = new Set(
+      localResults
+        .filter((lr) => String(lr.source || "").toUpperCase() === "GENERAL")
+        .map((lr) => String(lr.sourceDrugId)),
+    );
+
     const seen = new Set<string>();
     const merged: GeneralDrugItem[] = [];
     pages.forEach((p) => {
       p.items.forEach((item) => {
         if (seen.has(item.generalDrugId)) return;
+        if (existingGeneralIds.has(String(item.generalDrugId))) return; // skip already-available
         seen.add(item.generalDrugId);
         merged.push(item);
       });
     });
 
     return merged;
-  }, [canSearch, queryClient, searchName]);
+  }, [canSearch, queryClient, searchName, localResults]);
   // = data?.data?.generalDrugs?.items ?? [];
 
   const hasMoreLocal =
@@ -343,371 +348,23 @@ const DrugSearch = ({
           THE CORE DROPDOWN COMPONENT (High Fidelity Style)
           ========================================== */}
       {isDropdownOpen && (
-        <Paper
-          sx={{
-            position: "absolute",
-            top: "115%",
-            left: 0,
-            right: 0,
-            zIndex: 100,
-            borderRadius: "24px",
-            border: "1px solid #ECE8EF",
-            boxShadow:
-              "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-            p: 2,
-            bgcolor: "#FFFFFF",
-            animation: "fadeIn 0.2s ease-out",
-          }}
-        >
-          {/* Category 1: Local Inventory Results */}
-          <Box
-            sx={{
-              mb: 3,
-            }}
-          >
-            <Typography
-              sx={{
-                fontWeight: 800,
-                fontSize: "14px",
-                color: "#5E3A60",
-                mb: 1,
-                pr: 1,
-              }}
-            >
-              نتائج من المخزون المحلي{" "}
-              <span
-                style={{ fontWeight: 500, color: "gray", fontSize: "12px" }}
-              >
-                {" "}
-                (اضغط على الدواء لاضافته للفاتورة)
-              </span>
-            </Typography>
-            <Box
-              ref={localScrollRootRef}
-              sx={{
-                height: "125px",
-                overflowY: "auto",
-                display: "flex",
-                flexDirection: "column",
-                gap: 1,
-              }}
-            >
-              {localResults.length === 0 && (
-                <Box
-                  sx={{
-                    height: "inherit",
-                    borderRadius: "20px",
-                    p: 1,
-                    bgcolor: "#FAF8FB",
-                    display: "flex",
-                    justifyContent: "center",
-                    gap: 2,
-                    flexDirection: { xs: "column", md: "row" },
-                  }}
-                >
-                  <Typography
-                    sx={{
-                      alignSelf: "center",
-                      color: "gray",
-                      fontSize: "12px",
-                      fontWeight: 500,
-                    }}
-                  >
-                    لا توجد نتائج..
-                  </Typography>
-                </Box>
-              )}
-              {localResults.map((drug) => (
-                <Box
-                  component="div"
-                  key={drug.pharmacyDrugId}
-                  onClick={() => handleAddDrugToInvoice(drug)}
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    bgcolor: "#EBF8FA",
-                    border: "1px solid #D2ECF0",
-                    borderRadius: "16px",
-                    px: 2,
-                    py: 1,
-                    gap: 2,
-                    flexDirection: { xs: "column", sm: "row" },
-                    cursor: "pointer",
-                  }}
-                >
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 2,
-                      width: "100%",
-                    }}
-                  >
-                    {/* <MedicalInformation /> */}
-                    <Box>
-                      <Typography
-                        sx={{
-                          fontWeight: 800,
-                          fontSize: "15px",
-                          color: "#1F4A52",
-                        }}
-                      >
-                        {drug.tradeName}
-                      </Typography>
-                      <Typography
-                        sx={{
-                          fontSize: "12px",
-                          color: "#7E6E80",
-                          fontWeight: 500,
-                        }}
-                      >
-                        {`باركود: ${drug.barcode}`}
-                      </Typography>
-                    </Box>
-                  </Box>
-                  {/* <Button
-                    variant="contained"
-                    onClick={() => handleAddDrugToInvoice(drug.pharmacyDrugId)}
-                    sx={{
-                      bgcolor: "#235B64",
-                      color: "#FFFFFF",
-                      borderRadius: "24px",
-                      px: 3,
-                      py: 1,
-                      fontWeight: 800,
-                      fontSize: "13px",
-                      boxShadow: "none",
-                      textTransform: "none",
-                      whiteSpace: "nowrap",
-                      alignSelf: { xs: "stretch", sm: "auto" },
-                      "&:hover": {
-                        bgcolor: "#1A464E",
-                        boxShadow: "0 4px 12px rgba(35, 91, 100, 0.2)",
-                      },
-                    }}
-                  >
-                    إضافة للفاتورة +
-                  </Button> */}
-                  <Chip
-                    color="default"
-                    label={
-                      <Typography
-                        sx={{
-                          fontSize: "12px",
-                          color: "#548892",
-                          fontWeight: 500,
-                        }}
-                      >
-                        الكمية المتوفرة: {"  "}
-                        <strong style={{ fontWeight: 800 }}>
-                          {drug.availableQuantity} وحدة
-                        </strong>
-                      </Typography>
-                    }
-                    size="small"
-                  />
-                </Box>
-              ))}
-              <Box ref={localSentinelRef} sx={{ height: 1 }} />
-            </Box>
-          </Box>
+        <SearchDropdown>
+          <LocalResultsSection
+            localResults={localResults}
+            localScrollRootRef={localScrollRootRef}
+            localSentinelRef={localSentinelRef}
+            onAddDrugToInvoice={handleAddDrugToInvoice}
+          />
 
-          {/* Category 2: Central Database */}
-          <Box
-            sx={{
-              mb: 3,
-            }}
-          >
-            <Typography
-              sx={{
-                fontWeight: 800,
-                fontSize: "14px",
-                color: "#5E3A60",
-                mb: 1,
-                pr: 1,
-              }}
-            >
-              قاعدة البيانات المركزية
-            </Typography>
-            <Box
-              ref={generalScrollRootRef}
-              sx={{
-                height: "125px",
-                overflowY: "auto",
-                display: "flex",
-                flexDirection: "column",
-                gap: 1,
-              }}
-            >
-              {generalResults.length === 0 && (
-                <Box
-                  sx={{
-                    height: "inherit",
-                    borderRadius: "20px",
-                    p: 1,
-                    bgcolor: "#FAF8FB",
-                    display: "flex",
-                    justifyContent: "center",
-                    gap: 2,
-                    flexDirection: { xs: "column", md: "row" },
-                  }}
-                >
-                  <Typography
-                    sx={{
-                      alignSelf: "center",
-                      color: "gray",
-                      fontSize: "12px",
-                      fontWeight: 500,
-                    }}
-                  >
-                    لا توجد نتائج..
-                  </Typography>
-                </Box>
-              )}
-              {generalResults.map((general) => (
-                <Box
-                  key={general.generalDrugId}
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    bgcolor: "#f3eaf8",
-                    border: "1px solid #EFEAF2",
-                    borderRadius: "16px",
-                    px: 2,
-                    py: 1,
-                    gap: 2,
-                    flexDirection: { xs: "column", sm: "row" },
-                  }}
-                >
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 2,
-                      width: "100%",
-                    }}
-                  >
-                    <Box>
-                      <Typography
-                        sx={{
-                          fontWeight: 800,
-                          fontSize: "15px",
-                          color: "primary.main",
-                        }}
-                      >
-                        {general.tradeName}
-                      </Typography>
-                      <Typography
-                        sx={{
-                          fontSize: "12px",
-                          color: "#7E6E80",
-                          fontWeight: 500,
-                        }}
-                      >
-                        {`باركود: ${general.barcode}`}
-                      </Typography>
-                    </Box>
-                  </Box>
-                  <Button
-                    variant="contained"
-                    onClick={() => handleAddCentralDB(general)}
-                    sx={{
-                      borderRadius: "24px",
-                      px: 3,
-                      py: 1,
-                      fontWeight: 700,
-                      fontSize: "12px",
-                      boxShadow: "none",
-                      whiteSpace: "nowrap",
-                      alignSelf: { xs: "stretch", sm: "auto" },
-                      display: "flex",
-                      gap: 1,
-                      "&:hover": {
-                        bgcolor: "#4C3150",
-                        boxShadow: "0 4px 12px rgba(94, 62, 99, 0.2)",
-                      },
-                    }}
-                  >
-                    إضافة للمخزون ثم للفاتورة
-                  </Button>
-                </Box>
-              ))}
-              <Box ref={generalSentinelRef} sx={{ height: 1 }} />
-            </Box>
-          </Box>
+          <GeneralResultsSection
+            generalResults={generalResults}
+            generalScrollRootRef={generalScrollRootRef}
+            generalSentinelRef={generalSentinelRef}
+            onAddCentralDB={handleAddCentralDB}
+          />
 
-          {/* Category 3: Not Found in DB / Custom Addition */}
-          <Box
-            sx={{
-              border: "2px dashed #D3CAD6",
-              borderRadius: "20px",
-              p: 1,
-              bgcolor: "#FAF8FB",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: 2,
-              flexDirection: { xs: "column", md: "row" },
-            }}
-          >
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: 2,
-                width: "100%",
-              }}
-            >
-              <PlusOne />
-              <Box>
-                <Typography
-                  sx={{ fontWeight: 800, fontSize: "14px", color: "#2E1A30" }}
-                >
-                  لم تجد الدواء في قاعدة البيانات؟
-                </Typography>
-                {/* <Typography
-                  sx={{
-                    fontSize: "12px",
-                    color: "#8B7D8C",
-                    fontWeight: 500,
-                    mt: 0.5,
-                  }}
-                >
-                  يمكنك إضافة تعريف جديد كلياً لهذا الدواء وتثبيته في سجلاتك.
-                </Typography> */}
-              </Box>
-            </Box>
-            <Button
-              variant="contained"
-              onClick={() => {
-                setIsManualModalOpen(true);
-              }}
-              sx={{
-                bgcolor: "#5E3E63",
-                color: "#FFFFFF",
-                borderRadius: "24px",
-                px: 3,
-                py: 1.2,
-                fontWeight: 800,
-                fontSize: "12px",
-                boxShadow: "0 6px 16px rgba(94, 62, 99, 0.15)",
-                textTransform: "none",
-                whiteSpace: "nowrap",
-                alignSelf: { xs: "stretch", md: "auto" },
-                display: "flex",
-                gap: 1,
-                "&:hover": {
-                  bgcolor: "#4C3150",
-                  boxShadow: "0 10px 20px rgba(94, 62, 99, 0.25)",
-                },
-              }}
-            >
-              إضافة دواء جديد يدوياً
-            </Button>
-          </Box>
-        </Paper>
+          <ManualAddSection onManualAdd={() => setIsManualModalOpen(true)} />
+        </SearchDropdown>
       )}
 
       <FoundMedicineDialog

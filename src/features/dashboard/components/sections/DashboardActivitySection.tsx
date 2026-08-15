@@ -1,16 +1,18 @@
 import { LinkRounded } from "@mui/icons-material";
 import { Box, Paper, Stack, Typography } from "@mui/material";
-import type { OperationLog } from "../../types/dashboard.types";
+import type {
+  DailyWindowActivityItem,
+} from "../../types/dashboard.types";
 
-type DashboardOperationsSectionProps = {
-  operations: OperationLog[];
+type DashboardActivitySectionProps = {
+  operations: DailyWindowActivityItem[];
   onViewAll?: () => void;
 };
 
-const DashboardOperationsSection = ({
+const DashboardActivitySection = ({
   operations,
   onViewAll,
-}: DashboardOperationsSectionProps) => {
+}: DashboardActivitySectionProps) => {
   return (
     <Paper
       elevation={0}
@@ -41,7 +43,7 @@ const DashboardOperationsSection = ({
             px: 2,
             py: 1,
             display: "grid",
-            gridTemplateColumns: "1.7fr 1fr 1fr 40px",
+            gridTemplateColumns: "1.7fr 1fr 40px",
             alignItems: "center",
             color: "#4D5D79",
             fontWeight: 700,
@@ -49,7 +51,6 @@ const DashboardOperationsSection = ({
           }}
         >
           <Box sx={{ textAlign: "right" }}>العملية</Box>
-          <Box sx={{ textAlign: "center" }}>الفئة او الاهمية</Box>
           <Box sx={{ textAlign: "center" }}>التوقيت</Box>
           <Box />
         </Box>
@@ -57,7 +58,7 @@ const DashboardOperationsSection = ({
         <Stack spacing={1.1} sx={{ mt: 1.25 }}>
           {operations.map((row) => (
             <Box
-              key={row.id}
+              key={row.invoiceActivityId}
               sx={{
                 border: "1px solid #EDF2F7",
                 backgroundColor: "#F9FCFF",
@@ -65,24 +66,19 @@ const DashboardOperationsSection = ({
                 px: 2,
                 py: 1.35,
                 display: "grid",
-                gridTemplateColumns: "1.7fr 1fr 1fr 40px",
+                gridTemplateColumns: "1.7fr 1fr 40px",
                 alignItems: "center",
               }}
             >
               <Typography
                 sx={{ textAlign: "right", fontWeight: 700, color: "#2C3954" }}
               >
-                {row.operation}
-              </Typography>
-              <Typography
-                sx={{ textAlign: "center", fontWeight: 700, color: "#54617A" }}
-              >
-                {row.category}
+                {row.message}
               </Typography>
               <Typography
                 sx={{ textAlign: "center", fontWeight: 800, color: "#28364D" }}
               >
-                {row.time}
+                {row.occurredAt}
               </Typography>
               <LinkRounded sx={{ color: "#7D879C", fontSize: 20 }} />
             </Box>
@@ -118,4 +114,4 @@ const DashboardOperationsSection = ({
   );
 };
 
-export default DashboardOperationsSection;
+export default DashboardActivitySection;

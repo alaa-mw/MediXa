@@ -1,5 +1,7 @@
 export type AlertTone = "danger" | "warning";
 
+export type RotationTitle = "sale" | "purchase" | "return" | "damage" | string;
+
 export interface InventoryAlertItem {
   id: string;
   title: string;
@@ -53,25 +55,41 @@ export interface DemandColumn {
 }
 
 export interface AnalysisInventoryViewModel {
-  topAlerts: InventoryAlertItem[];
-  rotation: {
-    title: string;
-    subtitle: string;
-    bars: RotationBar[];
-    metrics: RotationMetric[];
+  slowMedicines: {
+    rows: Array<{
+      id: string;
+      name: string;
+      notSaleFromDays: number;
+    }>;
   };
-  criticalStock: {
-    title: string;
-    rows: CriticalStockItem[];
+  expiryMedicines: {
+    rows: Array<{
+      id: string;
+      name: string;
+      remainQty: number;
+      status: string;
+      expiryDate: string;
+      lossValue: number;
+      supplier: string;
+    }>;
   };
-  performance: {
-    title: string;
+  PeformanceMedicines: {
     bestSelling: PerformanceListItem[];
     lowSelling: PerformanceListItem[];
   };
-  demandAnalysis: {
-    title: string;
-    subtitle: string;
-    columns: DemandColumn[];
+  rotation: {
+    bars: Array<{
+      id: string;
+      title: RotationTitle;
+      invoicesNumber: number;
+    }>;
+    totalValue: {
+      value: string;
+      note: string;
+    };
+    remainMedAvg: {
+      value: string;
+      note: string;
+    };
   };
 }

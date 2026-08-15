@@ -104,6 +104,7 @@ const DashboardStatCard = ({ item }: DashboardStatCardProps) => {
         </Typography>
         <CalendarTodayRounded sx={{ fontSize: 13, color: "#5B6476" ,px:1 }} />
       </Stack>
+      
     </Paper>
   );
 };

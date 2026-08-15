@@ -1,9 +1,58 @@
-import { Box, Paper, Typography } from "@mui/material";
+import { useMemo, useState } from "react";
+import { Box, IconButton, Paper, Typography } from "@mui/material";
 
 const weekDays = ["Sun", "Mon", "Tue", "Wen", "Thr", "Fri", "Sat"];
-const monthDays = ["09", "10", "11", "12", "13", "14", "15"];
 
-const DashboardCalendarCard = () => {
+type DashboardCalendarCardProps = {
+  onDateChange?: (date: Date) => void;
+};
+
+const getStartOfWeek = (date: Date) => {
+  const start = new Date(date);
+  start.setHours(0, 0, 0, 0);
+  start.setDate(start.getDate() - start.getDay());
+  return start;
+};
+
+const isSameDay = (a: Date, b: Date) =>
+  a.getFullYear() === b.getFullYear() &&
+  a.getMonth() === b.getMonth() &&
+  a.getDate() === b.getDate();
+
+const DashboardCalendarCard = ({
+  onDateChange,
+}: DashboardCalendarCardProps) => {
+  const [selectedDate, setSelectedDate] = useState(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return today;
+  });
+
+  const weekDates = useMemo(() => {
+    const start = getStartOfWeek(selectedDate);
+    return Array.from({ length: 7 }, (_, index) => {
+      const date = new Date(start);
+      date.setDate(start.getDate() + index);
+      return date;
+    });
+  }, [selectedDate]);
+
+  const monthLabel = new Intl.DateTimeFormat("en-US", {
+    month: "long",
+    year: "numeric",
+  }).format(selectedDate);
+
+  const handleDaySelect = (date: Date) => {
+    setSelectedDate(date);
+    onDateChange?.(date);
+  };
+
+  const handleMonthShift = (months: number) => {// Shift the selected date by the specified number of months
+    const nextDate = new Date(selectedDate); 
+    nextDate.setMonth(selectedDate.getMonth() + months);  
+    handleDaySelect(nextDate);
+  };
+
   return (
     <Paper
       elevation={0}
@@ -14,12 +63,36 @@ const DashboardCalendarCard = () => {
         backgroundColor: "#FFFFFF",
       }}
     >
-      <Typography
-        variant="h5"
-        sx={{ fontWeight: 800, textAlign: "center", mb: 1.5 }}
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          mb: 1.5,
+        }}
       >
-        September 2026
-      </Typography>
+        <IconButton
+          size="small"
+          onClick={() => handleMonthShift(-1)}
+          aria-label="Previous month"
+          sx={{ color: "#5B6476" }}
+        >
+          {"<"}
+        </IconButton>
+
+        <Typography variant="h5" sx={{ fontWeight: 800, textAlign: "center" }}>
+          {monthLabel}
+        </Typography>
+
+        <IconButton
+          size="small"
+          onClick={() => handleMonthShift(1)}
+          aria-label="Next month"
+          sx={{ color: "#5B6476" }}
+        >
+          {">"}
+        </IconButton>
+      </Box>
 
       <Box
         sx={{
@@ -48,19 +121,24 @@ const DashboardCalendarCard = () => {
           textAlign: "center",
         }}
       >
-        {monthDays.map((day) => (
+        {weekDates.map((date) => (
           <Box
-            key={day}
+            key={date.toISOString()}
+            onClick={() => handleDaySelect(date)}
             sx={{
               py: 0.75,
               borderRadius: "999px",
-              backgroundColor: day === "15" ? "#FADFE6" : "transparent",
+              cursor: "pointer",
+              userSelect: "none",
+              backgroundColor: isSameDay(date, selectedDate)
+                ? "#FADFE6"
+                : "transparent",
               color: "#4A5568",
-              fontWeight: day === "15" ? 800 : 600,
+              fontWeight: isSameDay(date, selectedDate) ? 800 : 600,
               fontSize: 14,
             }}
           >
-            {day}
+            {String(date.getDate()).padStart(2, "0")}
           </Box>
         ))}
       </Box>

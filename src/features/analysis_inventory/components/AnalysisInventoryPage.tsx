@@ -1,10 +1,10 @@
 import { Box, Stack } from "@mui/material";
 import { analysisInventoryMock } from "./analysisInventory.mock";
-import CriticalStockCard from "./sections/CriticalStockCard";
-import DemandAnalysisSection from "./sections/DemandAnalysisSection";
-import InventoryAlertCard from "./sections/InventoryAlertCard";
-import InventoryRotationCard from "./sections/InventoryRotationCard";
-import ProductPerformanceCard from "./sections/ProductPerformanceCard";
+import ExpiryMedicinesCard from "./sections/ExpiryMedicinesCard";
+import PeformanceMedicinesCard from "./sections/PeformanceMedicinesCard";
+import RotationCard from "./sections/RotationCard";
+import SalesTrendSection from "./sections/SalesTrendSection";
+import SlowMedicinesCard from "./sections/SlowMedicinesCard";
 
 const AnalysisInventoryPage = () => {
   const viewModel = analysisInventoryMock;
@@ -22,50 +22,31 @@ const AnalysisInventoryPage = () => {
         <Box
           sx={{
             display: "grid",
-            gridTemplateColumns: { xs: "1fr", xl: "280px 1fr" },
+            gridTemplateColumns: { xs: "1fr", xl: "3fr 1fr" },
             gap: 2,
           }}
         >
-          <Stack spacing={2}>
-            {viewModel.topAlerts.map((alertCard) => (
-              <InventoryAlertCard key={alertCard.id} item={alertCard} />
-            ))}
-          </Stack>
-
-          <Stack spacing={2}>
-            <InventoryRotationCard
-              title={viewModel.rotation.title}
-              subtitle={viewModel.rotation.subtitle}
-              bars={viewModel.rotation.bars}
-              metrics={viewModel.rotation.metrics}
-            />
-
+          <Stack spacing={2} >
+            <SalesTrendSection />
             <Box
               sx={{
                 display: "grid",
-                gridTemplateColumns: { xs: "1fr", md: "1.7fr 1fr" },
+                gridTemplateColumns: { xs: "1fr", xl: "1fr 1fr" },
                 gap: 2,
               }}
             >
-              <CriticalStockCard
-                title={viewModel.criticalStock.title}
-                rows={viewModel.criticalStock.rows}
-              />
-
-              <ProductPerformanceCard
-                title={viewModel.performance.title}
-                bestSelling={viewModel.performance.bestSelling}
-                lowSelling={viewModel.performance.lowSelling}
+              <RotationCard rotation={viewModel.rotation} />
+              <PeformanceMedicinesCard
+                bestSelling={viewModel.PeformanceMedicines.bestSelling}
+                lowSelling={viewModel.PeformanceMedicines.lowSelling}
               />
             </Box>
           </Stack>
+          <Stack spacing={2}>
+            <ExpiryMedicinesCard rows={viewModel.expiryMedicines.rows} />
+            <SlowMedicinesCard rows={viewModel.slowMedicines.rows} />
+          </Stack>
         </Box>
-
-        <DemandAnalysisSection
-          title={viewModel.demandAnalysis.title}
-          subtitle={viewModel.demandAnalysis.subtitle}
-          columns={viewModel.demandAnalysis.columns}
-        />
       </Stack>
     </Box>
   );

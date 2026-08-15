@@ -1,25 +1,45 @@
-import { Box, Divider, Stack, Typography } from "@mui/material";
-import type { PerformanceListItem } from "../../types/analysisInventory.types";
+import {
+    Box,
+    Button,
+    Divider,
+    Stack,
+    Typography
+} from "@mui/material";
+import { useState } from "react";
+import type { AnalysisInventoryViewModel } from "../../types/analysisInventory.types";
+import PeriodPopoverButton from "../PeriodPopoverButton";
 import AnalysisPanel from "./AnalysisPanel";
 
-type ProductPerformanceCardProps = {
-  title: string;
-  bestSelling: PerformanceListItem[];
-  lowSelling: PerformanceListItem[];
+type PeformanceMedicinesCardProps = {
+  bestSelling: AnalysisInventoryViewModel["PeformanceMedicines"]["bestSelling"];
+  lowSelling: AnalysisInventoryViewModel["PeformanceMedicines"]["lowSelling"];
 };
 
-const ProductPerformanceCard = ({
-  title,
+const PeformanceMedicinesCard = ({
   bestSelling,
   lowSelling,
-}: ProductPerformanceCardProps) => {
+}: PeformanceMedicinesCardProps) => {
+  const [period, setPeriod] = useState<number>(30);
+
+  const handlePeriodChange = (value: number) => {
+    const v = Math.max(7, Math.min(90, Math.floor(value || 0)));
+    setPeriod(v);
+  };
   return (
-    <AnalysisPanel title={title}>
+    <AnalysisPanel title="أداء الأصناف (الأكثر/الأقل مبيعاً)">
       <Stack spacing={1.25}>
-        <Box>
+        <Stack
+          direction="row"
+          sx={{ alignItems: "center", justifyContent: "space-between" }}
+        >
           <Typography sx={{ fontWeight: 800, color: "#259468", fontSize: 13 }}>
             الأكثر مبيعاً
           </Typography>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <PeriodPopoverButton value={period} onChange={handlePeriodChange} />
+          </Box>
+        </Stack>
+        <Box>
           <Stack spacing={0.85} sx={{ mt: 0.8 }}>
             {bestSelling.map((item) => (
               <Box
@@ -88,9 +108,18 @@ const ProductPerformanceCard = ({
             ))}
           </Stack>
         </Box>
+        <Button
+          fullWidth
+          variant="outlined"
+          color="error"
+          size="small"
+          sx={{ borderRadius: 1.75, fontWeight: 700 }}
+        >
+          عرض الكل
+        </Button>
       </Stack>
     </AnalysisPanel>
   );
 };
 
-export default ProductPerformanceCard;
+export default PeformanceMedicinesCard;
