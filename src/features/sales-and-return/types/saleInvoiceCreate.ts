@@ -53,6 +53,7 @@ export interface BatchAllocation {
 // النموذج الداخلي للصنف في السلة (Rich UI Model)
 export interface InvoiceItem {
   pharmacyDrugId: number;
+  customerRequestItemId?: number; 
   tradeName: string;
   dosageFormName?: string;
   requiresPrescription?: boolean;

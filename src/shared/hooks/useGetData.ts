@@ -7,6 +7,7 @@ export const useGetData = <TData>(endpoint: string) => {
   return useQuery<FetchResponse<TData>, Error>({
     queryKey: [endpoint],
     queryFn: () => apiClient.get(),
+    enabled: !!endpoint,
   });
 };
 
