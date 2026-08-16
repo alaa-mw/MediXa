@@ -17,10 +17,12 @@ import logonobg from "../../../assets/logonobg.png";
 import type { LoginResponse } from "../types/LoginResponse";
 import TokenService from "../../../shared/services/tokenService";
 import { useNavigate } from "react-router-dom";
+import { useSnackbar } from "../../../shared/providers/useSnackbar";
 
 const UserLogin = () => {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+    const { showSnackbar } = useSnackbar();
 
   const { mutate: loginUser, isPending } = usePostDataNoToken<LoginResponse>(
     "/authentication/sign-in-user",
@@ -81,6 +83,12 @@ const UserLogin = () => {
 
       onError: (error) => {
         console.log("error:", error);
+        const errorDetails = (error as Error & { details?: string }).details;
+        if(errorDetails )
+          showSnackbar(error.message+": " + errorDetails, "error");
+        else
+          showSnackbar(error.message , "error");
+
       },
     });
   };
