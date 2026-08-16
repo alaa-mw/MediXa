@@ -1,6 +1,8 @@
 import { io, type Socket } from "socket.io-client";
 
-const BACKEND_BASE_URL = import.meta.env.VITE_API_URL;
+const BACKEND_BASE_URL = window.location.origin;
+
+console.log("BACKEND_BASE_URL", BACKEND_BASE_URL);
 
 class SocketService {
   public socket: Socket | null = null;

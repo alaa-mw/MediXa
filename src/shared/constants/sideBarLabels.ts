@@ -21,49 +21,14 @@ export const sideBarLabels: Record<
       icon: DashboardIcon,
     },
     {
-      title: "المبيعات",
-      path: "/sales",
-      icon: PointOfSaleIcon,
-    },
-    {
-      title: "الفواتير",
-      path: "/invoices",
-      icon: ReceiptLongIcon,
-    },
-    {
-      title: "المخزون",
-      path: "/inventory",
-      icon: Inventory2Icon,
-    },
-    {
-      title: "الطلبات",
-      path: "/orders",
-      icon: ShoppingBagIcon,
-    },
-    {
       title: "التقارير",
       path: "/reports",
       icon: BarChartIcon,
     },
     {
-      title: "الموردين",
-      path: "/suppliers",
-      icon: LocalShippingIcon,
-    },
-    {
-      title: "استكشاف الأدوية",
-      path: "/medicine-search",
-      icon: SearchIcon,
-    },
-    {
       title: "اشتراكي",
       path: "/subscription-schedule",
       icon: PaymentsIcon,
-    },
-    {
-      title: "الدعم الفني",
-      path: "/support",
-      icon: SupportAgentIcon,
     },
   ],
   PHARMACY: [
@@ -110,17 +75,6 @@ export const sideBarLabels: Record<
     {
       title: "الدعم الفني",
       path: "/support",
-      icon: SupportAgentIcon,
-    },
-    // temp - later
-    {
-      title: "مؤقت ",
-      path: "/r1",
-      icon: SupportAgentIcon,
-    },
-    {
-      title: "مؤقت2",
-      path: "/r2",
       icon: SupportAgentIcon,
     },
     {

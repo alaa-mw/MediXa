@@ -58,7 +58,7 @@ import OwnerRenewSubscriptionPage from "./features/online_renew_subsrciption/pag
 import OwnerPharmacySubscriptionSchedule from "./features/online_renew_subsrciption/page/OwnerPharmaSubs";
 
 function App() {
-  const pharmacyPaths = ["/pharmacy", "/pharmacy_owner"];
+  const pharmacyPaths = ["/pharmacy",];
   return (
     <>
       <ThemeProvider theme={arabicTheme}>
