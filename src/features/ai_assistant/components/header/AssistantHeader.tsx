@@ -1,4 +1,3 @@
-import WavingHandRoundedIcon from "@mui/icons-material/WavingHandRounded";
 import { Box, Typography } from "@mui/material";
 
 const AssistantHeader = () => {
@@ -11,8 +10,7 @@ const AssistantHeader = () => {
         justifyContent: "center",
         textAlign: "center",
         my: "auto",
-        pr: 24,
-        pt: 3,
+        pt:2
       }}
     >
       {/* سطر الترحيب مع الإيموجي */}

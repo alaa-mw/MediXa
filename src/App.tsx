@@ -56,9 +56,10 @@ import { PaymentSuccessPage } from "./features/online_renew_subsrciption/page/Su
 import { PaymentCancelPage } from "./features/online_renew_subsrciption/page/CanclePaymentPage";
 import OwnerRenewSubscriptionPage from "./features/online_renew_subsrciption/page/OwnerPlaneCard";
 import OwnerPharmacySubscriptionSchedule from "./features/online_renew_subsrciption/page/OwnerPharmaSubs";
+import FloatingAssistantLauncher from "./features/ai_assistant/components/FloatingAssistantLauncher";
 
 function App() {
-  const pharmacyPaths = ["/pharmacy",];
+  const pharmacyPaths = ["/pharmacy"];
   return (
     <>
       <ThemeProvider theme={arabicTheme}>
@@ -259,6 +260,8 @@ function App() {
             ))}
           </Route>
         </Routes>
+
+        <FloatingAssistantLauncher />
       </ThemeProvider>
     </>
   );

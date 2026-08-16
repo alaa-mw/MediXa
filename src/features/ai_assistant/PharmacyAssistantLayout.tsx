@@ -26,18 +26,17 @@ const AssistantLayout = () => {
   return (
     <Box
       sx={{
-        width: "100vw",
-        height: "100vh",
+        width: "100%", // تم التغيير من 100vw ليلتزم بالمساحة المتبقية بجانب الشريط الجانبي للتطبيق
+        height: "100%", // تم التغيير من 100vh
         overflow: "hidden",
-        position: "absolute",
-        top: 0,
-        left: 0,
+        // تم إزالة position: absolute و top و left لمنعه من الانزلاق تحت الشريط الأيمن
       }}
     >
       <Stack
         direction="row"
         sx={{ height: "100%", width: "100%", direction: "ltr" }}
       >
+        {/* قائمة الجلسات الثابتة في اليسار */}
         <Box
           sx={{
             width: 300,
@@ -85,32 +84,55 @@ const AssistantLayout = () => {
           </Box>
         </Box>
 
-        <Stack direction="column" sx={{ flex: 1, height: "100%" }}>
+        {/* منطقة الدردشة المتجاوبة */}
+        <Stack
+          direction="column"
+          sx={{ flex: 1, height: "100%", overflow: "hidden" }}
+        >
           <AssistantHeader />
           <Box
             sx={{
-              m: 1,
               height: "100%",
-              width: 960,
+              width: "100%",
               overflowY: "auto",
               flex: 1,
+              display: "flex",
+              justifyContent: "center", // لتوسيط المحادثة في المساحة المتاحة
+              // تم إزالة m: 1 لتلبية طلبك بدون أي Padding/Margin إضافي
             }}
           >
-            <ChatContainer
-              turns={activeSessionId === undefined ? [] : turns}
-              onLoadMoreMessages={handleLoadMoreMessages}
-              hasMoreMessages={hasMoreMessages}
-              isLoadingMore={isLoadingMoreMessages}
-              errorMessage={lastErrorMessage}
-            />
+            {/* حاوية داخلية تحدد أقصى عرض للدردشة لتبقى مقروءة، ولكن تتجاوب مع الشاشات الصغيرة */}
+            <Box sx={{ width: "100%", maxWidth: 960 }}>
+              <ChatContainer
+                turns={activeSessionId === undefined ? [] : turns}
+                onLoadMoreMessages={handleLoadMoreMessages}
+                hasMoreMessages={hasMoreMessages}
+                isLoadingMore={isLoadingMoreMessages}
+                errorMessage={lastErrorMessage}
+              />
+            </Box>
           </Box>
-          <Box sx={{ flexShrink: 0, width: 960 }}>
-            <ChatInput onSend={handleSendMessage} isLoading={isPendingAction} />
+
+          <Box
+            sx={{
+              flexShrink: 0,
+              width: "100%",
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            <Box sx={{ width: "100%", maxWidth: 960 }}>
+              <ChatInput
+                onSend={handleSendMessage}
+                isLoading={isPendingAction}
+              />
+            </Box>
           </Box>
         </Stack>
       </Stack>
     </Box>
   );
 };
+
 
 export default AssistantLayout;

@@ -9,8 +9,10 @@ export interface Supplier {
   updatedAt: string;
 }
 
+
 export type PurchaseOrderStatus =
   | "PENDING"
+  | "CONFIRMED"
   | "RECEIVED"
   | "CANCELLED";
 
