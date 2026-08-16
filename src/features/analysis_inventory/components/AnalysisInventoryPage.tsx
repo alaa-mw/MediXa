@@ -1,5 +1,4 @@
 import { Box, Stack } from "@mui/material";
-import { analysisInventoryMock } from "./analysisInventory.mock";
 import ExpiryMedicinesCard from "./sections/ExpiryMedicinesCard";
 import PeformanceMedicinesCard from "./sections/PeformanceMedicinesCard";
 import RotationCard from "./sections/RotationCard";
@@ -7,8 +6,6 @@ import SalesTrendSection from "./sections/SalesTrendSection";
 import SlowMedicinesCard from "./sections/SlowMedicinesCard";
 
 const AnalysisInventoryPage = () => {
-  const viewModel = analysisInventoryMock;
-
   return (
     <Box
       dir="rtl"
@@ -26,7 +23,7 @@ const AnalysisInventoryPage = () => {
             gap: 2,
           }}
         >
-          <Stack spacing={2} >
+          <Stack spacing={2}>
             <SalesTrendSection />
             <Box
               sx={{
@@ -35,16 +32,13 @@ const AnalysisInventoryPage = () => {
                 gap: 2,
               }}
             >
-              <RotationCard rotation={viewModel.rotation} />
-              <PeformanceMedicinesCard
-                bestSelling={viewModel.PeformanceMedicines.bestSelling}
-                lowSelling={viewModel.PeformanceMedicines.lowSelling}
-              />
+              <RotationCard />
+              <PeformanceMedicinesCard />
             </Box>
           </Stack>
           <Stack spacing={2}>
-            <ExpiryMedicinesCard rows={viewModel.expiryMedicines.rows} />
-            <SlowMedicinesCard rows={viewModel.slowMedicines.rows} />
+            <ExpiryMedicinesCard />
+            <SlowMedicinesCard />
           </Stack>
         </Box>
       </Stack>

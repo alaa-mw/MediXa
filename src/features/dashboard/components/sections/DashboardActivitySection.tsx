@@ -1,16 +1,18 @@
 import { LinkRounded } from "@mui/icons-material";
-import { Box, Paper, Stack, Typography } from "@mui/material";
-import type {
-  DailyWindowActivityItem,
-} from "../../types/dashboard.types";
+import { Box, Pagination, Paper, Stack, Typography } from "@mui/material";
+import type { DailyWindowActivityItem } from "../../types/dashboard.types";
+import type { Meta } from "../../../../shared/api/api-types";
 
 type DashboardActivitySectionProps = {
-  operations: DailyWindowActivityItem[];
-  onViewAll?: () => void;
+  activities: {
+    data: DailyWindowActivityItem[];
+    meta?: Meta;
+  };
+  onViewAll?: (page: number) => void;
 };
 
 const DashboardActivitySection = ({
-  operations,
+  activities,
   onViewAll,
 }: DashboardActivitySectionProps) => {
   return (
@@ -56,7 +58,14 @@ const DashboardActivitySection = ({
         </Box>
 
         <Stack spacing={1.1} sx={{ mt: 1.25 }}>
-          {operations.map((row) => (
+          {activities.data.length === 0 && (
+            <Typography
+              sx={{ textAlign: "center", fontWeight: 700, color: "#4D5D79" }}
+            >
+              لا توجد عمليات حديثة
+            </Typography>
+          )}
+          {activities.data.map((row) => (
             <Box
               key={row.invoiceActivityId}
               sx={{
@@ -85,7 +94,7 @@ const DashboardActivitySection = ({
           ))}
         </Stack>
 
-        <Box
+        {/* <Box
           sx={{
             mt: 2.1,
             borderTop: "1px solid #E6EEF7",
@@ -108,7 +117,20 @@ const DashboardActivitySection = ({
           >
             عرض كامل السجل
           </Typography>
-        </Box>
+           </Box> */}
+        {(activities?.meta?.totalPages ?? 1) > 1 && (
+          <Box sx={{ direction: "rtl" }}>
+            <Box sx={{ display: "flex", alignItems: "center" }}>
+              <Pagination
+                count={activities?.meta?.totalPages ?? 1}
+                page={activities?.meta?.page ?? 1}
+                size="small"
+                 onChange={(_, value) =>onViewAll?.(value)}
+                
+              />
+            </Box>
+          </Box>
+        )}
       </Box>
     </Paper>
   );

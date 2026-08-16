@@ -1,102 +1,92 @@
-import {
-  MenuItem,
-  Select,
-  Stack,
-  Tab,
-  Tabs,
-  Typography,
-  type SelectChangeEvent,
-} from "@mui/material";
+import { Stack, Tab, Tabs, Typography } from "@mui/material";
 import { Box } from "@mui/material";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import AnalysisPanel from "./AnalysisPanel";
+import useGetWithParams from "../../../../shared/hooks/useGetWithParams";
+import TokenService from "../../../../shared/services/tokenService";
+import { CustomDatePickerField } from "../../../../shared/components/FiltterDatePicker";
+import type { SalesTrendResponse } from "../../types/analysisInventory.types";
 
-type TrendMode = "yearly" | "monthly" | "weekly";
+
+
+export type TrendMode = "YEAR" | "MONTH" | "WEEK" | "DAY";
 
 type SalesTrendChartCardProps = {
-  onSelectionChange?: (selection: {
-    mode: TrendMode;
-    year: string;
-    month: string;
-  }) => void;
+  mode: TrendMode;
+  selectedDate: string;
+  onModeChange: (mode: TrendMode) => void;
+  onDateChange: (date: string) => void;
 };
 
-const years = ["2023", "2024", "2025", "2026"];
-const months = [
-  "يناير",
-  "فبراير",
-  "مارس",
-  "ابريل",
-  "مايو",
-  "يونيو",
-  "يوليو",
-  "اغسطس",
-  "سبتمبر",
-  "اكتوبر",
-  "نوفمبر",
-  "ديسمبر",
-];
+const modeToLevel: Record<TrendMode, TrendMode> = {
+  YEAR: "YEAR",
+  MONTH: "MONTH",
+  WEEK: "WEEK",
+  DAY: "DAY",
+};
 
-const chartDataByMode: Record<TrendMode, { label: string; value: number }[]> = {
-  weekly: [
-    { label: "السبت", value: 1100 },
-    { label: "الاحد", value: 2200 },
-    { label: "الاثنين", value: 1650 },
-    { label: "الثلاثاء", value: 3200 },
-    { label: "اليوم", value: 3700 },
-    { label: "الخميس", value: 650 },
-    { label: "الجمعة", value: 420 },
-  ],
-  monthly: [
-    { label: "الأسبوع 1", value: 2800 },
-    { label: "الأسبوع 2", value: 3400 },
-    { label: "الأسبوع 3", value: 2900 },
-    { label: "الأسبوع 4", value: 3600 },
-  ],
-  yearly: [
-    { label: "Q1", value: 3200 },
-    { label: "Q2", value: 4100 },
-    { label: "Q3", value: 3700 },
-    { label: "Q4", value: 4600 },
-  ],
+const formatTick = (value: number) => {
+  if (value >= 1000) {
+    return `${Math.round(value / 100) / 10}K`;
+  }
+  return String(value);
 };
 
 const SalesTrendChartCard = ({
-  onSelectionChange,
+  mode,
+  selectedDate,
+  onModeChange,
+  onDateChange,
 }: SalesTrendChartCardProps) => {
-  const [mode, setMode] = useState<TrendMode>("weekly");
-  const [selectedYear, setSelectedYear] = useState("2026");
-  const [selectedMonth, setSelectedMonth] = useState("اغسطس");
+  const pharmacyId = TokenService.getPharmacyId() || "1";
+  const selectedLevel = modeToLevel[mode];
 
-  const data = useMemo(() => chartDataByMode[mode], [mode]);
+  const {
+    data: response,
+    queryParams,
+    setQueryParams,
+  } = useGetWithParams<SalesTrendResponse>(
+    "/analytics/historical/sales-trend",
+    {
+      pharmacy_id: pharmacyId,
+      date: selectedDate,
+      level: selectedLevel,
+    },
+  );
+
+  const data = useMemo(
+    () =>
+      (response?.data.items ?? []).map((item) => ({
+        label: item.label,
+        value: item.grossSalesAmount,
+      })),
+    [response?.data.items],
+  );
+
   const maxValue = useMemo(
     () => Math.max(...data.map((item) => item.value), 1),
     [data],
   );
 
-  const emitChange = (next: {
-    mode: TrendMode;
-    year: string;
-    month: string;
-  }) => {
-    onSelectionChange?.(next);
-  };
+  const tickStep = useMemo(() => {
+    const approx = Math.ceil(maxValue / 5);
+    return Math.max(Math.ceil(approx / 100) * 100, 100);
+  }, [maxValue]);
+
+  const yTicks = useMemo(
+    () => [5, 4, 3, 2, 1, 0].map((factor) => factor * tickStep),
+    [tickStep],
+  );
 
   const handleModeChange = (_: React.SyntheticEvent, value: TrendMode) => {
-    setMode(value);
-    emitChange({ mode: value, year: selectedYear, month: selectedMonth });
+    onModeChange(value);
+    const nextLevel = modeToLevel[value];
+    setQueryParams({ ...queryParams, level: nextLevel });
   };
 
-  const handleYearChange = (event: SelectChangeEvent) => {
-    const value = event.target.value;
-    setSelectedYear(value);
-    emitChange({ mode, year: value, month: selectedMonth });
-  };
-
-  const handleMonthChange = (event: SelectChangeEvent) => {
-    const value = event.target.value;
-    setSelectedMonth(value);
-    emitChange({ mode, year: selectedYear, month: value });
+  const handleDateChange = (date: string) => {
+    onDateChange(date);
+    setQueryParams({ ...queryParams, date });
   };
 
   return (
@@ -139,60 +129,17 @@ const SalesTrendChartCard = ({
                 },
               }}
             >
-              <Tab value="yearly" label="سنوي" disableRipple />
-              <Tab value="monthly" label="شهري" disableRipple />
-              <Tab value="weekly" label="اسبوعي" disableRipple />
+              <Tab value="YEAR" label="سنوي" disableRipple />
+              <Tab value="MONTH" label="شهري" disableRipple />
+              <Tab value="WEEK" label="اسبوعي" disableRipple />
             </Tabs>
 
-            {mode === "monthly" && (
-              <Select
-                size="small"
-                value={selectedYear}
-                onChange={handleYearChange}
-                sx={{
-                  minWidth: 92,
-                  height: 32,
-                  borderRadius: 1.5,
-                  backgroundColor: "#F8FCFF",
-                  "& .MuiSelect-select": {
-                    py: 0.5,
-                    fontSize: 13,
-                    fontWeight: 700,
-                  },
-                }}
-              >
-                {years.map((year) => (
-                  <MenuItem key={year} value={year}>
-                    {year}
-                  </MenuItem>
-                ))}
-              </Select>
-            )}
-
-            {mode === "weekly" && (
-              <Select
-                size="small"
-                value={selectedMonth}
-                onChange={handleMonthChange}
-                sx={{
-                  minWidth: 108,
-                  height: 32,
-                  borderRadius: 1.5,
-                  backgroundColor: "#F8FCFF",
-                  "& .MuiSelect-select": {
-                    py: 0.5,
-                    fontSize: 13,
-                    fontWeight: 700,
-                  },
-                }}
-              >
-                {months.map((month) => (
-                  <MenuItem key={month} value={month}>
-                    {month}
-                  </MenuItem>
-                ))}
-              </Select>
-            )}
+            <Box sx={{ width: 148 }}>
+              <CustomDatePickerField
+                value={selectedDate}
+                onChange={handleDateChange}
+              />
+            </Box>
           </Box>
         </Box>
 
@@ -211,12 +158,11 @@ const SalesTrendChartCard = ({
               fontSize: 12,
             }}
           >
-            <Typography sx={{ fontSize: 12 }}>5K</Typography>
-            <Typography sx={{ fontSize: 12 }}>4K</Typography>
-            <Typography sx={{ fontSize: 12 }}>3K</Typography>
-            <Typography sx={{ fontSize: 12 }}>2K</Typography>
-            <Typography sx={{ fontSize: 12 }}>1K</Typography>
-            <Typography sx={{ fontSize: 12 }}>0</Typography>
+            {yTicks.map((tick) => (
+              <Typography key={tick} sx={{ fontSize: 12 }}>
+                {formatTick(tick)}
+              </Typography>
+            ))}
           </Stack>
 
           <Box
@@ -249,11 +195,11 @@ const SalesTrendChartCard = ({
                 px: 1,
               }}
             >
-              {data.map((item) => {
-                const isToday = item.label === "اليوم";
+              {data.map((item, index) => {
+                const isLatest = index === data.length - 1;
                 return (
                   <Box
-                    key={item.label}
+                    key={`${item.label}-${index}`}
                     sx={{
                       height: "100%",
                       flex: 1,
@@ -269,14 +215,14 @@ const SalesTrendChartCard = ({
                         width: "100%",
                         borderRadius: "8px 8px 0 0",
                         height: `${Math.max((item.value / maxValue) * 158, 12)}px`,
-                        backgroundColor: isToday ? "#1D5FC1" : "#C7D6F4",
+                        backgroundColor: isLatest ? "#1D5FC1" : "#C7D6F4",
                       }}
                     />
                     <Typography
                       sx={{
                         fontSize: 12,
-                        fontWeight: isToday ? 800 : 600,
-                        color: isToday ? "#1D5FC1" : "#8A9AB0",
+                        fontWeight: isLatest ? 800 : 600,
+                        color: isLatest ? "#1D5FC1" : "#8A9AB0",
                       }}
                     >
                       {item.label}

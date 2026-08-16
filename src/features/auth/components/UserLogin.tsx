@@ -61,10 +61,13 @@ const UserLogin = () => {
           });
         } else {
           if (response?.data?.pharmacies?.[0]?.pharmacyId) {
-            localStorage.setItem(
-              "pharmacyId",
+            TokenService.setPharmacyId(
               response?.data?.pharmacies?.[0]?.pharmacyId,
             );
+            // localStorage.setItem(
+            //   "pharmacyId",
+            //   response?.data?.pharmacies?.[0]?.pharmacyId,
+            // );
           }
           if (response?.data?.pharmacies?.[0]?.pharmacyName) {
             localStorage.setItem(

@@ -1,95 +1,96 @@
-export type AlertTone = "danger" | "warning";
-
-export type RotationTitle = "sale" | "purchase" | "return" | "damage" | string;
-
-export interface InventoryAlertItem {
-  id: string;
-  title: string;
-  subtitle: string;
-  value: number;
-  label: string;
-  rows: Array<{
-    id: string;
-    name: string;
-    note: string;
+export interface ExpiredMedResponse {
+  days: number;
+  period: {
+    fromDate: string;
+    toDate: string;
+  };
+  totalExpiredBatches: number;
+  totalUniqueDrugs: number;
+  items: Array<{
+    batchId: number;
+    pharmacyDrugId: string;
+    drugName: string;
+    expiryDate: string;
+    remainingBaseQuantity: number;
+    remainingUnits: number;
   }>;
-  ctaLabel: string;
-  tone: AlertTone;
 }
 
-export interface RotationMetric {
-  id: string;
-  label: string;
-  value: string;
-  note: string;
-}
-
-export interface RotationBar {
-  id: string;
-  height: number;
-  color: string;
-}
-
-export interface CriticalStockItem {
-  id: string;
-  medicineName: string;
-  currentQuantity: number;
-  minimumThreshold: number;
-  status: string;
-  statusTone: "danger" | "warning";
-}
-
-export interface PerformanceListItem {
-  id: string;
-  medicineName: string;
-  count: number;
-}
-
-export interface DemandColumn {
-  id: string;
-  title: string;
-  subtitle: string;
-  highlight: string;
-  confidenceRate: string;
-  suggestions: string[];
-}
-
-export interface AnalysisInventoryViewModel {
-  slowMedicines: {
-    rows: Array<{
-      id: string;
-      name: string;
-      notSaleFromDays: number;
-    }>;
+export interface SlowMedResponse {
+  days: number;
+  period: {
+    fromDate: string;
+    toDate: string;
   };
-  expiryMedicines: {
-    rows: Array<{
-      id: string;
-      name: string;
-      remainQty: number;
-      status: string;
-      expiryDate: string;
-      lossValue: number;
-      supplier: string;
-    }>;
+  total: number;
+  items: Array<{
+    pharmacyDrugId: string;
+    drugName: string;
+    timeSinceLastSale: number;
+  }>;
+}
+
+export interface PerformanceMedResponse {
+  days: number;
+  period: {
+    fromDate: string;
+    toDate: string;
   };
-  PeformanceMedicines: {
-    bestSelling: PerformanceListItem[];
-    lowSelling: PerformanceListItem[];
+  topSelling: Array<{
+    pharmacyDrugId: number;
+    drugName: string;
+    soldFullBoxes: number;
+    soldRemainingUnits: number;
+  }>;
+  leastSelling: Array<{
+    pharmacyDrugId: number;
+    drugName: string;
+    soldFullBoxes: number;
+    soldRemainingUnits: number;
+  }>;
+}
+
+export interface RotationResponse {
+  days: number;
+  period: {
+    fromDate: string;
+    toDate: string;
   };
-  rotation: {
-    bars: Array<{
-      id: string;
-      title: RotationTitle;
-      invoicesNumber: number;
-    }>;
-    totalValue: {
-      value: string;
-      note: string;
-    };
-    remainMedAvg: {
-      value: string;
-      note: string;
-    };
+  totalValue: {
+    value: string;
+    note: string;
   };
+  items: Array<{
+    type: "SALE" | "RETURN" | "DAMAGE" | "SUPPLIER";
+    count: number;
+  }>;
+}
+
+export interface SalesTrendResponse {
+  level: "DAY" | "WEEK" | "MONTH" | "YEAR";
+  bucketLevel: "DAY";
+  period: {
+    fromDate: string;
+    toDate: string;
+    fromDateKey: number;
+    toDateKey: number;
+  };
+  items: Array<{
+    key: string;
+    label: string;
+    referenceDate: string;
+    fromDate: string;
+    toDate: string;
+    grossSalesAmount: number;
+  }>;
+}
+
+export interface SalesSummaryResponse {
+  period: {
+    fromDate: string;
+    toDate: string;
+  };
+  grossSalesAmount: number;
+  netSalesAmount: number;
+  saleInvoiceCount: number;
 }

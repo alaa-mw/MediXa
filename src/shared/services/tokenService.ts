@@ -7,6 +7,7 @@ class TokenService {
   private static readonly ACCESS_TOKEN_KEY = 'accessToken';
   private static readonly REFRESH_TOKEN_KEY = 'refreshToken';
   private static readonly USER_ROLE_KEY = 'userRole';
+  private static readonly PHARMACY_ID_KEY = 'pharmacyId';
 
   static setTokens(tokens: Tokens): void {
     try {
@@ -37,6 +38,14 @@ class TokenService {
 
   static getUserRole(): string | null {
     return localStorage.getItem(this.USER_ROLE_KEY);
+  }
+
+  static setPharmacyId(pharmacyId: string): void {
+    localStorage.setItem(this.PHARMACY_ID_KEY, pharmacyId);
+  }
+
+  static getPharmacyId(): string | null {
+    return localStorage.getItem(this.PHARMACY_ID_KEY);
   }
 }
 

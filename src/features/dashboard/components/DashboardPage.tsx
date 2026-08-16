@@ -1,35 +1,74 @@
-import React from "react";
 import { Box, Stack, Typography } from "@mui/material";
-import DashboardAlertsSection from "./sections/DashboardAlertsSection";
-import DashboardTopSection from "./sections/DashboardTopSection";
+import React, { useEffect } from "react";
+import useGetWithParams from "../../../shared/hooks/useGetWithParams";
 import type {
   DailyWindowActivityItem,
-  IncomingAlert,
-  OperationLog,
-  StatCardData,
+  DailyWindowAlertItem,
+  DailyWindowCardsData,
 } from "../types/dashboard.types";
-import useGetWithParams from "../../../shared/hooks/useGetWithParams";
+import { organizeCardResponse } from "../utils/organizeCardResponse";
 import DashboardActivitySection from "./sections/DashboardActivitySection";
+import DashboardAlertsSection from "./sections/DashboardAlertsSection";
+import DashboardCalendarCard from "./sections/DashboardCalendarCard";
+import DashboardStatCard from "./sections/DashboardStatCard";
+import TokenService from "../../../shared/services/tokenService";
 
 const DashboardPage = () => {
+  const todayDate = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
+  const [today, setToday] = React.useState(todayDate);
+  const pharmacyId = TokenService.getPharmacyId() || ""; // Replace with your actual pharmacy ID retrieval logic
+
   const { data: statCards, setQueryParams: setStatCardsQueryParams } =
-    useGetWithParams(`/daily-window/cards`, {
+    useGetWithParams<DailyWindowCardsData>(`/daily-window/cards`, {
+      pharmacy_id: pharmacyId,
       date: today,
     });
+
+  const organizedStatCards = statCards
+    ? organizeCardResponse(statCards.data)
+    : [];
+
   const { data: incomingAlerts, setQueryParams: setIncomingAlertsQueryParams } =
-    useGetWithParams(`/daily-window/alerts`, {
-      page: "",
-      limit: "",
-    });
-  const { data: activities, setQueryParams: setActivitiesQueryParams } =
-    useGetWithParams<DailyWindowActivityItem[]>(`/daily-window/activities`, {
+    useGetWithParams<DailyWindowAlertItem[]>(`/daily-window/alerts`, {
+      pharmacy_id: pharmacyId,
       page: "",
       limit: "",
     });
 
-  const handleViewAllOperations = () => {
-    // Reserved for future navigation to a full operations history page.
+  const { data: activities, setQueryParams: setActivitiesQueryParams } =
+    useGetWithParams<DailyWindowActivityItem[]>(`/daily-window/activities`, {
+      pharmacy_id: pharmacyId,
+      date: today,
+      page: "",
+      limit: "",
+    });
+
+  const handleViewNextActivities = (nextPage: number) => {
+    setActivitiesQueryParams((prev) => ({
+      ...prev,
+      page: nextPage.toString(),
+    }));
   };
+  // Reserved for future navigation to a full operations history page.
+
+  useEffect(() => {
+    // recall all
+    setStatCardsQueryParams({
+      pharmacy_id: pharmacyId,
+      date: today,
+    });
+    setActivitiesQueryParams({
+      pharmacy_id: pharmacyId,
+      date: today,
+      page: "",
+      limit: "",
+    });
+    setIncomingAlertsQueryParams({
+      pharmacy_id: pharmacyId,
+      page: "",
+      limit: "",
+    });
+  }, [today]);
 
   return (
     <Box
@@ -43,7 +82,23 @@ const DashboardPage = () => {
         <Typography variant="h5" sx={{ fontWeight: 700 }}>
           النافذة اليومية{" "}
         </Typography>
-        <DashboardTopSection statCards={statCards} />
+        {/* top section */}
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: {
+              xs: "1fr",
+              md: "repeat(4, 1fr) 1.84fr",
+            },
+            gap: 2,
+          }}
+        >
+          {organizedStatCards.map((item, index) => (
+            <DashboardStatCard key={index} item={item} />
+          ))}
+
+          <DashboardCalendarCard today={today} setToday={setToday} />
+        </Box>
 
         <Box
           sx={{
@@ -53,10 +108,13 @@ const DashboardPage = () => {
           }}
         >
           <DashboardActivitySection
-            activities={activities}
-            onViewAll={handleViewAllOperations}
+            activities={{
+              data: activities?.data || [],
+              meta: activities?.meta,
+            }}
+            onViewAll={handleViewNextActivities}
           />
-          <DashboardAlertsSection alerts={incomingAlerts} />
+          <DashboardAlertsSection alerts={incomingAlerts?.data || []} />
         </Box>
       </Stack>
     </Box>

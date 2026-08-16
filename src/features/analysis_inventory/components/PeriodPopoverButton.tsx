@@ -24,8 +24,8 @@ type PeriodPopoverButtonProps = {
 const PeriodPopoverButton = ({
   value,
   onChange,
-  min = 7,
-  max = 90,
+  min = 1,
+  max = 365,
   label = "أيام",
   buttonProps,
 }: PeriodPopoverButtonProps) => {

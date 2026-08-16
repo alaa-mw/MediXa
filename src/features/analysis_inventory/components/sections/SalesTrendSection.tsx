@@ -1,18 +1,21 @@
 import { Box } from "@mui/material";
+import { useState } from "react";
 import SalesSummaryCard from "./SalesSummaryCard";
-import SalesTrendChartCard from "./SalesTrendChartCard";
+import SalesTrendChartCard, { type TrendMode } from "./SalesTrendChartCard";
 
-type TrendMode = "yearly" | "monthly" | "weekly";
-
-type SalesTrendSectionProps = {
-  onSelectionChange?: (selection: {
-    mode: TrendMode;
-    year: string;
-    month: string;
-  }) => void;
+const formatDateOnly = (date: Date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 };
 
-const SalesTrendSection = ({ onSelectionChange }: SalesTrendSectionProps) => {
+const SalesTrendSection = () => {
+  const [trendMode, setTrendMode] = useState<TrendMode>("WEEK");
+  const [selectedDate, setSelectedDate] = useState(() =>
+    formatDateOnly(new Date()),
+  );
+
   return (
     <Box
       sx={{
@@ -21,8 +24,13 @@ const SalesTrendSection = ({ onSelectionChange }: SalesTrendSectionProps) => {
         gap: 2,
       }}
     >
-      <SalesSummaryCard value="4,520 ر.س" growthLabel="+12%" />
-      <SalesTrendChartCard onSelectionChange={onSelectionChange} />
+      <SalesSummaryCard mode={trendMode} selectedDate={selectedDate} />
+      <SalesTrendChartCard
+        mode={trendMode}
+        selectedDate={selectedDate}
+        onModeChange={setTrendMode}
+        onDateChange={setSelectedDate}
+      />
     </Box>
   );
 };

@@ -126,11 +126,10 @@ function App() {
           >
             <Route path={"/pharmacy_owner"} element={<DashboardTemplate />}>
               <Route path="*" element={<div>later</div>} />
-              <Route index element={<div>hello</div>} />
+              <Route index element={<Navigate to="dashboard" replace />} />
 
-              <Route path="dashboard" element={<div>dashboard</div>} />
-
-              <Route path="reports" element={<div>reports</div>} />
+              <Route path="dashboard" element={<DashboardPage />} />
+              <Route path="reports" element={<AnalysisInventoryPage />} />
 
               {/* <Route
                 path="subscription"
@@ -256,9 +255,6 @@ function App() {
                   path="sales-details/:invoiceId/create-return"
                   element={<CreateReturnInvoicePage />}
                 />
-                {/* tests reports */}
-                <Route path="r1" element={<DashboardPage />} />
-                <Route path="r2" element={<AnalysisInventoryPage />} />
               </Route>
             ))}
           </Route>

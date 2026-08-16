@@ -1,10 +1,30 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
+import type { Dispatch, SetStateAction } from "react";
 import { Box, IconButton, Paper, Typography } from "@mui/material";
 
 const weekDays = ["Sun", "Mon", "Tue", "Wen", "Thr", "Fri", "Sat"];
 
 type DashboardCalendarCardProps = {
-  onDateChange?: (date: Date) => void;
+  today: string;
+  setToday: Dispatch<SetStateAction<string>>;
+};
+
+const toDateOnlyString = (date: Date): string => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+const parseDateOnlyString = (value: string): Date => {
+  const parsed = new Date(`${value}T00:00:00`);
+  if (Number.isNaN(parsed.getTime())) {
+    const fallback = new Date();
+    fallback.setHours(0, 0, 0, 0);
+    return fallback;
+  }
+  parsed.setHours(0, 0, 0, 0);
+  return parsed;
 };
 
 const getStartOfWeek = (date: Date) => {
@@ -20,13 +40,10 @@ const isSameDay = (a: Date, b: Date) =>
   a.getDate() === b.getDate();
 
 const DashboardCalendarCard = ({
-  onDateChange,
+  today,
+  setToday,
 }: DashboardCalendarCardProps) => {
-  const [selectedDate, setSelectedDate] = useState(() => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    return today;
-  });
+  const selectedDate = useMemo(() => parseDateOnlyString(today), [today]);
 
   const weekDates = useMemo(() => {
     const start = getStartOfWeek(selectedDate);
@@ -43,13 +60,13 @@ const DashboardCalendarCard = ({
   }).format(selectedDate);
 
   const handleDaySelect = (date: Date) => {
-    setSelectedDate(date);
-    onDateChange?.(date);
+    setToday(toDateOnlyString(date));
   };
 
-  const handleMonthShift = (months: number) => {// Shift the selected date by the specified number of months
-    const nextDate = new Date(selectedDate); 
-    nextDate.setMonth(selectedDate.getMonth() + months);  
+  const handleMonthShift = (months: number) => {
+    // Shift the selected date by the specified number of months.
+    const nextDate = new Date(selectedDate);
+    nextDate.setMonth(selectedDate.getMonth() + months);
     handleDaySelect(nextDate);
   };
 
