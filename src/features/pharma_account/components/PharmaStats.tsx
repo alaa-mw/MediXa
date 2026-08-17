@@ -34,7 +34,7 @@ const PharmaStatsCards = ({
       {/* الكارد الثاني: الاشتراكات النشطة (بظل أخضر خفيف) */}
       <StatsCard
         title="الاشتراكات النشطة"
-        value={numberOfActiveSubscriptions}
+        value="5"
         shadowColor="rgba(99, 235, 151, 0.15)"
         bgColor="#cdffd9"
       />

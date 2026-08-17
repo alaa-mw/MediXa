@@ -26,6 +26,11 @@ export const sideBarLabels: Record<
       icon: BarChartIcon,
     },
     {
+      title: "نشرة الأسعار",
+      path: "/price-list",
+      icon: PaymentsIcon,
+    },
+    {
       title: "اشتراكي",
       path: "/subscription-schedule",
       icon: PaymentsIcon,
@@ -73,10 +78,12 @@ export const sideBarLabels: Record<
       icon: SearchIcon,
     },
     {
-      title: "الدعم الفني",
-      path: "/support",
-      icon: SupportAgentIcon,
+      title: "نشرة الأسعار",
+      path: "/price-list",
+      icon: PaymentsIcon,
     },
+
+
     {
       title: "المساعد الذكي",
       path: "/ai-assistant",
@@ -105,12 +112,7 @@ export const sideBarLabels: Record<
       icon: Inventory2Icon,
     },
     {
-      title: "الدعم الفني",
-      path: "/support",
-      icon: SupportAgentIcon,
-    },
-    {
-      title: "المالية",
+      title: "إدارة العروض",
       path: "/Create_offer",
       icon: SupportAgentIcon,
     },

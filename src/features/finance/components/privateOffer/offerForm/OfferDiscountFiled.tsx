@@ -6,6 +6,7 @@ import {
   type SxProps,
   type TextFieldProps,
   type Theme,
+  type SelectProps,
 } from "@mui/material";
 import { DiscountTypes } from "../../../types/discountTypes";
 import FormTextField from "../../FormTextField";
@@ -39,13 +40,24 @@ const OfferDiscountFields = ({ control, isValueField }: Props) => {
     <Controller
       name="discountType"
       control={control}
-      // ✅ استخراج fieldState لقراءة الخطأ
       render={({ field, fieldState }) => (
         <FormSelect
           label="نوع الخصم"
           options={DiscountTypes}
           {...field}
-          // ✅ تمرير الخصائص للـ TextField الداخلي
+          value={field.value ?? ""}
+          onChange={(event) => field.onChange(event.target.value)}
+          displayEmpty
+          SelectProps={{
+            displayEmpty: true,
+            renderValue: (selected: unknown) => {
+              if (!selected) return "اختر نوع الخصم";
+              const option = DiscountTypes.find(
+                (item) => item.value === selected,
+              );
+              return option?.label ?? "اختر نوع الخصم";
+            },
+          }}
           error={!!fieldState.error}
           helperText={fieldState.error?.message}
         />
@@ -63,7 +75,10 @@ interface Option {
 
 interface TProps extends Omit<TextFieldProps, "select"> {
   options: Option[];
+  displayEmpty?: boolean;
+  SelectProps?: SelectProps;
 }
+
 const FormSelect = ({ options, sx, ...props }: TProps) => {
   return (
     <TextField
@@ -71,23 +86,35 @@ const FormSelect = ({ options, sx, ...props }: TProps) => {
       fullWidth
       size="small"
       {...props}
-      // 🛠️ التعديل هنا: تمرير الـ sx كمصفوفة يحل مشكلة الـ Type نهائياً ويمنع تداخل الستايلات المشتركة
       sx={
         [
           ...(Array.isArray(textfieldStyle)
             ? textfieldStyle
             : [textfieldStyle]),
           {
-            // إصلاح أيقونة السهم الداخلي للـ Select
             "& .MuiSelect-icon": {
               right: "auto !important",
               left: "12px !important",
+              color: "gray",
             },
-            // تعديل الـ padding لحجم الخط والنص الداخلي
+            // إرجاع الـ input لوضعه الطبيعي بدون padding زائد
             "& .MuiOutlinedInput-input": {
               paddingLeft: "10px !important",
               paddingRight: "14px !important",
-              textAlign: "right",
+              textAlign: "center",
+            },
+            // توسيط النص الافتراضي (Placeholder / Empty value) عمودياً في المنتصف
+            "& .MuiSelect-select": {
+              display: "flex",
+              alignItems: "center",
+              height: "100%",
+            },
+
+            "& .MuiInputLabel-root": {
+              transform: "translate(2px, 10px) scale(1)",
+              "&.MuiInputLabel-shrink": {
+                transform: "translate(4px, -9px) scale(0.75)",
+              },
             },
           },
           ...(Array.isArray(sx) ? sx : sx ? [sx] : []),

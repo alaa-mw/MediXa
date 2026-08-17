@@ -61,25 +61,41 @@ const OffersDialog: React.FC<OffersDialogProps> = ({
                       mb: 1,
                     }}
                   >
-                    <Typography
-                      variant="h6"
-                      sx={{ color: "primary.main", fontWeight: "bold" }}
-                    >
-                      {item.title} {/* الوصول المباشر للعنوان */}
-                    </Typography>
-                    <Chip
-                      label={`${item.pricing.discountValue}% خصم`}
-                      color="error"
-                      size="small"
-                    />
+                    <Stack direction={"column"}>
+                      <Typography
+                        variant="h6"
+                        sx={{ color: "primary.main", fontWeight: "bold" }}
+                      >
+                        {item.title} {/* الوصول المباشر للعنوان */}
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{ mb: 2, color: "text.secondary" }}
+                      >
+                        {item.description} {/* الوصول المباشر للوصف */}
+                      </Typography>
+                    </Stack>
+                    <Stack direction={"row"} sx={{ justifyItems: "center" }}>
+                      <Chip
+                        label={item.plan.type}
+                        size="small"
+                        sx={{ bgcolor: "success.light", ml: 1 }}
+                      />
+                      {item.pricing.discountType == "FIXED_AMOUNT" ? (
+                        <Chip
+                          label={`$${item.pricing.discountValue} خصم  `}
+                          color="error"
+                          size="small"
+                        />
+                      ) : (
+                        <Chip
+                          label={`${item.pricing.discountValue}% خصم`}
+                          color="error"
+                          size="small"
+                        />
+                      )}
+                    </Stack>
                   </Box>
-
-                  <Typography
-                    variant="body2"
-                    sx={{ mb: 2, color: "text.secondary" }}
-                  >
-                    {item.description} {/* الوصول المباشر للوصف */}
-                  </Typography>
 
                   <Box
                     sx={{
@@ -115,7 +131,7 @@ const OffersDialog: React.FC<OffersDialogProps> = ({
                       </Typography>
                       <Typography
                         variant="body1"
-                        sx={{ fontWeight: "bold", color: "success.main" }}
+                        sx={{ fontWeight: "bold", color: "secondary.main" }}
                       >
                         {item.pricing.finalPrice} {item.pricing.currency}
                       </Typography>

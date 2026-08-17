@@ -111,7 +111,7 @@ export const CreatePharmacyAccount = () => {
       },
       onError: (error) => {
         console.log("error: Create Pharmacy", error);
-        showSnackbar("حدث خطأ أثناء إنشاء الحساب", "error");
+        showSnackbar(error.message, "error");
       },
     });
   };

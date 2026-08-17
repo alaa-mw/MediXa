@@ -1,3 +1,79 @@
+// import * as yup from "yup";
+// import type {
+//   DiscountType,
+//   OfferFormModel,
+//   OfferScope,
+// } from "../../../types/offerTypes";
+// import { Box, Stack, Typography } from "@mui/material";
+// import OfferFormCard from "./OfferFormCard";
+
+// const schema: yup.ObjectSchema<OfferFormModel> = yup.object({
+//   code: yup.string().required(),
+//   title: yup.string().required(),
+//   description: yup.string().required(),
+//   discountType: yup
+//     .mixed<DiscountType>()
+//     .oneOf(["PERCENTAGE", "FIXED_AMOUNT"])
+//     .required(),
+//   scope: yup.mixed<OfferScope>().oneOf(["PRIVATE", "PUBLIC"]).required(),
+//   discountValue: yup.number().required(),
+//   startsAt: yup.string().required(),
+//   endsAt: yup.string().required(),
+// });
+
+// interface Props {
+//   isPending: boolean;
+//   onSubmit: (data: OfferFormModel) => void;
+// }
+
+// const OfferForm = ({ isPending, onSubmit }: Props) => {
+//   return (
+//     <Box
+//       sx={{
+//         width: "100%",
+//         display: "flex",
+//         flexDirection: { xs: "column", md: "row" },
+//         justifyContent: "flex-start",
+//         alignItems: "flex-start",
+//         gap: 2,
+//       }}
+//     >
+//       <Stack
+//         sx={{
+//           minWidth: { md: "180px" },
+//           mt: 2,
+//           display: "flex",
+//           justifyContent: "flex-start",
+//           alignItems: "flex-start",
+//         }}
+//       >
+//         <Typography
+//           variant="h6"
+//           sx={{ fontWeight: 700, color: "text.primary", whiteSpace: "nowrap" }}
+//         >
+//           إضافة عرض جديد
+//         </Typography>
+//       </Stack>
+//       <Box
+//         sx={{
+//           flexGrow: 1,
+//           width: "50%",
+//           display: "flex",
+//           p: 0,
+//           mt: 2,
+//         }}
+//       >
+//         <OfferFormCard
+//           isPending={isPending}
+//           onSubmit={onSubmit}
+//           schema={schema}
+//         />
+//       </Box>
+//     </Box>
+//   );
+// };
+
+// export default OfferForm;
 import * as yup from "yup";
 import type {
   DiscountType,
@@ -22,11 +98,11 @@ const schema: yup.ObjectSchema<OfferFormModel> = yup.object({
 });
 
 interface Props {
-  isPending : boolean
+  isPending: boolean;
   onSubmit: (data: OfferFormModel) => void;
 }
 
-const OfferForm = ({isPending, onSubmit }: Props) => {
+const OfferForm = ({ isPending, onSubmit }: Props) => {
   return (
     <Box
       sx={{
@@ -38,13 +114,11 @@ const OfferForm = ({isPending, onSubmit }: Props) => {
         gap: 2,
       }}
     >
-      {/* 2. وضعنا العنوان ثانياً في الكود: ليدفعه المتصفح في نظام الـ RTL إلى أقصى اليمين تماماً موازاةً للعنوان العلوي */}
       <Stack
         sx={{
-          minWidth: { md: "180px" },
-          mt: 2,
-          display: "flex",
-          justifyContent: "flex-start",
+          width: { xs: "100%", md: "200px" },
+          minWidth: { md: "200px" },
+          mt: { xs: 0, md: 2 },
           alignItems: "flex-start",
         }}
       >
@@ -55,17 +129,19 @@ const OfferForm = ({isPending, onSubmit }: Props) => {
           إضافة عرض جديد
         </Typography>
       </Stack>
-      {/* 1. وضعنا الكارد أولاً في الكود: ليتمدد ويأخذ المساحة الكاملة على اليسار بين الخطين الحمرين */}
+
       <Box
         sx={{
           flexGrow: 1,
-          width: "100%",
+          width: { xs: "100%", md: "calc(100% - 216px)" },
           display: "flex",
-          p: 0,
-          mt: 2,
         }}
       >
-        <OfferFormCard isPending={isPending} onSubmit={onSubmit} schema={schema} />
+        <OfferFormCard
+          isPending={isPending}
+          onSubmit={onSubmit}
+          schema={schema}
+        />
       </Box>
     </Box>
   );

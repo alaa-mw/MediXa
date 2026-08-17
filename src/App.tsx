@@ -56,6 +56,7 @@ import { PaymentSuccessPage } from "./features/online_renew_subsrciption/page/Su
 import { PaymentCancelPage } from "./features/online_renew_subsrciption/page/CanclePaymentPage";
 import OwnerRenewSubscriptionPage from "./features/online_renew_subsrciption/page/OwnerPlaneCard";
 import OwnerPharmacySubscriptionSchedule from "./features/online_renew_subsrciption/page/OwnerPharmaSubs";
+import PriceListPage from "./features/pharmacy_price_list/pages/PriceListPage";
 import FloatingAssistantLauncher from "./features/ai_assistant/components/FloatingAssistantLauncher";
 
 function App() {
@@ -241,10 +242,11 @@ function App() {
                 {/* suppliers */}
                 <Route path="suppliers" element={<SuppliersList />} />
                 <Route path="suppliers/add" element={<AddSupplier />} />
-                <Route
+                <Route path="price-list" element={<PriceListPage />} />
+                {/* <Route
                   path="medicine-search"
                   element={<Test />} // Replace <Test /> with the actual component for medicine search
-                />
+                /> */}
                 <Route path="support" element={<div>support</div>} />
                 <Route path="ai-assistant" element={<AssistantPage />} />
                 <Route
