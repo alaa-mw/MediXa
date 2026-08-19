@@ -4,7 +4,6 @@ import { Box } from "@mui/material";
 import { AddMedicineButton } from "./AddMedicineButton";
 import { FilterButton } from "./FilterButton";
 import { SearchBar } from "./SearchBar";
-import { CategoryTabs } from "./inventory/CategoryTabs";
 import SearchBarDynamic from "../../../shared/layout/SearchBarDynamic";
 import BarcodeMyDrugs from "../../../shared/layout/BarcodeMyDrugs";
 
@@ -53,7 +52,6 @@ export const InventoryHeader: React.FC<InventoryHeaderProps> = ({
         <FilterButton />
         <AddMedicineButton onClick={onAddClick} label="إضافة دواء جديد" />
       </Box>
-      <CategoryTabs activeTab={activeTab} onChange={setActiveTab} />
     </Box>
   );
 };

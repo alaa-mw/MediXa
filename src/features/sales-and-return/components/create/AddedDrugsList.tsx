@@ -30,7 +30,8 @@ const TABLE_COLUMNS = "2.2fr 1fr 1.6fr 1.4fr 1.3fr 1.2fr 0.5fr";
 
 export const AddedDrugsList: React.FC = () => {
   const {
-selectors: { items },    actions: {
+    selectors: { items, isCustomerRequest }, 
+    actions: {
       increaseQuantity,
       decreaseQuantity,
       changeUnit,
@@ -72,37 +73,47 @@ selectors: { items },    actions: {
     </Box>
   );
 
-  // تحديد نوع الوحدة
-  const renderUnitSelector = (item: InvoiceItem) => (
-    <Box sx={{ textAlign: "center" }}>
-      <FormControl size="small" fullWidth>
-        <Select
-          value={item.selectedUnit.unitType}
-          onChange={(e) => changeUnit(item.pharmacyDrugId, e.target.value)}
-          sx={{ borderRadius: 2, fontSize: 14, height: 38, bgcolor: "white" }}
-        >
-          {item.availableSaleUnits.map((unit) => {
-            const isOutOfStock = unit.availableDisplayQuantity === 0;
-            return (
-              <MenuItem
-                key={unit.unitType}
-                value={unit.unitType}
-                disabled={isOutOfStock}
-                sx={{
-                  fontSize: 14,
-                  opacity: isOutOfStock ? 0.5 : 1,
-                }}
-              >
-                {unit.label} {isOutOfStock && "(غير متاح)"}
-              </MenuItem>
-            );
-          })}
-        </Select>
-      </FormControl>
-    </Box>
-  );
+  const renderUnitSelector = (item: InvoiceItem) => {
+    if (isCustomerRequest) {
+      return (
+        <Box sx={{ textAlign: "center" }}>
+          <Typography sx={{ fontWeight: 600, fontSize: 14, color: "#334155" }}>
+            {item.selectedUnit.label }
+          </Typography>
+        </Box>
+      );
+    }
 
-  // الكمية المحددة
+    return (
+      <Box sx={{ textAlign: "center" }}>
+        <FormControl size="small" fullWidth>
+          <Select
+            value={item.selectedUnit.unitType}
+            onChange={(e) => changeUnit(item.pharmacyDrugId, e.target.value)}
+            sx={{ borderRadius: 2, fontSize: 14, height: 38, bgcolor: "white" }}
+          >
+            {item.availableSaleUnits.map((unit) => {
+              const isOutOfStock = unit.availableDisplayQuantity === 0;
+              return (
+                <MenuItem
+                  key={unit.unitType}
+                  value={unit.unitType}
+                  disabled={isOutOfStock}
+                  sx={{
+                    fontSize: 14,
+                    opacity: isOutOfStock ? 0.5 : 1,
+                  }}
+                >
+                  {unit.label} {isOutOfStock && "(غير متاح)"}
+                </MenuItem>
+              );
+            })}
+          </Select>
+        </FormControl>
+      </Box>
+    );
+  };
+
   const renderQuantityControl = (item: InvoiceItem) => {
     const hasBatches = Boolean(
       item.batchAllocations && item.batchAllocations.length > 0
@@ -115,7 +126,7 @@ selectors: { items },    actions: {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            justify: "center",
+            justifyContent: "center",
             gap: 0.2,
           }}
         >
@@ -178,10 +189,25 @@ selectors: { items },    actions: {
     );
   };
 
-  // تحديد السعر
-  const renderPricingEditor = (item: InvoiceItem) => (
-    <PricingEditor item={item} changePricingMode={changePricingMode} />
-  );
+  // تحديد السعر (عرض نص فقط في طلب الزبون بدلاً من PricingEditor)
+  const renderPricingEditor = (item: InvoiceItem) => {
+    if (isCustomerRequest) {
+      return (
+        <Typography
+          sx={{
+            textAlign: "center",
+            fontWeight: 700,
+            fontSize: 14,
+            color: "#1E293B",
+          }}
+        >
+          {item.effectiveUnitPrice.toLocaleString()}
+        </Typography>
+      );
+    }
+
+    return <PricingEditor item={item} changePricingMode={changePricingMode} />;
+  };
 
   // الإجمالي للدواء الواحد
   const renderSubtotal = (item: InvoiceItem) => (
@@ -197,43 +223,52 @@ selectors: { items },    actions: {
     </Typography>
   );
 
-  // تحديد الكمية من دفعات معينة
-  const renderBatchButton = (item: InvoiceItem) => {
-    const hasBatches = Boolean(item.batchAllocations?.length);
-    return (
-      <Box sx={{ textAlign: "center" }}>
-        <Button
-          size="small"
-          variant={hasBatches ? "contained" : "outlined"}
-          color={hasBatches ? "success" : "primary"}
-          onClick={() => setSelectedItemForBatch(item)}
-          sx={{
-            fontSize: 12,
-            py: 0.5,
-            px: 1.5,
-            borderRadius: 1.5,
-            fontWeight: 600,
-          }}
-        >
-          {item.batchAllocations?.length
-            ? `محدد (${item.batchAllocations.length})`
-            : "تخصيص"}
-        </Button>
-      </Box>
-    );
-  };
+  // زر تحديد الدفعات (معطل في طلب الزبون)
+const renderBatchButton = (item: InvoiceItem) => {
+  const hasBatches = Boolean(item.batchAllocations?.length);
+  return (
+    <Box sx={{ textAlign: "center" }}>
+      <Button
+        size="small"
+        disabled={isCustomerRequest}
+        variant={hasBatches ? "contained" : "outlined"}
+        color="secondary"
+        onClick={() => setSelectedItemForBatch(item)}
+        sx={{
+          fontSize: 12,
+          py: 0.5,
+          px: 1.5,
+          borderRadius: 1.5,
+          fontWeight: 600,
+          bgcolor: hasBatches ? "secondary.light" : undefined,
+          "&:hover": {
+            bgcolor: hasBatches ? "secondary.main" : undefined,
+          },
+        }}
+      >
+        {item.batchAllocations?.length
+          ? `محدد (${item.batchAllocations.length})`
+          : "تخصيص"}
+      </Button>
+    </Box>
+  );
+};
 
+  // زر الإزالة (معطل في طلب الزبون)
   const renderDeleteButton = (item: InvoiceItem) => (
     <Box sx={{ textAlign: "center" }}>
-      <Tooltip title="إزالة من الفاتورة">
-        <IconButton
-          size="small"
-          color="error"
-          onClick={() => removeDrug(item.pharmacyDrugId)}
-          sx={{ bgcolor: "#FEF2F2" }}
-        >
-          <DeleteOutlined fontSize="small" />
-        </IconButton>
+      <Tooltip title={ "إزالة من الفاتورة"}>
+        <span>
+          <IconButton
+            size="small"
+            color="error"
+            // disabled={isCustomerRequest}
+            onClick={() => removeDrug(item.pharmacyDrugId)}
+            sx={{ bgcolor: "#FEF2F2" }}
+          >
+            <DeleteOutlined fontSize="small" />
+          </IconButton>
+        </span>
       </Tooltip>
     </Box>
   );
@@ -330,7 +365,7 @@ selectors: { items },    actions: {
         ))}
 
         {/* Modals */}
-        {selectedItemForBatch && (
+        {selectedItemForBatch && !isCustomerRequest && (
           <BatchSelectionModal
             open={Boolean(selectedItemForBatch)}
             item={selectedItemForBatch}

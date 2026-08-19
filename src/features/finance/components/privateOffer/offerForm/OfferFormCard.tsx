@@ -18,24 +18,33 @@ import { Check } from "@mui/icons-material";
 
 interface Props {
   isPending: boolean;
-  onSubmit: (data: OfferFormModel) => void;
+  onSubmit: (data: OfferFormModel) => boolean | Promise<boolean> | void;
   schema: OfferFormModel | any;
 }
 
 const OfferFormCard = ({ isPending, onSubmit, schema }: Props) => {
-  const { control, handleSubmit } = useForm<OfferFormModel>({
+  const defaultValues: OfferFormModel = {
+    code: "",
+    title: "",
+    description: "",
+    discountType: "",
+    scope: "PRIVATE",
+    discountValue: "" as any,
+    startsAt: "",
+    endsAt: "",
+  };
+
+  const { control, handleSubmit, reset } = useForm<OfferFormModel>({
     resolver: yupResolver(schema),
-    defaultValues: {
-      code: "",
-      title: "",
-      description: "",
-      discountType: "FIXED_AMOUNT",
-      scope: "PRIVATE",
-      discountValue: "" as any,
-      startsAt: "",
-      endsAt: "",
-    },
+    defaultValues,
   });
+
+  const handleFormSubmit = async (data: OfferFormModel) => {
+    const isSuccess = await onSubmit(data);
+    if (isSuccess !== false) {
+      reset(defaultValues);
+    }
+  };
 
   return (
     <Card
@@ -70,9 +79,8 @@ const OfferFormCard = ({ isPending, onSubmit, schema }: Props) => {
               onChange={(_, value) => value && field.onChange(value)}
               size="small"
               sx={{
-                gap: 2, // المسافة بين الزرين ليفصل كل زر عن الآخر تماماً وتظهر حوافهما سليمة
+                gap: 2,
                 display: "flex",
-                // إجبار كل زر على الاحتفاظ بحواف دائرية مستقلة ومظهر Outlined منفصل
                 "& .MuiToggleButtonGroup-grouped": {
                   borderRadius: "10px !important5",
                   border: "1.5px solid #9d7ea6 !important",
@@ -85,7 +93,7 @@ const OfferFormCard = ({ isPending, onSubmit, schema }: Props) => {
                 value="PUBLIC"
                 sx={{
                   px: 3,
-                  py: 0.6, // ارتفاع أقل للزر
+                  py: 0.6,
                   fontWeight: 600,
                   fontSize: "0.95rem",
                   textTransform: "none",
@@ -189,7 +197,7 @@ const OfferFormCard = ({ isPending, onSubmit, schema }: Props) => {
       <PrimaryButton
         sx={{ mt: 4 }}
         disabled={isPending}
-        onClick={handleSubmit(onSubmit)}
+        onClick={handleSubmit(handleFormSubmit)}
       >
         {isPending ? "جاري الإضافة..." : "إضافة العرض"}
       </PrimaryButton>

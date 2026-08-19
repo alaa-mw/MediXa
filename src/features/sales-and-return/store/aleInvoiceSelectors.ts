@@ -9,6 +9,9 @@ export const selectSaleInvoiceDiscount = (state: RootState) => state.saleInvoice
 
 export const selectSaleInvoicePaymentStatus = (state: RootState) => state.saleInvoice.paymentStatus;
 
+export const selectCheckoutMode = (state: RootState) => state.saleInvoice.checkoutMode;
+
+
 
 export const selectItemsWithSubtotal = createSelector(
   [selectSaleInvoiceItems],
@@ -45,4 +48,9 @@ export const selectShouldShowPatientCard = createSelector(
   [selectRequiresPrescriptionAny, selectSaleInvoicePaymentStatus],
   (requiresPrescription, status) =>
     requiresPrescription || status === "PENDING" || status === "PARTIAL"
+);
+
+export const selectIsCustomerRequest = createSelector(
+  [selectCheckoutMode],
+  (mode) => mode === "CUSTOMER_REQUEST"
 );

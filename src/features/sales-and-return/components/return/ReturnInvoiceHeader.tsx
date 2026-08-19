@@ -54,36 +54,12 @@ export const ReturnInvoiceHeader: React.FC<ReturnInvoiceHeaderProps> = ({
     }
   };
 
-  // احتساب الفلاتر الفعالة للمرتجعات (بدون الـ IDs)
   const activeFiltersCount = useMemo(() => {
     let count = 0;
-    if (rawFilters.invoiceStatus && rawFilters.invoiceStatus !== "ALL") count++;
-    if (rawFilters.unitType) count++;
-    if (rawFilters.returnReason) count++;
-    if (rawFilters.restockToInventory !== "") count++;
     if (rawFilters.fromDate || rawFilters.toDate) count++;
     if (rawFilters.minRefund || rawFilters.maxRefund) count++;
     return count;
   }, [rawFilters]);
-
-  // القواميس النصية للـ Chips المترجمة للمرتجعات
-//   const statusLabels: Record<string, string> = {
-//     DRAFT: "مسودة",
-//     POSTED: "مثبتة",
-//     CANCELLED: "ملغاة",
-//   };
-  
-  const unitLabels: Record<string, string> = {
-    BOX: "علبة",
-    STRIP: "ظرف",
-    TABLET: "حبة",
-  };
-
-  const reasonLabels: Record<string, string> = {
-    CUSTOMER_CHANGED_MIND: "تغيير رأي الزبون",
-    EXPIRED_DISCARD: "منتهي / إتلاف",
-    DAMAGED_GOODS: "بضاعة تالفة",
-  };
 
   // نفس الستايل المهيب والأنيق المعتمد لديكِ
   const premiumChipStyles: SxProps<Theme> = {
@@ -161,10 +137,8 @@ export const ReturnInvoiceHeader: React.FC<ReturnInvoiceHeaderProps> = ({
           rawFilters={rawFilters}
           onApplyFilters={onApplyFilters}
         />
-
       </Box>
 
-      {/* قسم الـ Chips الحية للمرتجعات */}
       {activeFiltersCount > 0 && (
         <Box
           sx={{
@@ -173,46 +147,6 @@ export const ReturnInvoiceHeader: React.FC<ReturnInvoiceHeaderProps> = ({
             flexWrap: "wrap",
           }}
         >
-          {/* Chip حالة الفاتورة */}
-          {/* {rawFilters.invoiceStatus && rawFilters.invoiceStatus !== "ALL" && (
-            <Chip
-              label={`الحالة: ${statusLabels[rawFilters.invoiceStatus] || rawFilters.invoiceStatus}`}
-              onDelete={() => handleRemoveSingleFilter("invoiceStatus")}
-              deleteIcon={<CloseIcon />}
-              sx={premiumChipStyles}
-            />
-          )} */}
-
-          {/* Chip نوع الوحدة */}
-          {rawFilters.unitType && (
-            <Chip
-              label={`الوحدة: ${unitLabels[rawFilters.unitType] || rawFilters.unitType}`}
-              onDelete={() => handleRemoveSingleFilter("unitType")}
-              deleteIcon={<CloseIcon />}
-              sx={premiumChipStyles}
-            />
-          )}
-
-          {/* Chip سبب المرتجع */}
-          {rawFilters.returnReason && (
-            <Chip
-              label={`السبب: ${reasonLabels[rawFilters.returnReason] || rawFilters.returnReason}`}
-              onDelete={() => handleRemoveSingleFilter("returnReason")}
-              deleteIcon={<CloseIcon />}
-              sx={premiumChipStyles}
-            />
-          )}
-
-          {/* Chip إعادة التذخير للمخزن */}
-          {rawFilters.restockToInventory !== "" && (
-            <Chip
-              label={`إعادة للمخزن: ${rawFilters.restockToInventory === "true" ? "نعم" : "لا"}`}
-              onDelete={() => handleRemoveSingleFilter("restockToInventory")}
-              deleteIcon={<CloseIcon />}
-              sx={premiumChipStyles}
-            />
-          )}
-
           {/* Chip المدى الزمني */}
           {(rawFilters.fromDate || rawFilters.toDate) && (
             <Chip

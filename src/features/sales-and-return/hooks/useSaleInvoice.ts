@@ -1,15 +1,14 @@
 
+
 import { useAppDispatch, useAppSelector } from "../../../shared/store/hooks";
 import { useCreateSaleInvoice } from "./useSaleInvoiceApi";
 import { useIdempotency } from "../../../shared/hooks/useIdempotency";
 import type { 
   BatchAllocation, 
   PatientInfo, 
- 
 } from "../types/saleInvoiceCreate";
 
 // Selectors
-
 
 // Actions & Thunks
 import { 
@@ -29,19 +28,25 @@ import {
   updatePatientInfo 
 } from "../store/createSaleInvoiceSlice";
 import { fetchAndAddDrug } from "../store/createSaleInvoiceThunks";
-import { mapSaleInvoiceStateToRequest } from "../utils/saleInvoiceMapper";
-import { selectItemsWithSubtotal, selectNetTotal, selectRequiresPrescriptionAny, selectSaleInvoiceState, selectShouldShowPatientCard, selectSubTotal } from "../store/aleInvoiceSelectors";
+import { selectCheckoutMode, selectIsCustomerRequest, selectItemsWithSubtotal, selectNetTotal, selectRequiresPrescriptionAny, selectSaleInvoiceState, selectShouldShowPatientCard, selectSubTotal } from "../store/aleInvoiceSelectors";
 import type { PaymentStatus, PricingMode, SaleType } from "../types/enums";
+import { useCheckoutCustomerRequest } from "./useCustomerRequestApi";
+import { mapCustomerRequestStateToCheckoutPayload } from "../utils/customerRequestMapper";
+import { mapSaleInvoiceStateToRequest } from "../utils/saleInvoiceMapper";
+import { useQueryClient } from "@tanstack/react-query";
 
 // Mapper
 
 export const useSaleInvoice = () => {
   const dispatch = useAppDispatch();
-  const { getKey } = useIdempotency();
+  const queryClient = useQueryClient();
+  const { getKey, clearKey } = useIdempotency();
   const createInvoiceMutation = useCreateSaleInvoice();
 
   // State
   const rawState = useAppSelector(selectSaleInvoiceState);
+
+  const checkoutCustomerRequestMutation = useCheckoutCustomerRequest(rawState.customerRequestId);
 
   // Selectors for UI
   const items = useAppSelector(selectItemsWithSubtotal);
@@ -49,27 +54,44 @@ export const useSaleInvoice = () => {
   const netTotal = useAppSelector(selectNetTotal);
   const requiresPrescriptionAny = useAppSelector(selectRequiresPrescriptionAny);
   const shouldShowPatientCard = useAppSelector(selectShouldShowPatientCard);
+  const checkoutMode = useAppSelector(selectCheckoutMode);
+  const isCustomerRequest = useAppSelector(selectIsCustomerRequest);
 
   // Submit Process
   const submitInvoice = (options?: {
     onSuccess?: (data: any) => void;
     onError?: (err: any) => void;
   }) => {
-    const requestPayload = mapSaleInvoiceStateToRequest(
-      rawState,
-      getKey(),
-      shouldShowPatientCard
-    );
+    const handleSuccess = (data: any) => {
+      dispatch(clearInvoice());
+      clearKey();
+      queryClient.invalidateQueries({ queryKey: ["/customer-request"] });
+      if (options?.onSuccess) options.onSuccess(data);
+    };
 
-    createInvoiceMutation.mutate(requestPayload, {
-      onSuccess: (data) => {
-        dispatch(clearInvoice());
-        if (options?.onSuccess) options.onSuccess(data);
-      },
-      onError: (err) => {
-        if (options?.onError) options.onError(err);
-      },
-    });
+    const handleError = (err: any) => {
+      if (options?.onError) options.onError(err);
+    };
+
+    if (rawState.checkoutMode === "CUSTOMER_REQUEST") {
+      const payload = mapCustomerRequestStateToCheckoutPayload(rawState, getKey());
+
+      checkoutCustomerRequestMutation.mutate(payload, {
+        onSuccess: handleSuccess,
+        onError: handleError,
+      });
+    } else {
+      const requestPayload = mapSaleInvoiceStateToRequest(
+        rawState,
+        getKey(),
+        shouldShowPatientCard
+      );
+
+      createInvoiceMutation.mutate(requestPayload, {
+        onSuccess: handleSuccess,
+        onError: handleError,
+      });
+    }
   };
 
   // Grouped Actions
@@ -93,7 +115,10 @@ export const useSaleInvoice = () => {
     changePaidAmount: (amount: number) => dispatch(setPaidAmount(amount)),
     changeNotes: (notes: string) => dispatch(setNotes(notes)),
     updatePatientInfo: (info: Partial<PatientInfo>) => dispatch(updatePatientInfo(info)),
-    clearInvoice: () => dispatch(clearInvoice()),
+    clearInvoice: () => {
+      dispatch(clearInvoice());
+      clearKey(); 
+    },
     submitInvoice,
   };
 
@@ -101,11 +126,13 @@ export const useSaleInvoice = () => {
     state: rawState,
     selectors: {
       items,
+      checkoutMode,
+      isCustomerRequest,
       subTotal,
       netTotal,
       requiresPrescriptionAny,
       shouldShowPatientCard,
-      isSubmitting: createInvoiceMutation.isPending,
+      isSubmitting: createInvoiceMutation.isPending || checkoutCustomerRequestMutation.isPending,
     },
     actions,
   };

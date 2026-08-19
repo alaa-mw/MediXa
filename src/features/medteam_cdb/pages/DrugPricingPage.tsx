@@ -512,13 +512,13 @@ const DrugPricingPage = () => {
         </Box>
       )}
 
-      {isSuccess && savedPayload && (
+      {/* {isSuccess && savedPayload && (
         <Box sx={{ mt: 2 }}>
           <Typography sx={{ color: "#15803d", fontWeight: 600 }}>
             تم حفظ قائمة الأسعار بنجاح
           </Typography>
         </Box>
-      )}
+      )} */}
     </Box>
   );
 };

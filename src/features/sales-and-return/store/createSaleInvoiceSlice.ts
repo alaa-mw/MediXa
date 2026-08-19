@@ -1,16 +1,21 @@
-import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
+
+
+import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type {
   BatchAllocation,
   InvoiceItem,
   PatientInfo,
-
 } from "../types/saleInvoiceCreate";
 import { calculateEffectivePrice } from "../utils/pricingHelper";
 import { fetchAndAddDrug } from "./createSaleInvoiceThunks";
 import type { PaymentStatus, PricingMode, SaleType } from "../types/enums";
 
+export type CheckoutMode = "NORMAL" | "CUSTOMER_REQUEST";
+
 export type SaleInvoiceSliceState = {
+  checkoutMode: CheckoutMode;
+  customerRequestId: number | null;
   items: InvoiceItem[];
   discount: number;
   paymentStatus: PaymentStatus;
@@ -23,6 +28,8 @@ export type SaleInvoiceSliceState = {
 };
 
 const initialState: SaleInvoiceSliceState = {
+  checkoutMode: "NORMAL",
+  customerRequestId: null,
   items: [],
   discount: 0,
   paymentStatus: "PAID",
@@ -41,6 +48,23 @@ const saleInvoiceSlice = createSlice({
   name: "saleInvoice",
   initialState,
   reducers: {
+    populateFromCheckoutPreview: (
+      state,
+      action: PayloadAction<{
+        customerRequestId: number;
+        patientInfo: PatientInfo;
+        notes?: string | null;
+        items: InvoiceItem[];
+      }>
+    ) => {
+      state.checkoutMode = "CUSTOMER_REQUEST";
+      state.customerRequestId = action.payload.customerRequestId;
+      state.patient = action.payload.patientInfo;
+      state.notes = action.payload.notes || "";
+      state.items = action.payload.items;
+      state.error = null;
+    },
+
     changeQuantity: (
       state,
       action: PayloadAction<{ pharmacyDrugId: number; newQty: number }>
@@ -49,6 +73,7 @@ const saleInvoiceSlice = createSlice({
       if (item) {
         const maxQty = item.selectedUnit.availableDisplayQuantity;
         item.displayQuantity = Math.max(1, Math.min(action.payload.newQty, maxQty));
+        item.subtotal = item.effectiveUnitPrice * item.displayQuantity;
       }
     },
 
@@ -57,6 +82,7 @@ const saleInvoiceSlice = createSlice({
       if (item) {
         const maxQty = item.selectedUnit.availableDisplayQuantity;
         item.displayQuantity = Math.min(item.displayQuantity + 1, maxQty);
+        item.subtotal = item.effectiveUnitPrice * item.displayQuantity;
       }
     },
 
@@ -64,19 +90,21 @@ const saleInvoiceSlice = createSlice({
       const item = findItem(state, action.payload);
       if (item) {
         item.displayQuantity = Math.max(1, item.displayQuantity - 1);
+        item.subtotal = item.effectiveUnitPrice * item.displayQuantity;
       }
     },
 
     removeDrug: (state, action: PayloadAction<number>) => {
-      state.items = state.items.filter(
-        (i) => i.pharmacyDrugId !== action.payload
-      );
+      // if (state.checkoutMode === "CUSTOMER_REQUEST") return;
+      state.items = state.items.filter((i) => i.pharmacyDrugId !== action.payload);
     },
 
-changeUnit: (
+    changeUnit: (
       state,
       action: PayloadAction<{ pharmacyDrugId: number; newUnitType: string }>
     ) => {
+      if (state.checkoutMode === "CUSTOMER_REQUEST") return;
+
       const { pharmacyDrugId, newUnitType } = action.payload;
       const item = findItem(state, pharmacyDrugId);
       if (item) {
@@ -99,11 +127,12 @@ changeUnit: (
           item.extraPercentage,
           item.manualUnitPrice
         );
+        item.subtotal = item.effectiveUnitPrice * item.displayQuantity;
         item.batchAllocations = undefined;
       }
     },
 
-   changePricingMode: (
+    changePricingMode: (
       state,
       action: PayloadAction<{
         pharmacyDrugId: number;
@@ -111,14 +140,13 @@ changeUnit: (
         value?: number;
       }>
     ) => {
+      if (state.checkoutMode === "CUSTOMER_REQUEST") return;
+
       const { pharmacyDrugId, mode, value } = action.payload;
       const item = findItem(state, pharmacyDrugId);
       if (item) {
         const isStrip = item.selectedUnit.unitType === "STRIP";
-
-        if (mode === "EXTRA_PERCENTAGE" && !isStrip) {
-          return;
-        }
+        if (mode === "EXTRA_PERCENTAGE" && !isStrip) return;
 
         item.pricingMode = mode;
         if (mode === "SUGGESTED") {
@@ -142,6 +170,7 @@ changeUnit: (
           item.extraPercentage,
           item.manualUnitPrice
         );
+        item.subtotal = item.effectiveUnitPrice * item.displayQuantity;
       }
     },
 
@@ -152,6 +181,8 @@ changeUnit: (
         allocations?: BatchAllocation[];
       }>
     ) => {
+      if (state.checkoutMode === "CUSTOMER_REQUEST") return;
+
       const { pharmacyDrugId, allocations } = action.payload;
       const item = findItem(state, pharmacyDrugId);
       if (item) {
@@ -164,6 +195,7 @@ changeUnit: (
           );
           item.batchAllocations = allocations;
           item.displayQuantity = totalAllocated;
+          item.subtotal = item.effectiveUnitPrice * totalAllocated;
         }
       }
     },
@@ -196,7 +228,7 @@ changeUnit: (
       })
       .addCase(fetchAndAddDrug.fulfilled, (state, action) => {
         state.isAddingDrug = false;
-        if (action.payload) {
+        if (action.payload && state.checkoutMode !== "CUSTOMER_REQUEST") {
           state.items.push(action.payload);
         }
       })
@@ -222,6 +254,7 @@ export const {
   setNotes,
   updatePatientInfo,
   clearInvoice,
+  populateFromCheckoutPreview,
 } = saleInvoiceSlice.actions;
 
 export default saleInvoiceSlice.reducer;

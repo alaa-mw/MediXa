@@ -6,11 +6,9 @@ import {
   ListItemText,
   Box,
 } from "@mui/material";
-// import { Link  } from "react-router-dom";
 import { type Theme } from "@mui/material/styles";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, useLocation } from "react-router-dom"; 
 import TokenService from "../services/tokenService";
-
 
 interface NavItemProps {
   path: string;
@@ -29,18 +27,21 @@ const NavItem: React.FC<NavItemProps> = ({
   variant = "default",
   theme,
 }) => {
-  // const location = useLocation();
-  // console.log("pppp",path);
+  const location = useLocation();
+
+  const userRole = TokenService.getUserRole()?.toLocaleLowerCase();
+  const basePath = `/${userRole}`;
+  
   const isSelected = 
-    path === `/${TokenService.getUserRole()?.toLocaleLowerCase()}`
-      ? location.pathname === path
-      : location.pathname.includes(path);
+    path === basePath 
+      ? location.pathname === path 
+      : location.pathname.startsWith(path);
 
   return (
     <ListItem disablePadding>
       <ListItemButton
         component={RouterLink}
-        to={path} // fix
+        to={path}
         selected={isSelected}
         disabled={!selectedCourse}
         sx={{
@@ -74,6 +75,9 @@ const NavItem: React.FC<NavItemProps> = ({
               : {
                   backgroundColor: "secondary.main",
                   borderRadius: "0px 50px 50px 0px",
+                  "&:hover": {
+                    backgroundColor: "secondary.main", 
+                  },
                 }),
           },
         }}

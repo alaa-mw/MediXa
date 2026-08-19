@@ -36,6 +36,7 @@ export const InvoiceSummary: React.FC = () => {
       changePaidAmount,
       changeNotes,
       submitInvoice,
+      clearInvoice
     },
   } = useSaleInvoice();
 
@@ -340,6 +341,8 @@ export const InvoiceSummary: React.FC = () => {
             />
           )}
 
+
+          {/* lملاحظات الفاتورة*/}
           <CustomTextField
             label="ملاحظات الفاتورة (اختياري)"
             placeholder="أضف أي ملاحظات إضافية..."
@@ -347,6 +350,8 @@ export const InvoiceSummary: React.FC = () => {
             onChange={(val) => changeNotes(val)}
           />
 
+
+          {/*معلومات المريض*/}
           {shouldShowPatientCard && (
             <PatientInfoCard
               patient={patient}
@@ -361,7 +366,7 @@ export const InvoiceSummary: React.FC = () => {
         </Box>
 
         {/* ===================== [ الجزء 3: ثابت في الأسفل ] ===================== */}
-        <Box sx={{ flexShrink: 0, pt: 2, borderTop: "1px solid #F1F5F9" }}>
+        {/* <Box sx={{ flexShrink: 0, pt: 2, borderTop: "1px solid #F1F5F9" }}>
           <Button
             type="button"
             fullWidth
@@ -383,7 +388,71 @@ export const InvoiceSummary: React.FC = () => {
               "إنشاء الفاتورة"
             )}
           </Button>
-        </Box>
+
+        </Box> */}
+        <Box
+  sx={{
+    flexShrink: 0,
+    pt: 2,
+    borderTop: "1px solid #F1F5F9",
+    display: "flex", 
+    gap: 1.5, 
+    alignItems: "center",
+  }}
+>
+  <Button
+    type="button"
+    variant="contained"
+    disabled={items.length === 0 || isSubmitting}
+    onClick={handleSubmit}
+    sx={{
+      flex: 1, 
+      py: 1.4,
+      fontSize: 15,
+      fontWeight: 800,
+      borderRadius: 3,
+      whiteSpace: "nowrap", 
+      minWidth: 0, 
+      bgcolor: "primary.main",
+      boxShadow: "0 4px 12px rgba(49, 106, 117, 0.25)",
+    }}
+  >
+    {isSubmitting ? (
+      <CircularProgress size={24} color="inherit" />
+    ) : (
+      "إنشاء الفاتورة"
+    )}
+  </Button>
+  {/* 1️⃣ زر إلغاء الفاتورة */}
+  <Button
+    type="button"
+    variant="outlined"
+    color="error"
+    disabled={items.length === 0 || isSubmitting}
+    onClick={() => {
+      clearInvoice();
+    }}
+    sx={{
+      flex: 1, 
+      py: 1.4,
+      fontSize: 15,
+      fontWeight: 800,
+      borderRadius: 3,
+      whiteSpace: "nowrap", 
+      minWidth: 0,
+      borderColor: "#FCA5A5",
+      bgcolor: "#FEF2F2",
+      color: "#DC2626",
+      "&.Mui-disabled": {
+        bgcolor: "#F8FAFC",
+        borderColor: "#E2E8F0",
+        color: "#94A3B8",
+      },
+    }}
+  >
+    إلغاء الفاتورة
+  </Button>  
+</Box>
       </Paper>
 
       {/* التنبيهات */}

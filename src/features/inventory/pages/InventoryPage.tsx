@@ -62,7 +62,7 @@ export const InventoryPage: React.FC = () => {
   }
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{minHeight: "100vh" }}>
       {" "}
       <Box>
         <InventoryHeader

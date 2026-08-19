@@ -2,6 +2,7 @@ import React from "react";
 import { Paper, Box, Typography, Stack } from "@mui/material";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import { CustomTextField } from "../../../../shared/layout/CustomTextField";
+import { useSaleInvoice } from "../../hooks/useSaleInvoice";
 
 interface Patient {
   fullName?: string;
@@ -24,6 +25,9 @@ export const PatientInfoCard: React.FC<PatientInfoCardProps> = ({
   onUpdate,
   onClearError,
 }) => {
+    const {
+      selectors: {  isCustomerRequest }, 
+    } = useSaleInvoice();
   return (
     <Paper
       elevation={0}
@@ -55,18 +59,23 @@ export const PatientInfoCard: React.FC<PatientInfoCardProps> = ({
           }}
           error={!!nameError}
           helperText={nameError}
+          disabled={isCustomerRequest}
         />
         <CustomTextField
           label="رقم الهاتف"
           placeholder="أدخل رقم الهاتف"
           value={patient?.phone || ""}
           onChange={(val) => onUpdate({ phone: val })}
+                    disabled={isCustomerRequest}
+
         />
         <CustomTextField
           label="الرقم الوطني"
           placeholder="أدخل الرقم الوطني"
           value={patient?.nationalId || ""}
           onChange={(val) => onUpdate({ nationalId: val })}
+                    disabled={isCustomerRequest}
+
         />
       </Stack>
     </Paper>

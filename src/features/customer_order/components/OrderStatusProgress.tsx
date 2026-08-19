@@ -1,22 +1,51 @@
-import React from "react";
-import { Box, Typography, Stack, Button } from "@mui/material";
+
+import React, { useState, useEffect } from "react";
+import { Box, Typography, Stack, Button, CircularProgress } from "@mui/material";
 import { format } from "date-fns";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import type { CustomerOrder } from "../types/customerOrder";
 import { getAtLabel } from "../utils/getOrderStatusLabel";
+import useGetData from "../../../shared/hooks/useGetData";
+import type { CheckoutPreviewData } from "../../sales-and-return/types/customerRequest";
+import { mapCheckoutPreviewToSlice } from "../../sales-and-return/utils/customerRequestMapper";
+import { populateFromCheckoutPreview } from "../../sales-and-return/store/createSaleInvoiceSlice";
 
-const OrderStatusProgress = ({
-  data,
-  onConfirm,
-}: {
-  data: CustomerOrder;
-  onConfirm?: () => void;
-}) => {
+
+
+const OrderStatusProgress = ({ data }: { data: CustomerOrder }) => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null);
+
+  const endpoint = selectedRequestId
+    ? `/customer-request/${selectedRequestId}/checkout-preview`
+    : "";
+
+  const { data: previewResponse, isLoading } = useGetData<CheckoutPreviewData>(endpoint);
+
+  const handleConfirm = () => {
+    setSelectedRequestId(data.customerRequestId);
+  };
+
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const rawPreviewData = (previewResponse as any)?.data || previewResponse;
+
+    if (rawPreviewData && selectedRequestId) {
+      const mappedData = mapCheckoutPreviewToSlice(rawPreviewData);
+      dispatch(populateFromCheckoutPreview(mappedData));
+      setSelectedRequestId(null);
+      navigate("/pharmacy/sales/sales/create");
+    }
+  }, [previewResponse, selectedRequestId, dispatch, navigate]);
+
   const requestedAt = data.requestedAt ? new Date(data.requestedAt) : null;
   const completedAt = data.completedAt ? new Date(data.completedAt) : null;
   const cancelledAt = data.cancelledAt ? new Date(data.cancelledAt) : null;
 
   const formatDate = (d: Date | null) => (d ? format(d, "PP") : "-");
-
   const secondInitial = !completedAt && !cancelledAt;
 
   return (
@@ -30,10 +59,10 @@ const OrderStatusProgress = ({
           background: completedAt
             ? theme.palette.success.main
             : cancelledAt
-              ? theme.palette.error.main
-              : secondInitial
-                ? `linear-gradient(90deg, ${theme.palette.warning.main} 50%, ${theme.palette.grey[300]} 50%)`
-                : theme.palette.grey[300],
+            ? theme.palette.error.main
+            : secondInitial
+            ? `linear-gradient(90deg, ${theme.palette.warning.main} 50%, ${theme.palette.grey[300]} 50%)`
+            : theme.palette.grey[300],
         })}
       />
       <Stack
@@ -76,10 +105,11 @@ const OrderStatusProgress = ({
                 variant="text"
                 size="small"
                 color="primary"
+                disabled={isLoading}
                 sx={{ fontWeight: 700, textTransform: "none" }}
-                onClick={() => onConfirm?.()}
+                onClick={handleConfirm}
               >
-                انهاء الطلب
+                {isLoading ? <CircularProgress size={16} /> : "تأكيد الطلب"}
               </Button>
             </Box>
           )}

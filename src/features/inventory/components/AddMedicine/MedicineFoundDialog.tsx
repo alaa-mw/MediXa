@@ -177,7 +177,7 @@ export const FoundMedicineDialog: React.FC<FoundMedicineDialogProps> = ({
             onChange={setAlertLimit}
           />
           <NumberSpinner
-            label="تنبيه انتهاء الصلاحية قبل (بالأشهر)"
+            label="تنبيه انتهاء الصلاحية قبل (بالآيام)"
             value={expiryAlertMonths}
             onChange={setExpiryAlertMonths}
           />

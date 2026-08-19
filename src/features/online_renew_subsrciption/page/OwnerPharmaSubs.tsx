@@ -16,12 +16,12 @@ const OwnerPharmacySubscriptionSchedule = ({}) => {
     limit: 20,
   };
 
-  //   const { data, isLoading, isError } = useGetPharmacySubscriptions(
-  //     localStorage.getItem("pharmacyId")
-  //       ? parseInt(localStorage.getItem("pharmacyId")!)
-  //       : 0,
-  //     queryParams,
-  //   );
+  const { data, isLoading, isError } = useGetPharmacySubscriptions(
+    localStorage.getItem("pharmacyId")
+      ? parseInt(localStorage.getItem("pharmacyId")!)
+      : 0,
+    queryParams,
+  );
 
   // 1. معالجة حالة التحميل
   //   if (isLoading) {

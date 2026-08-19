@@ -20,7 +20,7 @@ const InvoiceSaleTable = ({
       sx={{
         width: "100%",
         maxWidth: "100%",
-        minWidth: "900px", // لضمان عدم تداخل الأعمدة بشكل سيء على الشاشات الصغيرة مع إمكانية التمرير الأفقي السلس
+        minWidth: "1200px", // لضمان عدم تداخل الأعمدة بشكل سيء على الشاشات الصغيرة مع إمكانية التمرير الأفقي السلس
         border: "1px solid #E2E8F0",
         borderRadius: 2,
         overflowX: "auto",
