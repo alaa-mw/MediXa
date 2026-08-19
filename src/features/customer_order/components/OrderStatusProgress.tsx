@@ -4,9 +4,8 @@ import { Box, Typography, Stack, Button, CircularProgress } from "@mui/material"
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-
 import type { CustomerOrder } from "../types/customerOrder";
-import getOrderStatusLabel from "../utils/getOrderStatusLabel";
+import { getAtLabel } from "../utils/getOrderStatusLabel";
 import useGetData from "../../../shared/hooks/useGetData";
 import type { CheckoutPreviewData } from "../../sales-and-return/types/customerRequest";
 import { mapCheckoutPreviewToSlice } from "../../sales-and-return/utils/customerRequestMapper";
@@ -18,7 +17,7 @@ const OrderStatusProgress = ({ data }: { data: CustomerOrder }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const [selectedRequestId, setSelectedRequestId] = useState<String | null>(null);
+  const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null);
 
   const endpoint = selectedRequestId
     ? `/customer-request/${selectedRequestId}/checkout-preview`
@@ -31,6 +30,7 @@ const OrderStatusProgress = ({ data }: { data: CustomerOrder }) => {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const rawPreviewData = (previewResponse as any)?.data || previewResponse;
 
     if (rawPreviewData && selectedRequestId) {
@@ -70,13 +70,14 @@ const OrderStatusProgress = ({ data }: { data: CustomerOrder }) => {
       >
         {/* Left circle (PENDING/requested) */}
         <Box sx={{ textAlign: "center", width: 120 }}>
+          <Typography variant="caption" sx={{ display: "block", mt: 0.4 }}>
+            {getAtLabel.requestedAt}
+          </Typography>
           <Typography
             variant="caption"
-            sx={{ display: "block", fontWeight: 700, mt: 0.5 }}
+            color="text.secondary"
+            sx={{ fontWeight: 700 }}
           >
-            {getOrderStatusLabel("PENDING")}
-          </Typography>
-          <Typography variant="caption" color="text.secondary">
             {formatDate(requestedAt)}
           </Typography>
         </Box>
@@ -85,15 +86,14 @@ const OrderStatusProgress = ({ data }: { data: CustomerOrder }) => {
         <Box sx={{ textAlign: "center", width: 120 }}>
           {completedAt || cancelledAt ? (
             <>
+              <Typography variant="caption" sx={{ display: "block", mt: 0.4 }}>
+                {completedAt ? getAtLabel.completedAt : getAtLabel.cancelledAt}
+              </Typography>
               <Typography
                 variant="caption"
-                sx={{ display: "block", fontWeight: 700, mt: 0.5 }}
+                color="text.secondary"
+                sx={{ fontWeight: 700 }}
               >
-                {completedAt
-                  ? getOrderStatusLabel("COMPLETED")
-                  : getOrderStatusLabel("CANCELLED")}
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
                 {completedAt
                   ? formatDate(completedAt)
                   : formatDate(cancelledAt)}

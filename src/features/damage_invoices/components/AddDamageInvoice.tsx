@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   Box,
   Button,
@@ -19,6 +20,7 @@ import SearchBarDynamic from "../../../shared/layout/SearchBarDynamic";
 import type { PharmacyDrugSearch } from "../../purchase_invoices/components/PurchaseInvoiceGrid";
 import SelectBatchesDialog from "./SelectBatchesDialog";
 import { useSnackbar } from "../../../shared/providers/useSnackbar";
+import { useIdempotency } from "../../../shared/hooks/useIdempotency";
 
 export interface BatchAllocation {
   batchId: string;
@@ -29,6 +31,7 @@ export interface BatchAllocation {
 }
 
 interface DamageInvoiceForm {
+  idempotencyKey: string;
   invoiceDate: string;
   notes: string;
   pharmacyDrugId: string;
@@ -38,8 +41,12 @@ interface DamageInvoiceForm {
 }
 
 const AddDamageInvoice = () => {
+  const { getKey, clearKey } = useIdempotency();
+  const today = new Date().toISOString().slice(0, 10);
+
   const [form, setForm] = useState<DamageInvoiceForm>({
-    invoiceDate: new Date().toISOString().slice(0, 10),
+    idempotencyKey: getKey(), // confirm if send to server - later
+    invoiceDate: today,
     notes: "",
     pharmacyDrugId: "", //
     quantityDamaged: 0, // set direct or sum of batches
@@ -55,11 +62,12 @@ const AddDamageInvoice = () => {
 
   const location = useLocation();
 
-  useEffect(() => {
+  useEffect(() => { // ربط زر اتلاف دفعة الموجود بواجهة بعيدة
     const state = (location.state ?? {}) as any;
     if (state && state.pharmacyDrugId) {
       setForm((s) => ({
         ...s,
+        idempotencyKey: getKey(),
         pharmacyDrugId: state.pharmacyDrugId,
         batchAllocations: Array.isArray(state.batchAllocations)
           ? state.batchAllocations.map((b: any) => ({
@@ -125,8 +133,21 @@ const AddDamageInvoice = () => {
     return form.quantityDamaged;
   };
 
+  const resetForm = () => {
+    setForm({
+      idempotencyKey: getKey(),
+      invoiceDate: today,
+      notes: "",
+      damageReason: "",
+      pharmacyDrugId: "",
+      quantityDamaged: 0,
+      batchAllocations: [],
+    });
+  };
+
   const handleSubmit = () => {
     const payload = {
+      idempotencyKey: form.idempotencyKey,
       invoiceDate: form.invoiceDate,
       notes: form.notes,
       damageReason: form.damageReason,
@@ -142,6 +163,8 @@ const AddDamageInvoice = () => {
     };
     createDamageInvoice(payload, {
       onSuccess: () => {
+        clearKey();
+        resetForm();
         showSnackbar("تم إنشاء فاتورة الإتلاف بنجاح", "success");
       },
       onError: (error) => {
@@ -355,16 +378,7 @@ const AddDamageInvoice = () => {
             <Box sx={{ display: "flex", gap: 1, justifyContent: "flex-end" }}>
               <Button
                 variant="outlined"
-                onClick={() =>
-                  setForm({
-                    pharmacyDrugId: "",
-                    batchAllocations: [],
-                    invoiceDate: "",
-                    damageReason: "",
-                    notes: "",
-                    quantityDamaged: 0,
-                  })
-                }
+                onClick={() => resetForm()}
                 sx={{ borderRadius: 2 }}
               >
                 إلغاء

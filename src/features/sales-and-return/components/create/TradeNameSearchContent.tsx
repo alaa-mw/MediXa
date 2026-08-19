@@ -22,6 +22,14 @@ interface Props {
   onCloseDropdown: () => void;
 }
 
+type InvoiceDrugMetadata = {
+  dosageFormName?: string;
+  dosageForm?: {
+    dosageFormName?: string;
+  };
+  requiresPrescription?: boolean;
+};
+
 export const TradeNameSearchContent = ({
   debouncedSearchTerm,
   userTypingSignal,
@@ -30,6 +38,7 @@ export const TradeNameSearchContent = ({
 }: Props) => {
   const [selectedDrugId, setSelectedDrugId] = useState<number | null>(null);
   const [selectedDrugs, setSelectedDrugs] = useState<PharmacyDrug[]>([]);
+  const [isAddingToInvoice, setIsAddingToInvoice] = useState(false);
   const observerTarget = useRef<HTMLDivElement>(null);
 
   // استخراج الدالة من كائن actions الخاص بالـ Facade Hook
@@ -63,18 +72,26 @@ export const TradeNameSearchContent = ({
 
   // إضافة الأدوية للفاتورة بالتوازي
   const handleAddSelectedToInvoice = async () => {
-    await Promise.all(
-      selectedDrugs.map((drug) =>
-        addDrug(drug.pharmacyDrugId, {
-          tradeName: drug.tradeName,
-          dosageFormName:
-            (drug as any).dosageFormName ||
-            (drug as any).dosageForm?.dosageFormName,
-          requiresPrescription: (drug as any).requiresPrescription,
+    if (isAddingToInvoice || selectedDrugs.length === 0) return;
+
+    setIsAddingToInvoice(true);
+    try {
+      await Promise.all(
+        selectedDrugs.map((drug) => {
+          const metadata = drug as PharmacyDrug & InvoiceDrugMetadata;
+
+          return addDrug(drug.pharmacyDrugId, {
+            tradeName: drug.tradeName,
+            dosageFormName:
+              metadata.dosageFormName || metadata.dosageForm?.dosageFormName,
+            requiresPrescription: metadata.requiresPrescription,
+          });
         }),
-      ),
-    );
-    onCloseDropdown();
+      );
+      onCloseDropdown();
+    } finally {
+      setIsAddingToInvoice(false);
+    }
   };
 
   // Intersection Observer للتمرير اللانهائي
@@ -236,9 +253,12 @@ export const TradeNameSearchContent = ({
               variant="contained"
               size="large"
               onClick={handleAddSelectedToInvoice}
+              disabled={isAddingToInvoice}
               sx={{ borderRadius: "12px", py: 1.5, fontWeight: 700 }}
             >
-              إضافة ({selectedDrugs.length}) إلى الفاتورة
+              {isAddingToInvoice
+                ? "جاري الإضافة..."
+                : `إضافة (${selectedDrugs.length}) إلى الفاتورة`}
             </Button>
           </Box>
         )}

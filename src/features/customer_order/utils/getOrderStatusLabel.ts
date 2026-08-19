@@ -14,3 +14,10 @@ export default function getOrderStatusLabel(status: string): string {
       return status;
   }
 }
+
+
+export const getAtLabel = {
+  requestedAt: "تم الطلب ",
+  cancelledAt: "تم الإلغاء ",
+  completedAt: "تم الانتهاء ",
+};

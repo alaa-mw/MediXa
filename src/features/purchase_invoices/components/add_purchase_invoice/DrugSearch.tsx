@@ -137,20 +137,31 @@ const DrugSearch = ({
   const localResults = useMemo(() => {
     if (!canSearch) return [] as PharmacyDrug[];
 
+    const currentLocalItems = data?.data?.pharmacyDrugs?.items ?? [];
+    const currentLocalPage = Number(queryParams.page ?? 1);
+
     const cached = queryClient.getQueriesData<
       FetchResponse<SearchDrugResponse>
     >({
       queryKey: ["/pharmacy-drugs/search-in-stock-and-cdb/by-name"],
     });
 
-    const pages = cached
-      .map(([queryKey, value]) => {
-        const params = readParamsFromQueryKey(queryKey);
-        const name = String(params.name ?? "").trim();
-        const page = Number(params.page ?? 1);
-        const items = value?.data?.pharmacyDrugs?.items ?? [];
-        return { name, page, items };
-      })
+    const pagesFromCache = cached.map(([queryKey, value]) => {
+      const params = readParamsFromQueryKey(queryKey);
+      const name = String(params.name ?? "").trim();
+      const page = Number(params.page ?? 1);
+      const items = value?.data?.pharmacyDrugs?.items ?? [];
+      return { name, page, items };
+    });
+
+    const pages = [
+      ...pagesFromCache,
+      {
+        name: searchName,
+        page: currentLocalPage,
+        items: currentLocalItems,
+      },
+    ]
       .filter((p) => p.name === searchName)
       .sort((a, b) => a.page - b.page);
 
@@ -165,10 +176,13 @@ const DrugSearch = ({
     });
 
     return merged;
-  }, [canSearch, queryClient, searchName]);
+  }, [canSearch, data, queryClient, queryParams.page, searchName]);
 
   const generalResults = useMemo(() => {
     if (!canSearch) return [] as GeneralDrugItem[];
+
+    const currentGeneralItems = data?.data?.generalDrugs?.items ?? [];
+    const currentGeneralPage = Number(queryParams.generalPage ?? 1);
 
     const cached = queryClient.getQueriesData<
       FetchResponse<SearchDrugResponse>
@@ -176,14 +190,22 @@ const DrugSearch = ({
       queryKey: ["/pharmacy-drugs/search-in-stock-and-cdb/by-name"],
     });
 
-    const pages = cached
-      .map(([queryKey, value]) => {
-        const params = readParamsFromQueryKey(queryKey);
-        const name = String(params.name ?? "").trim();
-        const page = Number(params.generalPage ?? 1);
-        const items = value?.data?.generalDrugs?.items ?? [];
-        return { name, page, items };
-      })
+    const pagesFromCache = cached.map(([queryKey, value]) => {
+      const params = readParamsFromQueryKey(queryKey);
+      const name = String(params.name ?? "").trim();
+      const page = Number(params.generalPage ?? 1);
+      const items = value?.data?.generalDrugs?.items ?? [];
+      return { name, page, items };
+    });
+
+    const pages = [
+      ...pagesFromCache,
+      {
+        name: searchName,
+        page: currentGeneralPage,
+        items: currentGeneralItems,
+      },
+    ]
       .filter((p) => p.name === searchName)
       .sort((a, b) => a.page - b.page);
 
@@ -206,7 +228,14 @@ const DrugSearch = ({
     });
 
     return merged;
-  }, [canSearch, queryClient, searchName, localResults]);
+  }, [
+    canSearch,
+    data,
+    queryParams.generalPage,
+    queryClient,
+    searchName,
+    localResults,
+  ]);
   // = data?.data?.generalDrugs?.items ?? [];
 
   const hasMoreLocal =
@@ -234,7 +263,7 @@ const DrugSearch = ({
       return;
     }
 
-    const observer = new IntersectionObserver(
+    const observer = new IntersectionObserver( // يحس ب إذا كان المستخدم قد وصل إلى أسفل قائمة النتائج المحلية
       ([entry]) => {
         if (!entry.isIntersecting) return;
         if (isFetching || localRequestingRef.current || !hasMoreLocal) return;
