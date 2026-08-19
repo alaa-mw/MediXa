@@ -50,6 +50,7 @@ import PurchaseOrderDetailsPage from "./features/purchase_order/components/Purch
 import DashboardPage from "./features/dashboard/components/DashboardPage";
 import AnalysisInventoryPage from "./features/analysis_inventory/components/AnalysisInventoryPage";
 import AssistantPage from "./features/ai_assistant/AIAssistantPage";
+import PredictiveOrdersPage from "./features/predictiveOrders/PredictiveOrdersPage";
 import { OwnerSelectPharmacy } from "./features/auth/components/ownerSelectPharmacy";
 import Test from "./features/online_renew_subsrciption/page/temp";
 import { PaymentSuccessPage } from "./features/online_renew_subsrciption/page/SuccessPaymentPage";
@@ -58,9 +59,11 @@ import OwnerRenewSubscriptionPage from "./features/online_renew_subsrciption/pag
 import OwnerPharmacySubscriptionSchedule from "./features/online_renew_subsrciption/page/OwnerPharmaSubs";
 import PriceListPage from "./features/pharmacy_price_list/pages/PriceListPage";
 import FloatingAssistantLauncher from "./features/ai_assistant/components/FloatingAssistantLauncher";
+import TokenService from "./shared/services/tokenService";
 
 function App() {
   const pharmacyPaths = ["/pharmacy"];
+  const role = TokenService.getUserRole();
   return (
     <>
       <ThemeProvider theme={arabicTheme}>
@@ -239,6 +242,10 @@ function App() {
                   path="orders/customer/add"
                   element={<AddCustomerOrder />}
                 />
+                <Route
+                  path="predictive-orders"
+                  element={<PredictiveOrdersPage />}
+                />
                 {/* suppliers */}
                 <Route path="suppliers" element={<SuppliersList />} />
                 <Route path="suppliers/add" element={<AddSupplier />} />
@@ -262,8 +269,7 @@ function App() {
             ))}
           </Route>
         </Routes>
-
-        <FloatingAssistantLauncher />
+        {role === "PHARMACY" && <FloatingAssistantLauncher />}
       </ThemeProvider>
     </>
   );
