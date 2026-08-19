@@ -87,11 +87,10 @@ export default function PricingHero({
                     year,
                     month - 1,
                     day,
-                    now.getHours() + 3,
-                    now.getMinutes() + 3,
+                    now.getHours(),
+                    now.getMinutes() + 1,
                     now.getSeconds(),
                   );
-
                   onDateChange(selectedDate.toISOString());
                 } else {
                   onDateChange("");

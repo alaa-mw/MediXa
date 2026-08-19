@@ -19,33 +19,35 @@ const InvoiceSaleTable = ({
     <Box
       sx={{
         width: "100%",
-        maxWidth: "100%",
-        minWidth: "900px", // لضمان عدم تداخل الأعمدة بشكل سيء على الشاشات الصغيرة مع إمكانية التمرير الأفقي السلس
+        minWidth: 0,
         border: "1px solid #E2E8F0",
         borderRadius: 2,
-        overflowX: "auto",
         boxSizing: "border-box",
       }}
     >
-      <InvoiceTableHeader isReturn={isReturnInvoice} />
+      <Box sx={{ width: "100%", overflowX: "auto" }}>
+        <Box sx={{ minWidth: { xs: 900, md: 0 } }}>
+          <InvoiceTableHeader isReturn={isReturnInvoice} />
 
-      {isReturnInvoice
-        ? returnInvoiceData?.map((pharmacy, index) => (
-            <InvoiceTableRow
-              key={pharmacy.returnInvoiceItemId}
-              returnItem={pharmacy}
-              itemIndex={index}
-              isReturnInvoice={true}
-            />
-          ))
-        : data?.map((pharmacy, index) => (
-            <InvoiceTableRow
-              key={pharmacy.saleInvoiceItemId}
-              saleItem={pharmacy}
-              itemIndex={index}
-              isReturnInvoice={false}
-            />
-          ))}
+          {isReturnInvoice
+            ? returnInvoiceData?.map((pharmacy, index) => (
+                <InvoiceTableRow
+                  key={pharmacy.returnInvoiceItemId}
+                  returnItem={pharmacy}
+                  itemIndex={index}
+                  isReturnInvoice={true}
+                />
+              ))
+            : data?.map((pharmacy, index) => (
+                <InvoiceTableRow
+                  key={pharmacy.saleInvoiceItemId}
+                  saleItem={pharmacy}
+                  itemIndex={index}
+                  isReturnInvoice={false}
+                />
+              ))}
+        </Box>
+      </Box>
     </Box>
   );
 };

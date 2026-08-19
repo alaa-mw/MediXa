@@ -14,17 +14,17 @@ const PharmacyAssignCard = ({ pharmacy, selected, onSelect }: Props) => {
   return (
     <Card
       variant="outlined"
-      onClick={onSelect} // جعل الكارد بالكامل قابلاً للضغط للاختيار السهل
+      onClick={onSelect}
       sx={{
         borderRadius: "16px",
-        borderColor: selected ? "primary.main" : "#E2E8F0", // يتغير اللون عند الاختيار
-        backgroundColor: selected ? "#F0FDF4" : "#F8FAFC", // خلفية مائلة للأخضر الخفيف عند التحديد
+        borderColor: selected ? "primary.main" : "#E2E8F0",
+        backgroundColor: selected ? "#F0FDF4" : "#F8FAFC",
         p: 2.5,
         width: "100%",
         maxWidth: 800,
         direction: "rtl",
         fontFamily: "inherit",
-        cursor: "pointer", // إظهار مؤشر اليد عند تمرير الفأرة
+        cursor: "pointer",
         transition: "all 0.2s ease-in-out",
         "&:hover": {
           borderColor: "primary.main",
@@ -32,11 +32,10 @@ const PharmacyAssignCard = ({ pharmacy, selected, onSelect }: Props) => {
       }}
     >
       <Box sx={{ display: "flex", alignItems: "flex-start", gap: 2 }}>
-        {/* التشيك بوكس الآن يعتمد على حالة الـ selected الخاصة بالاختيار */}
         <Checkbox
           checked={selected}
           onChange={onSelect}
-          onClick={(e) => e.stopPropagation()} // منع تكرار الحدث عند الضغط مباشرة على التشيك بوكس
+          onClick={(e) => e.stopPropagation()}
           checkedIcon={
             <CheckCircleIcon sx={{ fontSize: 28, color: "#22C55E" }} />
           }
@@ -75,9 +74,6 @@ const PharmacyAssignCard = ({ pharmacy, selected, onSelect }: Props) => {
                   fontSize: "0.75rem",
                 }}
               />
-              <Typography variant="body2" sx={{ color: "#64748B" }}>
-                المعرف: {pharmacy.pharmacyId}
-              </Typography>
             </Box>
           </Box>
 

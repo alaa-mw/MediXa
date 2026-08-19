@@ -1,19 +1,13 @@
-import { CheckCircle } from "@mui/icons-material";
-import { Box, Chip, Stack } from "@mui/material";
+import { CheckCircle, InfoOutlined } from "@mui/icons-material";
+import { Box, Button } from "@mui/material";
 import type { GeneralDrug } from "../types/allGeneralDrugType";
-import type { DosageForm } from "../types/dosageFormType";
-import useGetWithParams from "../../../shared/hooks/useGetWithParams";
-import useGetData from "../../../shared/hooks/useGetData";
 
 interface Props {
   generalDrug: GeneralDrug;
+  onShowDetails: (generalDrugId: number) => void;
 }
 
-const GeneralDrugTableRow = ({ generalDrug }: Props) => {
-  const { data } = useGetData<DosageForm>(
-    "/dosage-forms/" + generalDrug.dosageFormId,
-  );
-
+const GeneralDrugTableRow = ({ generalDrug, onShowDetails }: Props) => {
   return (
     <Box
       sx={{
@@ -42,11 +36,14 @@ const GeneralDrugTableRow = ({ generalDrug }: Props) => {
       >
         {generalDrug.tradeName}
       </Box>
-      <Box
-        sx={{ textAlign: "center", fontWeight: 600, color: "#1E293B", pr: 1 }}
+      <Button
+        variant="text"
+        endIcon={<InfoOutlined sx={{ mr: 1.5 }} />}
+        onClick={() => onShowDetails(generalDrug.generalDrugId)}
+        sx={{ fontWeight: 600, color: "#3d9197" }}
       >
-        {data?.data.dosageFormName}
-      </Box>
+        تفاصيل الدواء
+      </Button>
 
       {/* 2. المواد الفعالة (تم فصلها لتظهر في العمود الثاني الصحيح) */}
       {/* <Box>

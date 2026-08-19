@@ -26,6 +26,7 @@ import type {
   PurchaseOrderCreatePayload,
   Supplier,
 } from "../types/purchaseOrder";
+import { RTLDatePicker } from "../../../shared/layout/RTLDatePicker";
 
 type OrderItem = {
   pharmacyDrugId: number | string;
@@ -37,6 +38,7 @@ type OrderItem = {
 const AddPurchaseOrder = () => {
   const [form, setForm] = useState({
     supplierId: "",
+    expectedReceiptDate: "",
     supplierName: "",
     notes: "",
     items: [] as OrderItem[],
@@ -127,7 +129,13 @@ const AddPurchaseOrder = () => {
     createPurchaseOrder(payload, {
       onSuccess: () => {
         showSnackbar("تم إنشاء طلبية الشراء بنجاح", "success");
-        setForm({ supplierId: "", supplierName: "", notes: "", items: [] });
+        setForm({
+          supplierId: "",
+          expectedReceiptDate: "",
+          supplierName: "",
+          notes: "",
+          items: [],
+        });
       },
       onError: (err) => {
         console.error(err);
@@ -223,12 +231,21 @@ const AddPurchaseOrder = () => {
                   )}
                 </Grid>
 
-                <Grid size={{ xs: 12 }}>
+                <Grid size={{ xs: 12, md: 8 }}>
                   <CustomTextField
                     label="ملاحظات"
                     value={form.notes}
                     onChange={(value) =>
                       setForm((s) => ({ ...s, notes: value }))
+                    }
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, md: 4 }}>
+                  <RTLDatePicker
+                    label={"تاريخ الاستلام"}
+                    value={form.expectedReceiptDate}
+                    onChange={(value) =>
+                      setForm((s) => ({ ...s, expectedReceiptDate: value }))
                     }
                   />
                 </Grid>

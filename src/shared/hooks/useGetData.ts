@@ -2,11 +2,12 @@ import { useQuery } from "@tanstack/react-query";
 import APIClient from "../api/api-client";
 import type { FetchResponse } from "../api/api-types";
 
-export const useGetData = <TData>(endpoint: string) => {
-  const apiClient = new APIClient<TData>(endpoint); // Create a new APIClient instance in the hook
+export const useGetData = <TData>(endpoint: string, enabled = true) => {
+  const apiClient = new APIClient<TData>(endpoint);
   return useQuery<FetchResponse<TData>, Error>({
     queryKey: [endpoint],
     queryFn: () => apiClient.get(),
+    // enabled,
     enabled: !!endpoint,
   });
 };

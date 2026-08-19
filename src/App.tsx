@@ -50,18 +50,41 @@ import PurchaseOrderDetailsPage from "./features/purchase_order/components/Purch
 import DashboardPage from "./features/dashboard/components/DashboardPage";
 import AnalysisInventoryPage from "./features/analysis_inventory/components/AnalysisInventoryPage";
 import AssistantPage from "./features/ai_assistant/AIAssistantPage";
+import PredictiveOrdersPage from "./features/predictiveOrders/PredictiveOrdersPage";
 import { OwnerSelectPharmacy } from "./features/auth/components/ownerSelectPharmacy";
 import Test from "./features/online_renew_subsrciption/page/temp";
 import { PaymentSuccessPage } from "./features/online_renew_subsrciption/page/SuccessPaymentPage";
 import { PaymentCancelPage } from "./features/online_renew_subsrciption/page/CanclePaymentPage";
 import OwnerRenewSubscriptionPage from "./features/online_renew_subsrciption/page/OwnerPlaneCard";
 import OwnerPharmacySubscriptionSchedule from "./features/online_renew_subsrciption/page/OwnerPharmaSubs";
+import PriceListPage from "./features/pharmacy_price_list/pages/PriceListPage";
 import FloatingAssistantLauncher from "./features/ai_assistant/components/FloatingAssistantLauncher";
 import AddGeneralDrugPage from "./features/inventory/pages/AddGeneralDrugPage";
 import AddPrivateDrugPage from "./features/inventory/pages/AddPrivateDrugPage";
+import NotificationsPage from "./features/notifications/pages/NotificationsPage";
+import { onMessage } from "firebase/messaging";
+import { messaging, requestPermission } from "./firebase/firebaseConfig";
+import { useEffect } from "react";
+import TokenService from "./shared/services/tokenService";
 
 function App() {
   const pharmacyPaths = ["/pharmacy"];
+  useEffect(() => {
+    // طلب الإذن عند تحميل التطبيق
+    requestPermission();
+
+    // الاستماع للإشعارات أثناء عمل التطبيق في الواجهة
+    const unsubscribe = onMessage(messaging, (payload) => {
+      console.log("Message received. ", payload);
+      if (payload.notification) {
+        alert(`${payload.notification.title}: ${payload.notification.body}`);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const role = TokenService.getUserRole();
   return (
     <>
       <ThemeProvider theme={arabicTheme}>
@@ -90,6 +113,7 @@ function App() {
                 element={<CreatePharmacyAccount />}
               />
               <Route path="subscription-plans" element={<PricingPage />} />
+              <Route path="notifications" element={<NotificationsPage />} />
               <Route path="pharmacies" element={<PharmacyManagement />} />
               <Route
                 path="pharmacies/subscription-schedule/:id"
@@ -118,6 +142,7 @@ function App() {
               <Route path="CDB/addDrug" element={<AddGeneralDrug />} />
               <Route path="CDB/allDrugs" element={<AllGeneralDrug />} />
               <Route path="CDB/pricing" element={<DrugPricingPage />} />
+              <Route path="notifications" element={<NotificationsPage />} />
             </Route>
           </Route>
 
@@ -133,6 +158,7 @@ function App() {
 
               <Route path="dashboard" element={<DashboardPage />} />
               <Route path="reports" element={<AnalysisInventoryPage />} />
+              <Route path="notifications" element={<NotificationsPage />} />
 
               {/* <Route
                 path="subscription"
@@ -170,6 +196,7 @@ function App() {
             {pharmacyPaths.map((path) => (
               <Route path={path} key={path} element={<DashboardTemplate />}>
                 <Route index element={<>hello</>} />
+                <Route path="notifications" element={<NotificationsPage />} />
                 <Route path="sales" element={<SalesLayout />}>
                   <Route index element={<Navigate to="sales" replace />} />
                   <Route path="sales" element={<SaleInvoicesPage />} />
@@ -242,13 +269,18 @@ function App() {
                   path="orders/customer/add"
                   element={<AddCustomerOrder />}
                 />
+                <Route
+                  path="predictive-orders"
+                  element={<PredictiveOrdersPage />}
+                />
                 {/* suppliers */}
                 <Route path="suppliers" element={<SuppliersList />} />
                 <Route path="suppliers/add" element={<AddSupplier />} />
-                <Route
+                <Route path="price-list" element={<PriceListPage />} />
+                {/* <Route
                   path="medicine-search"
                   element={<Test />} // Replace <Test /> with the actual component for medicine search
-                />
+                /> */}
                 <Route path="support" element={<div>support</div>} />
                 <Route path="ai-assistant" element={<AssistantPage />} />
                 <Route
@@ -264,8 +296,7 @@ function App() {
             ))}
           </Route>
         </Routes>
-
-        <FloatingAssistantLauncher />
+        {role === "PHARMACY" && <FloatingAssistantLauncher />}
       </ThemeProvider>
     </>
   );

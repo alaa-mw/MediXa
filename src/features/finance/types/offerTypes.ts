@@ -1,4 +1,4 @@
-export type DiscountType = "PERCENTAGE" | "FIXED_AMOUNT" | " ";
+export type DiscountType = "" | "PERCENTAGE" | "FIXED_AMOUNT";
 
 export type OfferScope = "PRIVATE" | "PUBLIC";
 

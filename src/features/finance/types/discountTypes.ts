@@ -1,5 +1,9 @@
 export const DiscountTypes = [
   {
+    value: "",
+    label: "اختر نوع الخصم",
+  },
+  {
     value: "PERCENTAGE",
     label: "( % ) Percentage ",
   },

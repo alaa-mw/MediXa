@@ -2,7 +2,8 @@ import {
   CalendarTodayRounded,
   Person2Rounded,
   PhoneRounded,
-  VisibilityRounded
+  VisibilityRounded,
+  CancelRounded,
 } from "@mui/icons-material";
 import {
   Box,
@@ -12,11 +13,14 @@ import {
   Chip,
   Stack,
   Typography,
+  IconButton,
 } from "@mui/material";
 
 import type { CustomerOrder } from "../types/customerOrder";
 import getOrderStatusLabel from "../utils/getOrderStatusLabel";
 import OrderStatusProgress from "./OrderStatusProgress";
+import usePostData from "../../../shared/hooks/usePostData";
+import { useSnackbar } from "../../../shared/providers/useSnackbar";
 
 const statusColor: Record<string, "default" | "warning" | "success" | "error"> =
   {
@@ -28,10 +32,35 @@ const statusColor: Record<string, "default" | "warning" | "success" | "error"> =
 const CustomerOrderCard = ({
   data,
   onView,
+  refetch,
 }: {
   data: CustomerOrder;
   onView?: (id: string) => void;
+  refetch: () => void;
 }) => {
+  const { showSnackbar } = useSnackbar();
+  const { mutate: cancelOrder } = usePostData(
+    `/customer-request/${data.customerRequestId}/cancel`,
+  );
+  const handleCancelOrder = () => {
+    cancelOrder(
+      {},
+      {
+        onSuccess: () => {
+          showSnackbar("تم إلغاء الطلب بنجاح", "success");
+          refetch();
+        },
+        onError: (error) => {
+          console.log("error:", error);
+          const errorDetails = (error as Error & { details?: string }).details;
+          if (errorDetails)
+            showSnackbar(error.message + ": " + errorDetails, "error");
+          else showSnackbar(error.message, "error");
+        },
+      },
+    );
+  };
+
   return (
     <Card
       sx={{
@@ -155,22 +184,40 @@ const CustomerOrderCard = ({
             <OrderStatusProgress data={data} />
           </Box>
 
-          {/* Action */}
-          <Button
-            fullWidth
-            variant="contained"
-            color="secondary"
-            startIcon={<VisibilityRounded />}
-            sx={{
-              height: 44,
-              borderRadius: 2.5,
-              fontWeight: 700,
-              textTransform: "none",
-            }}
-            onClick={() => onView?.(`details/${String(data.customerRequestId)}`)}
-          >
-            عرض الطلب
-          </Button>
+          {/* Action: primary full button + small cancel icon button */}
+          <Stack direction="row" sx={{ gap: 1 }}>
+            <Button
+              variant="contained"
+              color="secondary"
+              startIcon={<VisibilityRounded />}
+              sx={{
+                height: 44,
+                borderRadius: 2.5,
+                fontWeight: 700,
+                textTransform: "none",
+                flex: 1,
+              }}
+              onClick={() =>
+                onView?.(`details/${String(data.customerRequestId)}`)
+              }
+            >
+              عرض الطلب
+            </Button>
+
+            <IconButton
+              aria-label="cancel"
+              onClick={handleCancelOrder}
+              sx={{
+                height: 44,
+                width: 44,
+                bgcolor: "#eae6e6",
+                color: "common.white",
+                "&:hover": { bgcolor: "secondary.dark" },
+              }}
+            >
+              <CancelRounded />
+            </IconButton>
+          </Stack>
         </Stack>
       </CardContent>
     </Card>

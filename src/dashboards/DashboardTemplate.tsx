@@ -2,9 +2,7 @@
 import { useState, useCallback } from "react";
 import { Box } from "@mui/material";
 import { Outlet } from "react-router-dom";
-import ResponsiveDrawer, {
-  // drawerWidth,
-} from "../shared/layout/ResponsiveDrawer";
+import ResponsiveDrawer from "../shared/layout/ResponsiveDrawer"; // drawerWidth,
 
 const DashboardTemplate = () => {
   // نستخدم State بدلاً من useRef العادي للاحتفاظ بعنصر الـ DOM
@@ -34,8 +32,11 @@ const DashboardTemplate = () => {
         component="main"
         sx={{
           flexGrow: 1,
+          minWidth: 0,
+          width: 0,
           height: "100%",
           overflowY: "auto",
+          overflowX: "hidden",
           p: {
             xs: 1,
             sm: 3,

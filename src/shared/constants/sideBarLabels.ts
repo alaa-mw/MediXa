@@ -8,6 +8,8 @@ import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import SearchIcon from "@mui/icons-material/Search";
 import PaymentsIcon from "@mui/icons-material/Payments";
 import SupportAgentIcon from "@mui/icons-material/SupportAgent";
+import AutoGraphIcon from "@mui/icons-material/AutoGraph";
+import NotificationsIcon from "@mui/icons-material/Notifications";
 import type { Role } from "../../app/routes/roles";
 
 export const sideBarLabels: Record<
@@ -26,9 +28,19 @@ export const sideBarLabels: Record<
       icon: BarChartIcon,
     },
     {
+      title: "نشرة الأسعار",
+      path: "/price-list",
+      icon: PaymentsIcon,
+    },
+    {
       title: "اشتراكي",
       path: "/subscription-schedule",
       icon: PaymentsIcon,
+    },
+    {
+      title: "الإشعارات",
+      path: "/notifications",
+      icon: NotificationsIcon,
     },
   ],
   PHARMACY: [
@@ -57,6 +69,11 @@ export const sideBarLabels: Record<
       path: "/orders",
       icon: ShoppingBagIcon,
     },
+    {
+      title: "المشتريات الذكية",
+      path: "/predictive-orders",
+      icon: AutoGraphIcon,
+    },
     // {
     //   title: "التقارير",
     //   path: "/reports",
@@ -67,20 +84,26 @@ export const sideBarLabels: Record<
       path: "/suppliers",
       icon: LocalShippingIcon,
     },
+    // {
+    //   title: "استكشاف الأدوية",
+    //   path: "/medicine-search",
+    //   icon: SearchIcon,
+    // },
     {
-      title: "استكشاف الأدوية",
-      path: "/medicine-search",
-      icon: SearchIcon,
+      title: "نشرة الأسعار",
+      path: "/price-list",
+      icon: PaymentsIcon,
     },
-    {
-      title: "الدعم الفني",
-      path: "/support",
-      icon: SupportAgentIcon,
-    },
+
     {
       title: "المساعد الذكي",
       path: "/ai-assistant",
       icon: SupportAgentIcon,
+    },
+    {
+      title: "الإشعارات",
+      path: "/notifications",
+      icon: NotificationsIcon,
     },
   ],
   ADMIN: [
@@ -105,14 +128,14 @@ export const sideBarLabels: Record<
       icon: Inventory2Icon,
     },
     {
-      title: "الدعم الفني",
-      path: "/support",
+      title: "إدارة العروض",
+      path: "/Create_offer",
       icon: SupportAgentIcon,
     },
     {
-      title: "المالية",
-      path: "/Create_offer",
-      icon: SupportAgentIcon,
+      title: "الإشعارات",
+      path: "/notifications",
+      icon: NotificationsIcon,
     },
   ],
   MEDICAL_TEAM: [
@@ -130,6 +153,11 @@ export const sideBarLabels: Record<
       title: "تسعير الأدوية",
       path: "/CDB/pricing",
       icon: Inventory2Icon,
+    },
+    {
+      title: "الإشعارات",
+      path: "/notifications",
+      icon: NotificationsIcon,
     },
   ],
 };

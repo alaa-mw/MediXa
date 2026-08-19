@@ -1,4 +1,3 @@
-
 import {
   Box,
   Typography,
@@ -23,6 +22,14 @@ interface Props {
   onSelectionChange: (hasIngredients: boolean) => void;
 }
 
+type InvoiceDrugMetadata = {
+  dosageFormName?: string;
+  dosageForm?: {
+    dosageFormName?: string;
+  };
+  requiresPrescription?: boolean;
+};
+
 export const ActiveIngredientSearchContent = ({
   debouncedSearchTerm,
   onClearSearchText,
@@ -34,6 +41,7 @@ export const ActiveIngredientSearchContent = ({
     ActiveIngredient[]
   >([]);
   const [selectedDrugs, setSelectedDrugs] = useState<PharmacyDrug[]>([]);
+  const [isAddingToInvoice, setIsAddingToInvoice] = useState(false);
 
   useEffect(() => {
     onSelectionChange(selectedIngredients.length > 0);
@@ -47,7 +55,9 @@ export const ActiveIngredientSearchContent = ({
   } = useActiveIngredientSearch(debouncedSearchTerm);
 
   // استخراج addDrug من actions
-  const { actions: { addDrug } } = useSaleInvoice();
+  const {
+    actions: { addDrug },
+  } = useSaleInvoice();
 
   const selectedIngredientIds = selectedIngredients.map((i) => i.ingredientId);
   const { data: drugsResponse, isLoading: isDrugsLoading } =
@@ -60,7 +70,7 @@ export const ActiveIngredientSearchContent = ({
       (entries) => {
         if (entries[0].isIntersecting && hasMore) loadMore();
       },
-      { threshold: 1.0 }
+      { threshold: 1.0 },
     );
 
     if (observerTarget.current) observer.observe(observerTarget.current);
@@ -73,7 +83,7 @@ export const ActiveIngredientSearchContent = ({
   const handleSelectIngredient = (ingredient: ActiveIngredient) => {
     if (
       !selectedIngredients.some(
-        (i) => i.ingredientId === ingredient.ingredientId
+        (i) => i.ingredientId === ingredient.ingredientId,
       )
     ) {
       setSelectedIngredients((prev) => [...prev, ingredient]);
@@ -84,7 +94,7 @@ export const ActiveIngredientSearchContent = ({
 
   const handleRemoveIngredient = (ingredientId: number) => {
     const updatedIngredients = selectedIngredients.filter(
-      (i) => i.ingredientId !== ingredientId
+      (i) => i.ingredientId !== ingredientId,
     );
     setSelectedIngredients(updatedIngredients);
     setSelectedDrugs([]);
@@ -92,17 +102,26 @@ export const ActiveIngredientSearchContent = ({
 
   // إضافة الأدوية المحددة بالتوازي بدلاً من التسلسل
   const handleAddSelectedToInvoice = async () => {
-    await Promise.all(
-      selectedDrugs.map((drug) =>
-        addDrug(drug.pharmacyDrugId, {
-          tradeName: drug.tradeName,
-          dosageFormName:
-            (drug as any).dosageFormName || (drug as any).dosageForm?.dosageFormName,
-          requiresPrescription: (drug as any).requiresPrescription,
-        })
-      )
-    );
-    onCloseDropdown();
+    if (isAddingToInvoice || selectedDrugs.length === 0) return;
+
+    setIsAddingToInvoice(true);
+    try {
+      await Promise.all(
+        selectedDrugs.map((drug) => {
+          const metadata = drug as PharmacyDrug & InvoiceDrugMetadata;
+
+          return addDrug(drug.pharmacyDrugId, {
+            tradeName: drug.tradeName,
+            dosageFormName:
+              metadata.dosageFormName || metadata.dosageForm?.dosageFormName,
+            requiresPrescription: metadata.requiresPrescription,
+          });
+        }),
+      );
+      onCloseDropdown();
+    } finally {
+      setIsAddingToInvoice(false);
+    }
   };
 
   return (
@@ -165,7 +184,9 @@ export const ActiveIngredientSearchContent = ({
               ))
             ) : (
               !isIngredientsLoading && (
-                <Typography sx={{ p: 2, textAlign: "center", color: "#64748b" }}>
+                <Typography
+                  sx={{ p: 2, textAlign: "center", color: "#64748b" }}
+                >
                   لا توجد نتائج
                 </Typography>
               )
@@ -173,7 +194,12 @@ export const ActiveIngredientSearchContent = ({
             {hasMore && (
               <Box
                 ref={observerTarget}
-                sx={{ display: "flex", justifyContent: "center", p: 2, height: "40px" }}
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  p: 2,
+                  height: "40px",
+                }}
               >
                 {isIngredientsLoading && <CircularProgress size={20} />}
               </Box>
@@ -187,34 +213,56 @@ export const ActiveIngredientSearchContent = ({
               </Box>
             ) : (
               <>
-                <Divider textAlign="left" sx={{ "&::before": { display: "none" }, mb: 1.5 }}>
+                <Divider
+                  textAlign="left"
+                  sx={{ "&::before": { display: "none" }, mb: 1.5 }}
+                >
                   <Chip
                     label="الأدوية المطابقة للتركيبة"
                     size="small"
-                    sx={{ bgcolor: "#f1f5f9", color: "#64748b", fontWeight: 600 }}
+                    sx={{
+                      bgcolor: "#f1f5f9",
+                      color: "#64748b",
+                      fontWeight: 600,
+                    }}
                   />
                 </Divider>
 
                 {drugsList.length > 0 ? (
-                  <Box sx={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 1.5 }}>
+                  <Box
+                    sx={{
+                      display: "grid",
+                      gridTemplateColumns: "repeat(2, 1fr)",
+                      gap: 1.5,
+                    }}
+                  >
                     {drugsList.map((drug, index) => (
                       <Box
                         key={drug.pharmacyDrugId}
                         sx={{
                           gridColumn:
-                            drugsList.length % 2 !== 0 && index === drugsList.length - 1
+                            drugsList.length % 2 !== 0 &&
+                            index === drugsList.length - 1
                               ? "span 2"
                               : "span 1",
                         }}
                       >
                         <AlternativeDrugCard
                           drug={drug}
-                          isSelected={selectedDrugs.some((d) => d.pharmacyDrugId === drug.pharmacyDrugId)}
+                          isSelected={selectedDrugs.some(
+                            (d) => d.pharmacyDrugId === drug.pharmacyDrugId,
+                          )}
                           onToggle={(d) => {
                             setSelectedDrugs((prev) =>
-                              prev.some((item) => item.pharmacyDrugId === d.pharmacyDrugId)
-                                ? prev.filter((item) => item.pharmacyDrugId !== d.pharmacyDrugId)
-                                : [...prev, d]
+                              prev.some(
+                                (item) =>
+                                  item.pharmacyDrugId === d.pharmacyDrugId,
+                              )
+                                ? prev.filter(
+                                    (item) =>
+                                      item.pharmacyDrugId !== d.pharmacyDrugId,
+                                  )
+                                : [...prev, d],
                             );
                           }}
                         />
@@ -240,26 +288,33 @@ export const ActiveIngredientSearchContent = ({
             )}
           </Box>
         ) : (
-          <Typography sx={{ p: 2, textAlign: "center", color: "#64748b", mt: 2 }}>
+          <Typography
+            sx={{ p: 2, textAlign: "center", color: "#64748b", mt: 2 }}
+          >
             ابحث عن المادة الفعالة...
           </Typography>
         )}
       </Box>
 
       {/* زر الإضافة الثابت في الأسفل */}
-      {hasSelectedIngredients && selectedDrugs.length > 0 && !isDrugsLoading && (
-        <Box sx={{ p: 2, borderTop: "1px solid #e2e8f0", bgcolor: "#fff" }}>
-          <Button
-            fullWidth
-            variant="contained"
-            size="large"
-            onClick={handleAddSelectedToInvoice}
-            sx={{ borderRadius: "12px", py: 1.5, fontWeight: 700 }}
-          >
-            إضافة ({selectedDrugs.length}) إلى الفاتورة
-          </Button>
-        </Box>
-      )}
+      {hasSelectedIngredients &&
+        selectedDrugs.length > 0 &&
+        !isDrugsLoading && (
+          <Box sx={{ p: 2, borderTop: "1px solid #e2e8f0", bgcolor: "#fff" }}>
+            <Button
+              fullWidth
+              variant="contained"
+              size="large"
+              onClick={handleAddSelectedToInvoice}
+              disabled={isAddingToInvoice}
+              sx={{ borderRadius: "12px", py: 1.5, fontWeight: 700 }}
+            >
+              {isAddingToInvoice
+                ? "جاري الإضافة..."
+                : `إضافة (${selectedDrugs.length}) إلى الفاتورة`}
+            </Button>
+          </Box>
+        )}
     </Box>
   );
 };

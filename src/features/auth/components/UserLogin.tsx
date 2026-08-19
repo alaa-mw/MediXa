@@ -9,7 +9,7 @@ import {
   Paper,
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import usePostDataNoToken from "../../../shared/hooks/usePostDataNoToken";
 import theme from "../../../shared/styles/mainTheme";
@@ -18,11 +18,12 @@ import type { LoginResponse } from "../types/LoginResponse";
 import TokenService from "../../../shared/services/tokenService";
 import { useNavigate } from "react-router-dom";
 import { useSnackbar } from "../../../shared/providers/useSnackbar";
+import { getFcmTokenAsString } from "../../../firebase/firebaseConfig";
 
 const UserLogin = () => {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-    const { showSnackbar } = useSnackbar();
+  const { showSnackbar } = useSnackbar();
 
   const { mutate: loginUser, isPending } = usePostDataNoToken<LoginResponse>(
     "/authentication/sign-in-user",
@@ -31,7 +32,19 @@ const UserLogin = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
+    fcm_token: "",
   });
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const token = await getFcmTokenAsString();
+        setFormData((prev) => ({ ...prev, fcm_token: token }));
+      } catch (err) {
+        console.error("Failed to get FCM token:", err);
+      }
+    })();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -52,6 +65,10 @@ const UserLogin = () => {
         TokenService.setUserRole(response?.data?.accountType); // change later
         TokenService.setTokens(response?.data?.tokens);
         const pharmacies = response?.data?.pharmacies;
+
+        if (TokenService.getUserRole() === "PHARMACY_OWNER" && pharmacies) {
+          localStorage.setItem("ownerPharmacies", JSON.stringify(pharmacies));
+        }
 
         if (
           TokenService.getUserRole() === "PHARMACY_OWNER" &&
@@ -84,11 +101,9 @@ const UserLogin = () => {
       onError: (error) => {
         console.log("error:", error);
         const errorDetails = (error as Error & { details?: string }).details;
-        if(errorDetails )
-          showSnackbar(error.message+": " + errorDetails, "error");
-        else
-          showSnackbar(error.message , "error");
-
+        if (errorDetails)
+          showSnackbar(error.message + ": " + errorDetails, "error");
+        else showSnackbar(error.message, "error");
       },
     });
   };
