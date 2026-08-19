@@ -127,6 +127,7 @@ export interface PharmacyDrugDetails {
 export interface DrugStock {
   availableQuantity: number;
   availableQuantityText: string;
+  availableIndividualUnits:number;
   minStockAlert: number;
   isLowStock: boolean;
   isOutOfStock: boolean;

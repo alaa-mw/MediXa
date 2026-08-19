@@ -225,12 +225,27 @@ export const MedicineCard: React.FC<MedicineCardProps> = ({ medicine }) => {
             }}
           >
             {medicine.stock.availableQuantityText}{" "}
-            <Box component="span" sx={{ color: "#64748b", fontWeight: 500, fontSize: "0.7rem" }}>
-              ({availableIndividualUnits} وحدة)
-            </Box>
+            
           </Typography>
         </Box>
-
+<Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.75, color: "#64748b" }}>
+            <InventoryIcon sx={{ fontSize: 16 }} />
+            <Typography variant="caption" sx={{ fontWeight: 500 }}>
+               عدد الوحدات:
+            </Typography>
+          </Box>
+          <Typography
+            variant="caption"
+            sx={{
+              fontWeight: 700,
+              color: isLowStock ? "#dc2626" : "#16a34a",
+            }}
+          >
+            {medicine.stock.availableIndividualUnits}{" "}
+            
+          </Typography>
+        </Box>
         <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 0.75, color: "#64748b" }}>
             <LocationIcon sx={{ fontSize: 16 }} />

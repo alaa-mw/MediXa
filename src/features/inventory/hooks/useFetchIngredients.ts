@@ -22,13 +22,16 @@ export const useFetchIngredients = () => {
       const response = await client.get();
 
       if (response && response.success) {
-        setIngredients(response.data); 
+        // 🛠️ التعديل هنا: الوصول للمصفوفة الفعالية response.data.data بدلاً من الكائن response.data
+        const actualData = response.data?.data || response.data || [];
+        setIngredients(Array.isArray(actualData) ? actualData : []);
       } else {
         throw new Error(response.message || "فشل جلب التراكيب الطبية");
       }
     } catch (err: any) {
       console.error("Fetch Ingredients Error:", err);
       setError(err?.message || "حدث خطأ أثناء جلب التراكيب الطبية");
+      setIngredients([]); // حماية إضافية لتفادي إبقاء قيم غير صحيحة
     } finally {
       setLoading(false);
     }
