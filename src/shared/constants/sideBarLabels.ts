@@ -8,6 +8,7 @@ import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import SearchIcon from "@mui/icons-material/Search";
 import PaymentsIcon from "@mui/icons-material/Payments";
 import SupportAgentIcon from "@mui/icons-material/SupportAgent";
+import AutoGraphIcon from "@mui/icons-material/AutoGraph";
 import type { Role } from "../../app/routes/roles";
 
 export const sideBarLabels: Record<
@@ -56,6 +57,11 @@ export const sideBarLabels: Record<
       title: "الطلبات",
       path: "/orders",
       icon: ShoppingBagIcon,
+    },
+    {
+      title: "المشتريات الذكية",
+      path: "/predictive-orders",
+      icon: AutoGraphIcon,
     },
     // {
     //   title: "التقارير",

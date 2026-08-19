@@ -118,9 +118,12 @@ const AddCustomerOrder = () => {
         showSnackbar("تم إنشاء طلب العميل بنجاح", "success");
         setForm({ customerName: "", customerPhone: "", notes: "", items: [] });
       },
-      onError: (err) => {
-        console.error(err);
-        showSnackbar("حدث خطأ أثناء إنشاء الطلب", "error");
+      onError: (error) => {
+         const errorDetails = (error as Error & { details?: string }).details;
+        if(errorDetails )
+          showSnackbar(error.message+": " + errorDetails, "error");
+        else
+          showSnackbar(error.message , "error");
       },
     });
   };

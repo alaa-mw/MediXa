@@ -2,7 +2,7 @@ import React from "react";
 import { Box, Typography, Stack, Button } from "@mui/material";
 import { format } from "date-fns";
 import type { CustomerOrder } from "../types/customerOrder";
-import getOrderStatusLabel from "../utils/getOrderStatusLabel";
+import { getAtLabel } from "../utils/getOrderStatusLabel";
 
 const OrderStatusProgress = ({
   data,
@@ -41,13 +41,14 @@ const OrderStatusProgress = ({
       >
         {/* Left circle (PENDING/requested) */}
         <Box sx={{ textAlign: "center", width: 120 }}>
+          <Typography variant="caption" sx={{ display: "block", mt: 0.4 }}>
+            {getAtLabel.requestedAt}
+          </Typography>
           <Typography
             variant="caption"
-            sx={{ display: "block", fontWeight: 700, mt: 0.5 }}
+            color="text.secondary"
+            sx={{ fontWeight: 700 }}
           >
-            {getOrderStatusLabel("PENDING")}
-          </Typography>
-          <Typography variant="caption" color="text.secondary">
             {formatDate(requestedAt)}
           </Typography>
         </Box>
@@ -56,15 +57,14 @@ const OrderStatusProgress = ({
         <Box sx={{ textAlign: "center", width: 120 }}>
           {completedAt || cancelledAt ? (
             <>
+              <Typography variant="caption" sx={{ display: "block", mt: 0.4 }}>
+                {completedAt ? getAtLabel.completedAt : getAtLabel.cancelledAt}
+              </Typography>
               <Typography
                 variant="caption"
-                sx={{ display: "block", fontWeight: 700, mt: 0.5 }}
+                color="text.secondary"
+                sx={{ fontWeight: 700 }}
               >
-                {completedAt
-                  ? getOrderStatusLabel("COMPLETED")
-                  : getOrderStatusLabel("CANCELLED")}
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
                 {completedAt
                   ? formatDate(completedAt)
                   : formatDate(cancelledAt)}

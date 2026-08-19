@@ -1,6 +1,7 @@
-import { Box, Stack, Typography } from "@mui/material";
+import { Box, Stack } from "@mui/material";
 import React, { useEffect } from "react";
 import useGetWithParams from "../../../shared/hooks/useGetWithParams";
+import TokenService from "../../../shared/services/tokenService";
 import type {
   DailyWindowActivityItem,
   DailyWindowAlertItem,
@@ -11,7 +12,6 @@ import DashboardActivitySection from "./sections/DashboardActivitySection";
 import DashboardAlertsSection from "./sections/DashboardAlertsSection";
 import DashboardCalendarCard from "./sections/DashboardCalendarCard";
 import DashboardStatCard from "./sections/DashboardStatCard";
-import TokenService from "../../../shared/services/tokenService";
 
 const DashboardPage = () => {
   const todayDate = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
@@ -79,9 +79,9 @@ const DashboardPage = () => {
       }}
     >
       <Stack spacing={2.5}>
-        <Typography variant="h5" sx={{ fontWeight: 700 }}>
+        {/* <Typography variant="h5" sx={{ fontWeight: 700 }}>
           النافذة اليومية{" "}
-        </Typography>
+        </Typography> */}
         {/* top section */}
         <Box
           sx={{

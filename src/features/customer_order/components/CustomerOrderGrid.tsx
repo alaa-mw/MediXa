@@ -42,7 +42,7 @@ const CustomerOrderGrid = () => {
   const [selectedSearch, setSelectedSearch] =
     useState<PharmacyDrugSearch | null>(null);
 
-  const { data, isLoading, queryParams, setQueryParams } = useGetWithParams<
+  const { data, isLoading, queryParams, setQueryParams , refetch } = useGetWithParams<
     CustomerOrder[]
   >("customer-request", localFilters);
 
@@ -297,6 +297,7 @@ const CustomerOrderGrid = () => {
                 key={order.customerRequestId}
                 data={order}
                 onView={(id) => navigate(String(id))}
+                refetch={refetch}
               />
             ))}
       </Box>
