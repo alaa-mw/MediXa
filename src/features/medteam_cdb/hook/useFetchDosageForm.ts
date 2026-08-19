@@ -5,7 +5,7 @@ import type {
 } from "../types/dosageFormType";
 import useGetWithParams from "../../../shared/hooks/useGetWithParams";
 
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 10;
 
 export const useDosageForms = () => {
   const [page, setPage] = useState(1);
@@ -27,7 +27,7 @@ export const useDosageForms = () => {
     search: "",
   });
 
-  const updateQuery = (nextPage = page, nextSearch = search) => {
+  const updateQuery = (nextPage: number, nextSearch: string) => {
     setQueryParams({
       page: nextPage,
       limit: PAGE_SIZE,

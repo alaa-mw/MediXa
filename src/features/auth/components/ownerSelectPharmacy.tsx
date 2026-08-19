@@ -19,7 +19,17 @@ export const OwnerSelectPharmacy: React.FC = () => {
   const location = useLocation(); // استدعاء useLocation
 
   // استخراج الصيدليات من الـ state، مع وضع مصفوفة فارغة كقيمة احترازية
-  const pharmacies: Pharmacies[] = location.state?.pharmacies || [];
+  const storedPharmacies = localStorage.getItem("ownerPharmacies");
+  let storedPharmacyList: Pharmacies[] = [];
+  if (storedPharmacies) {
+    try {
+      storedPharmacyList = JSON.parse(storedPharmacies) as Pharmacies[];
+    } catch {
+      storedPharmacyList = [];
+    }
+  }
+  const pharmacies: Pharmacies[] =
+    location.state?.pharmacies || storedPharmacyList;
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   // دالة التعامل مع اختيار الصيدلية

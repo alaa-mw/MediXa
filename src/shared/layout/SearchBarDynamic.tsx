@@ -3,6 +3,7 @@ import { Box, List, ListItemButton, ListItemText, Paper } from "@mui/material";
 import React, { useEffect, useRef, useState } from "react";
 
 interface SearchBarProps<T> {
+  value?: string; // 👈 إمكانية استلام القيمة من المكون الأب
   placeholder?: string;
 
   onChange: (value: string) => void;
@@ -18,6 +19,7 @@ interface SearchBarProps<T> {
 }
 
 export default function SearchBarDynamic<T>({
+  value: externalValue, // 👈 استلام القيمة الخارجية
   placeholder,
   onChange,
   results = [],
@@ -28,7 +30,14 @@ export default function SearchBarDynamic<T>({
 }: SearchBarProps<T>) {
   const [open, setOpen] = React.useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState(externalValue || "");
+
+  // 🔄 مزامنة الـ input عند تحديث القيمة الخارجية (مثل قراءة الباركود)
+  useEffect(() => {
+    if (externalValue !== undefined) {
+      setValue(externalValue);
+    }
+  }, [externalValue]);
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
@@ -111,16 +120,15 @@ export default function SearchBarDynamic<T>({
         >
           <List>
             {results.map((item, index) => (
-              
               <ListItemButton
-                  key={index}
-                  onClick={() => {
-                    if (onSelect) {
-                      onSelect(item);
-                    }
-                    setOpen(false);
-                  }}
-                  sx={{
+                key={index}
+                onClick={() => {
+                  if (onSelect) {
+                    onSelect(item);
+                  }
+                  setOpen(false);
+                }}
+                sx={{
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "space-between",
@@ -131,12 +139,12 @@ export default function SearchBarDynamic<T>({
                   flexDirection: { xs: "column", sm: "row" },
                   cursor: "pointer",
                 }}
-                >
-                  <ListItemText
-                    sx={{ my: 0 }}
-                    primary={getOptionLabel ? getOptionLabel(item) : ""}
-                  />
-                </ListItemButton>
+              >
+                <ListItemText
+                  sx={{ my: 0 }}
+                  primary={getOptionLabel ? getOptionLabel(item) : ""}
+                />
+              </ListItemButton>
             ))}
           </List>
         </Paper>

@@ -5,15 +5,19 @@ import MenuIcon from "@mui/icons-material/Menu";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import { Drawer, IconButton } from "@mui/material";
-import MyDrawer from './MyDrawer';
+import MyDrawer from "./MyDrawer";
 
 export const drawerWidth = 240;
 
 interface ResponsiveDrawerProps {
   container?: HTMLElement | null;
+  appBarTopOffset?: number;
 }
 
-const ResponsiveDrawer = ({ container }: ResponsiveDrawerProps) => {
+const ResponsiveDrawer = ({
+  container,
+  appBarTopOffset = 0,
+}: ResponsiveDrawerProps) => {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [isClosing, setIsClosing] = React.useState(false);
   const handleDrawerClose = () => {
@@ -36,7 +40,8 @@ const ResponsiveDrawer = ({ container }: ResponsiveDrawerProps) => {
       <AppBar
         position="fixed"
         sx={{
-          display: { xs: "block", md: "none" }, 
+          display: { xs: "block", md: "none" },
+          top: appBarTopOffset,
           width: { md: `calc(100% - ${drawerWidth}px)` },
           // ml: { sm: `${drawerWidth}px` },
         }}
@@ -47,7 +52,7 @@ const ResponsiveDrawer = ({ container }: ResponsiveDrawerProps) => {
             aria-label="open drawer"
             edge="start"
             onClick={handleDrawerToggle}
-            sx={{ mx: 1, display: { md: "none" } }} 
+            sx={{ mx: 1, display: { md: "none" } }}
           >
             <MenuIcon />
           </IconButton>
@@ -60,7 +65,7 @@ const ResponsiveDrawer = ({ container }: ResponsiveDrawerProps) => {
         component="nav"
         sx={{
           width: { md: drawerWidth },
-          flexShrink: { md: 0  }, // (md) ويجعلها لا تتقلص عند تغيير حجم الشاشة
+          flexShrink: { md: 0 }, // (md) ويجعلها لا تتقلص عند تغيير حجم الشاشة
         }}
         aria-label="mailbox folders"
       >

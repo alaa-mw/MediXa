@@ -21,6 +21,7 @@
     "axios": "^1.16.0",
     "date-fns": "^4.4.0",
     "dayjs": "^1.11.21",
+    "firebase": "^12.17.1",
     "framer-motion": "^12.40.0",
     "lucide-react": "^1.22.0",
     "react": "^19.2.5",

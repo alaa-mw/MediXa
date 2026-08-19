@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { Box, CircularProgress, Typography } from "@mui/material";
 import GeneralDrugTableHeader from "./GeneralDrugTableHeader";
 import type { GeneralDrug } from "../types/allGeneralDrugType";
 import GeneralDrugTableRow from "./GeneralDrugTableRow";
+import GeneralDrugDetailsDialog from "./GeneralDrugDetailsDialog";
 
 interface GeneralDrugTableProps {
   drugs: GeneralDrug[];
@@ -14,6 +16,8 @@ const GeneralDrugTable = ({
   isLoading,
   isError,
 }: GeneralDrugTableProps) => {
+  const [selectedDrugId, setSelectedDrugId] = useState<number | null>(null);
+
   return (
     <Box
       sx={{
@@ -39,9 +43,17 @@ const GeneralDrugTable = ({
         </Box>
       ) : (
         drugs.map((drug) => (
-          <GeneralDrugTableRow key={drug.generalDrugId} generalDrug={drug} />
+          <GeneralDrugTableRow
+            key={drug.generalDrugId}
+            generalDrug={drug}
+            onShowDetails={setSelectedDrugId}
+          />
         ))
       )}
+      <GeneralDrugDetailsDialog
+        generalDrugId={selectedDrugId}
+        onClose={() => setSelectedDrugId(null)}
+      />
     </Box>
   );
 };

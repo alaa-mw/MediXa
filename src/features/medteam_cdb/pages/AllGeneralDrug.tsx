@@ -14,7 +14,6 @@ import GeneralDrugTable from "../components/GeneralDrugTable";
 import useGetWithParams from "../../../shared/hooks/useGetWithParams";
 import type { GeneralDrug, PaginatedData } from "../types/allGeneralDrugType";
 import { useEffect, useState } from "react";
-import type { DosageForm } from "../types/dosageFormType";
 import { useDebounce } from "../../../shared/hooks/useDebounce";
 
 const AllGeneralDrug = () => {

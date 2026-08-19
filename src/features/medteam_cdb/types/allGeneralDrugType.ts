@@ -14,6 +14,38 @@ export interface GeneralDrug {
   updatedAt: string;
 }
 
+export interface GeneralDrugDetails extends GeneralDrug {
+  dosageForm: {
+    dosageFormId: number;
+    dosageFormName: string;
+    formCategory: string;
+    createdAt: string;
+    updatedAt: string;
+  };
+  ingredients: {
+    drugIngredientId: number;
+    ingredientId: number;
+    generalDrugId: number;
+    strengthValue: string;
+    unit: string;
+    ingredient: {
+      ingredientId: number;
+      ingredientName: string;
+      description: string;
+    };
+  }[];
+  categories: {
+    uniqueId: number;
+    generalDrugId: number;
+    categoryId: number;
+    category: {
+      categoryId: number;
+      categoryName: string;
+      description: string;
+    };
+  }[];
+}
+
 // تعريف هيكل بيانات الترقيم (Pagination Data)
 export interface PaginatedData<T> {
   data: T[];
