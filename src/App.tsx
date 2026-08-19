@@ -58,9 +58,28 @@ import OwnerRenewSubscriptionPage from "./features/online_renew_subsrciption/pag
 import OwnerPharmacySubscriptionSchedule from "./features/online_renew_subsrciption/page/OwnerPharmaSubs";
 import PriceListPage from "./features/pharmacy_price_list/pages/PriceListPage";
 import FloatingAssistantLauncher from "./features/ai_assistant/components/FloatingAssistantLauncher";
+import NotificationsPage from "./features/notifications/pages/NotificationsPage";
+import { useEffect } from "react";
+import { messaging, requestPermission } from "./firebase/firebaseConfig";
+import { onMessage } from "firebase/messaging";
 
 function App() {
   const pharmacyPaths = ["/pharmacy"];
+  useEffect(() => {
+    // طلب الإذن عند تحميل التطبيق
+    requestPermission();
+
+    // الاستماع للإشعارات أثناء عمل التطبيق في الواجهة
+    const unsubscribe = onMessage(messaging, (payload) => {
+      console.log("Message received. ", payload);
+      if (payload.notification) {
+        alert(`${payload.notification.title}: ${payload.notification.body}`);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   return (
     <>
       <ThemeProvider theme={arabicTheme}>
@@ -89,6 +108,7 @@ function App() {
                 element={<CreatePharmacyAccount />}
               />
               <Route path="subscription-plans" element={<PricingPage />} />
+              <Route path="notifications" element={<NotificationsPage />} />
               <Route path="pharmacies" element={<PharmacyManagement />} />
               <Route
                 path="pharmacies/subscription-schedule/:id"
@@ -117,6 +137,7 @@ function App() {
               <Route path="CDB/addDrug" element={<AddGeneralDrug />} />
               <Route path="CDB/allDrugs" element={<AllGeneralDrug />} />
               <Route path="CDB/pricing" element={<DrugPricingPage />} />
+              <Route path="notifications" element={<NotificationsPage />} />
             </Route>
           </Route>
 
@@ -132,6 +153,7 @@ function App() {
 
               <Route path="dashboard" element={<DashboardPage />} />
               <Route path="reports" element={<AnalysisInventoryPage />} />
+              <Route path="notifications" element={<NotificationsPage />} />
 
               {/* <Route
                 path="subscription"
@@ -169,6 +191,7 @@ function App() {
             {pharmacyPaths.map((path) => (
               <Route path={path} key={path} element={<DashboardTemplate />}>
                 <Route index element={<>hello</>} />
+                <Route path="notifications" element={<NotificationsPage />} />
                 <Route path="sales" element={<SalesLayout />}>
                   <Route index element={<Navigate to="sales" replace />} />
                   <Route path="sales" element={<SaleInvoicesPage />} />

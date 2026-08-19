@@ -47,17 +47,16 @@ const ActiveIngredientForm = ({
   onRemoveIngredient,
 }: ActiveIngredientFormProps) => {
   // يفضّل التأكد من أن الـ hook يرجع دوال التصفح والبحث مستقبلاً
-  const [page, setPage] = useState(1);
   const {
     activeIngredients,
     isLoading,
     refetch,
-    // setPage,
-    // setSearch,
-    // page,
-    // totalPages,
-    // totalItems,
-    // itemsPerPage,
+    page: activeIngredientsPage,
+    totalPages,
+    totalItems,
+    itemsPerPage,
+    setPage,
+    setSearch,
   } = useActiveIngredients();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -91,10 +90,10 @@ const ActiveIngredientForm = ({
                 loading={isLoading}
                 // تجهيز الـ Pagination للمستقبل (لو لم تكن موجودة حالياً بالـ hook نضع قيم افتراضية)
                 pagination={{
-                  page: page || 1,
-                  pages: 1,
-                  total: 1,
-                  limit: 100,
+                  page: activeIngredientsPage,
+                  pages: totalPages,
+                  total: totalItems,
+                  limit: itemsPerPage,
                 }}
                 getOptionLabel={(option) => option.ingredientName}
                 isOptionEqualToValue={(a, b) =>
@@ -107,8 +106,8 @@ const ActiveIngredientForm = ({
                     selectedItem ? selectedItem.ingredientId : -1,
                   );
                 }}
-                //onSearch={setSearch} // سيعمل مباشرة عند تهيئة الـ API لدعم البحث
-                onPageChange={setPage} // سيعمل مباشرة عند تهيئة الـ API لدعم الصفحات
+                onSearch={setSearch}
+                onPageChange={setPage}
                 onQuickAdd={() => setIsModalOpen(true)}
               />
               <DynamicQuickAddModal

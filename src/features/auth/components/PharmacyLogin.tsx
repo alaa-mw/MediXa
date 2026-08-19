@@ -9,7 +9,7 @@ import {
   Paper,
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import usePostDataNoToken from "../../../shared/hooks/usePostDataNoToken";
 import theme from "../../../shared/styles/mainTheme";
@@ -18,6 +18,7 @@ import type { LoginResponse } from "../types/LoginResponse";
 import TokenService from "../../../shared/services/tokenService";
 import { useNavigate } from "react-router-dom";
 import { useSnackbar } from "../../../shared/providers/useSnackbar";
+import { getFcmTokenAsString } from "../../../firebase/firebaseConfig";
 
 const PharmacyLogin = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -30,7 +31,19 @@ const PharmacyLogin = () => {
   const [formData, setFormData] = useState({
     loginCode: "",
     password: "",
+    fcm_token: "",
   });
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const token = await getFcmTokenAsString();
+        setFormData((prev) => ({ ...prev, fcm_token: token }));
+      } catch (err) {
+        console.error("Failed to get FCM token:", err);
+      }
+    })();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -57,11 +70,9 @@ const PharmacyLogin = () => {
       onError: (error) => {
         console.log("error:", error);
         const errorDetails = (error as Error & { details?: string }).details;
-        if(errorDetails )
-          showSnackbar(error.message+": " + errorDetails, "error");
-        else
-          showSnackbar(error.message , "error");
-
+        if (errorDetails)
+          showSnackbar(error.message + ": " + errorDetails, "error");
+        else showSnackbar(error.message, "error");
       },
     });
   };

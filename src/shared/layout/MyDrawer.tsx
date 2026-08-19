@@ -17,6 +17,7 @@ import NavItem from "./NavItem";
 import type { Role } from "../../app/routes/roles";
 import logonobg from "../../assets/logonobg.png";
 import logoWhite from "../../assets/logo_white.png";
+import { removeFcmToken } from "../../firebase/firebaseConfig";
 
 interface MyDrawerProps {
   handleDrawerClose?: () => void;
@@ -31,8 +32,9 @@ const MyDrawer = ({ handleDrawerClose }: MyDrawerProps) => {
   //   `${rolesConfig[localStorage.getItem("userRole") || ""].apiPrefix}/logout`,
   //   undefined
   // );
-  const handleLogout = () => {
+  const handleLogout = async () => {
     TokenService.clearTokens();
+    await removeFcmToken();
     window.location.href = "/";
     // logout(undefined, {
     //   onSuccess: () => {
