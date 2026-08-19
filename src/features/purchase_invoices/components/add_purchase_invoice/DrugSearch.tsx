@@ -46,9 +46,9 @@ const DrugSearch = ({
       {
         name: "",
         page: 1,
-        limit: 10,
+        limit: 6,
         generalPage: 1,
-        generalLimit: 4,
+        generalLimit: 6,
       },
       {
         shouldFetch: (params) => String(params.name ?? "").trim().length >= 3,

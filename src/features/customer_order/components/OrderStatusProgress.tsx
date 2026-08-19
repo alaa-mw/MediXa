@@ -66,7 +66,7 @@ const OrderStatusProgress = ({ data }: { data: CustomerOrder }) => {
         })}
       />
       <Stack
-        sx={{ flexDirection: "row", alignItems: "center", gap: 2, px: 0.5 }}
+        sx={{ flexDirection: "row", alignItems: "center",justifyContent:"space-between", gap: 2, px: 0.5 }}
       >
         {/* Left circle (PENDING/requested) */}
         <Box sx={{ textAlign: "center", width: 120 }}>

@@ -133,7 +133,7 @@ const LocalResultsSection = ({
                 >
                   الكمية المتوفرة: {"  "}
                   <strong style={{ fontWeight: 800 }}>
-                    {drug.availableQuantity} وحدة
+                    {drug.availableBoxCount} علبة
                   </strong>
                 </Typography>
               }
