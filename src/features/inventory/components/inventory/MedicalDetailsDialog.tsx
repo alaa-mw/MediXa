@@ -1,3 +1,4 @@
+
 import React from "react";
 import {
   Dialog,
@@ -6,10 +7,10 @@ import {
   Box,
   Typography,
   IconButton,
-  Divider,
+  Grid,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
-import type { PharmacyDrug } from "../../types/inventory";
+import { Close as CloseIcon, InfoOutlined as InfoIcon } from "@mui/icons-material";
+import type { PharmacyDrug } from "../../types/pharnacyDrug";
 
 interface MedicalDetailsDialogProps {
   open: boolean;
@@ -22,29 +23,22 @@ export const MedicalDetailsDialog: React.FC<MedicalDetailsDialogProps> = ({
   onClose,
   medicine,
 }) => {
-  // دالة مساعدة لعرض الأسطر داخل الـ Dialog بشكل منسق وفاتح
-  const DetailRow = ({
-    label,
-    value,
-  }: {
-    label: string;
-    value: string | number | null;
-  }) => (
+  const StatCard = ({ label, value }: { label: string; value: string | number | null }) => (
     <Box
       sx={{
+        p: 1.75,
+        backgroundColor: "#f8fafc",
+        borderRadius: "10px",
+        border: "1px solid #f1f5f9",
         display: "flex",
-        justifyContent: "space-between",
-        py: 1.5,
-        borderBottom: "1px solid #f1f5f9",
+        flexDirection: "column",
+        gap: 0.5,
       }}
     >
-      <Typography
-        variant="body2"
-        sx={{ color: "#64748bd7", fontWeight: "500" }}
-      >
+      <Typography variant="caption" sx={{ color: "#64748b", fontWeight: 500, fontSize: "0.75rem" }}>
         {label}
       </Typography>
-      <Typography variant="body2" sx={{ color: "#1e293b", fontWeight: "600" }}>
+      <Typography variant="body2" sx={{ color: "#0f172a", fontWeight: 700 }}>
         {value || "—"}
       </Typography>
     </Box>
@@ -54,105 +48,95 @@ export const MedicalDetailsDialog: React.FC<MedicalDetailsDialogProps> = ({
     <Dialog
       open={open}
       onClose={onClose}
-      maxWidth="xs"
+      maxWidth="sm"
       fullWidth
-      scroll="paper"
-      // 🟢 التحديث الجديد المتوافق مع TypeScript و MUI الحديثة بدلاً من PaperProps المباشرة
       slotProps={{
         paper: {
           sx: {
-            borderRadius: "20px",
-            p: 1,
-            boxShadow: "0px 20px 40px rgba(0,0,0,0.08)",
+            borderRadius: "16px",
+            overflow: "hidden",
+            boxShadow: "0px 20px 40px rgba(0,0,0,0.12)",
           },
         },
       }}
     >
-      {/* رأس النافذة */}
+      {/* Header */}
       <DialogTitle
         sx={{
+          backgroundColor: "primary.main",
+          color: "#ffffff",
+          p: 2.5,
           display: "flex",
           justifyContent: "space-between",
-          alignItems: "center",
-          pb: 1,
+          alignItems: "flex-start",
           direction: "rtl",
         }}
       >
         <Box>
-          <Typography variant="h6" sx={{ fontWeight: "700", color: "#0f172a" }}>
+          <Typography variant="h6" sx={{ fontWeight: 700, fontSize: "1.1rem" }}>
             {medicine.tradeName}
           </Typography>
-          <Typography variant="caption" color="textSecondary">
-            المعلومات الفنية والطبية الكاملة
+          <Typography variant="caption" sx={{ color: "#cbd5e1", fontSize: "0.775rem" }}>
+            التفاصيل الفنية والبيانات المسجلة بالنظام
           </Typography>
         </Box>
-
-        <IconButton onClick={onClose} size="small" sx={{ color: "#94a3b8" }}>
+        <IconButton onClick={onClose} size="small" sx={{ color: "#94a3b8", "&:hover": { color: "#fff" } }}>
           <CloseIcon fontSize="small" />
         </IconButton>
       </DialogTitle>
 
-      <Divider sx={{ mx: 3, my: 0.5 }} />
+      {/* Content */}
+      <DialogContent sx={{ p: 3, direction: "rtl", backgroundColor: "#ffffff" }}>
+        <Grid container spacing={2}>
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <StatCard label="الرمز الباركودي العالمي" value={medicine.barcode} />
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <StatCard label="الشكل الصيدلاني" value={medicine.dosageForm.formCategory} />
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <StatCard label="وحدات العلبة الواحدة" value={`${medicine.unitsPerBox} units`} />
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <StatCard label="حد التنبيه للمخزن" value={`${medicine.pharmacyDrugDetails.minStockAlert} عبوة`} />
+          </Grid>
 
-      {/* محتوى التفاصيل الفاخر وغير المعجوق بالألوان */}
-      <DialogContent sx={{ pt: 1, direction: "rtl" }}>
-        <Box sx={{ display: "flex", flexDirection: "column" }}>
-          <DetailRow
-            label="الرمز الباركودي العالمي (Barcode)"
-            value={medicine.barcode}
-          />
-          <DetailRow
-            label="الشكل الصيدلاني الرئيسي"
-            value={medicine.dosageForm.formCategory}
-          />
-          <DetailRow
-            label="عدد الوحدات داخل العلبة الواحده"
-            value={`${medicine.unitsPerBox} وحدات`}
-          />
-          <DetailRow
-            label="حد التنبيه للمخزن المنخفض"
-            value={`${medicine.pharmacyDrugDetails.minStockAlert} عبوة`}
-          />
-          <DetailRow
-            label="أيام إنذار تاريخ الصلاحية"
-            value={`${medicine.pharmacyDrugDetails.expiryDateAlarm} يوم`}
-          />
-          <DetailRow
-            label="تاريخ تسجيل الدواء بالنظام"
-            value={new Date(medicine.createdAt).toLocaleDateString("ar-EG")}
-          />
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <StatCard label="أيام إنذار الصلاحية" value={`${medicine.pharmacyDrugDetails.expiryDateAlarm} يوم`} />
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <StatCard
+              label="تاريخ الإضافة"
+              value={new Date(medicine.createdAt).toLocaleDateString("ar-EG")}
+            />
+          </Grid>
+        </Grid>
 
-          {/* الملاحظات إذا وجدت في الأسفل بشكل مريح */}
-          {medicine.pharmacyDrugDetails.notes && (
-            <Box
-              sx={{
-                mt: 2,
-                p: 2,
-                backgroundColor: "#f8fafc",
-                borderRadius: "12px",
-                border: "1px solid #d9e3f1",
-              }}
-            >
-              <Typography
-                variant="caption"
-                sx={{
-                  color: "#64748b",
-                  display: "block",
-                  mb: 0.5,
-                  fontWeight: "600",
-                }}
-              >
-                ملاحظات الصيدلية:
+        {/* Notes Block */}
+        {medicine.pharmacyDrugDetails.notes && (
+          <Box
+            sx={{
+              mt: 2.5,
+              p: 2,
+              backgroundColor: "#f0f9ff",
+              borderRadius: "10px",
+              border: "1px solid #bae6fd",
+              display: "flex",
+              gap: 1.5,
+              alignItems: "flex-start",
+            }}
+          >
+            <InfoIcon sx={{ color: "#0284c7", fontSize: 20, mt: 0.2 }} />
+            <Box>
+              <Typography variant="caption" sx={{ color: "#0369a1", fontWeight: 700, display: "block", mb: 0.5 }}>
+                ملاحظات الصيدلية
               </Typography>
-              <Typography
-                variant="body2"
-                sx={{ color: "#334155", lineHeight: 1.5 }}
-              >
+              <Typography variant="body2" sx={{ color: "#334155", fontSize: "0.825rem", lineHeight: 1.5 }}>
                 {medicine.pharmacyDrugDetails.notes}
               </Typography>
             </Box>
-          )}
-        </Box>
+          </Box>
+        )}
       </DialogContent>
     </Dialog>
   );

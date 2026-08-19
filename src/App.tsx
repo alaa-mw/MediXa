@@ -57,6 +57,8 @@ import { PaymentCancelPage } from "./features/online_renew_subsrciption/page/Can
 import OwnerRenewSubscriptionPage from "./features/online_renew_subsrciption/page/OwnerPlaneCard";
 import OwnerPharmacySubscriptionSchedule from "./features/online_renew_subsrciption/page/OwnerPharmaSubs";
 import FloatingAssistantLauncher from "./features/ai_assistant/components/FloatingAssistantLauncher";
+import AddGeneralDrugPage from "./features/inventory/pages/AddGeneralDrugPage";
+import AddPrivateDrugPage from "./features/inventory/pages/AddPrivateDrugPage";
 
 function App() {
   const pharmacyPaths = ["/pharmacy"];
@@ -212,6 +214,8 @@ function App() {
                 {/* inventory */}
                 <Route path="inventory" element={<InventoryPage />} />
                 <Route path="inventory/add" element={<AddMedicinePage />} />
+                                <Route path="inventory/add/:generalDrugId" element={<AddGeneralDrugPage />} />
+<Route path="inventory/add-private" element={<AddPrivateDrugPage />} />
                 <Route
                   path="inventory/batches/:drugId"
                   element={<DrugBatchesPage />}

@@ -68,7 +68,7 @@ export const CreateSaleInvoicePage = () => {
       
     }}
   >
-    الطلبات المعلقة
+   طلبات الزبائن
   </Button>
         </Box>
 

@@ -1,11 +1,24 @@
 import { Box, Typography, Button } from "@mui/material";
 import { PlusOne } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom"; // 1. استيراد useNavigate
 
 type ManualAddSectionProps = {
-  onManualAdd: () => void;
+  onManualAdd?: () => void; // تم جعله اختياري في حال عدم الحاجة لتمريره من الأب
 };
 
 const ManualAddSection = ({ onManualAdd }: ManualAddSectionProps) => {
+  const navigate = useNavigate(); // 2. تهيئة الـ navigate
+
+  const handleManualAdd = () => {
+    // التوجيه المباشر لصفحة إضافة الدواء الخاص
+    navigate("/pharmacy/inventory/add-private");
+
+    // استدعاء الـ callback إذا كان ممرراً
+    if (onManualAdd) {
+      onManualAdd();
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -39,7 +52,7 @@ const ManualAddSection = ({ onManualAdd }: ManualAddSectionProps) => {
       </Box>
       <Button
         variant="contained"
-        onClick={onManualAdd}
+        onClick={handleManualAdd}
         sx={{
           bgcolor: "#5E3E63",
           color: "#FFFFFF",

@@ -6,7 +6,7 @@ import {
 } from "@mui/material";
 import { X, Settings, AlertTriangle } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query"; 
-import type { PharmacyDrug } from "../../types/inventory";
+import type { PharmacyDrug } from "../../types/pharnacyDrug";
 import { CustomTextField } from "../CustomTextField";
 import { useSnackbar } from "../../../../shared/providers/useSnackbar";
 import usePostData from "../../../../shared/hooks/usePostData";

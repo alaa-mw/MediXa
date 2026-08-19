@@ -1,13 +1,10 @@
 
-
-
-
 import React, { useState, useEffect, useRef } from "react";
 import { 
   Dialog, DialogTitle, DialogContent, DialogActions, Box, Typography, Button, IconButton, Tabs, Tab, CircularProgress
 } from "@mui/material";
 import { X, Settings, Beaker, Pill, DollarSign } from "lucide-react"; 
-import type { PharmacyDrug } from "../../types/inventory";
+import type { PharmacyDrug } from "../../types/pharnacyDrug";
 
 import { useFetchIngredients } from "../../hooks/useFetchIngredients";
 import { useFetchDrugCategories } from "../../hooks/useFetchDrugCategories";
@@ -38,8 +35,9 @@ export const EditPrivateMedicineDialog: React.FC<EditPrivateMedicineDialogProps>
   const { dosageForms, fetchDosageForms, loading: loadingDosageForms } = useFetchDosageForms();
   const { ingredients, fetchIngredients, loading: loadingIngredients } = useFetchIngredients();
 
+ const drugId = medicine?.pharmacyDrugId;
   const { mutate: updateDrug, isPending } = usePostData<any>(
-    `/pharmacy-drugs/update-private-drug/${medicine?.pharmacyDrugId}`
+    `/pharmacy-drugs/update-private-drug/${drugId}`
   );
 
   const [allUnits] = useState<UnitOption[]>([
