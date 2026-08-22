@@ -11,6 +11,7 @@ import {
   useTradeDrugSearch,
   useDrugAlternatives,
 } from "../../hooks/useTradeNameSearch";
+import useGetData from "../../../../shared/hooks/useGetData";
 import { AlternativeDrugCard } from "./AlternativeDrugCard";
 import type { PharmacyDrug } from "../../types/drug";
 import { useSaleInvoice } from "../../hooks/useSaleInvoice";
@@ -30,6 +31,11 @@ type InvoiceDrugMetadata = {
   requiresPrescription?: boolean;
 };
 
+type SimilarNameDrug = {
+  pharmacyDrugId: number;
+  tradeName: string;
+};
+
 export const TradeNameSearchContent = ({
   debouncedSearchTerm,
   userTypingSignal,
@@ -37,6 +43,7 @@ export const TradeNameSearchContent = ({
   onCloseDropdown,
 }: Props) => {
   const [selectedDrugId, setSelectedDrugId] = useState<number | null>(null);
+  const [selectedDrugName, setSelectedDrugName] = useState("");
   const [selectedDrugs, setSelectedDrugs] = useState<PharmacyDrug[]>([]);
   const [isAddingToInvoice, setIsAddingToInvoice] = useState(false);
   const observerTarget = useRef<HTMLDivElement>(null);
@@ -49,6 +56,7 @@ export const TradeNameSearchContent = ({
   // تصفير الاختيارات عند تغيير مدخلات البحث
   useEffect(() => {
     setSelectedDrugId(null);
+    setSelectedDrugName("");
     setSelectedDrugs([]);
   }, [userTypingSignal]);
 
@@ -56,6 +64,21 @@ export const TradeNameSearchContent = ({
     useTradeDrugSearch(debouncedSearchTerm);
   const { data: alternativesData, isLoading: isAlternativesLoading } =
     useDrugAlternatives(selectedDrugId);
+
+  const trimmedSelectedDrugName = selectedDrugName.trim();
+  const lasaEndpoint =
+    selectedDrugId && trimmedSelectedDrugName.length >= 3
+      ? `/pharmacy-drugs/search-my-drugs/similar-names?name=${encodeURIComponent(trimmedSelectedDrugName)}`
+      : "";
+
+  const { data: lasaResponse } = useGetData<SimilarNameDrug[]>(lasaEndpoint);
+
+  const lasaSuggestions =
+    lasaResponse?.data?.filter(
+      (item) =>
+        item.tradeName.trim().toLowerCase() !==
+        trimmedSelectedDrugName.toLowerCase(),
+    ) || [];
 
   // منطق التحديد (Toggle Selection)
   const toggleDrugSelection = (drug: PharmacyDrug) => {
@@ -109,6 +132,7 @@ export const TradeNameSearchContent = ({
 
   const handleSelectTargetDrug = (drugId: number, drugName: string) => {
     setSelectedDrugId(drugId);
+    setSelectedDrugName(drugName);
     onDrugSelectedUpdateText(drugName);
   };
 
@@ -140,6 +164,35 @@ export const TradeNameSearchContent = ({
       >
         {/* منطقة المحتوى القابل للتمرير */}
         <Box sx={{ flex: 1, overflowY: "auto", p: 1 }}>
+          {lasaSuggestions.length > 0 && (
+            <>
+              <Divider
+                textAlign="left"
+                sx={{ "&::before": { display: "none" }, mb: 1.5 }}
+              >
+                <Chip
+                  label="did you mean ?"
+                  size="small"
+                  sx={{ bgcolor: "#f1f5f9", color: "#64748b", fontWeight: 600 }}
+                />
+              </Divider>
+
+              <Box
+                sx={{
+                  p: 1.5,
+                  mb: 2,
+                  borderRadius: "12px",
+                  border: "1px solid #e2e8f0",
+                  bgcolor: "#ffffff",
+                }}
+              >
+                <Typography sx={{ fontWeight: 600, color: "#0f172a" }}>
+                  {lasaSuggestions.map((item) => item.tradeName).join(", ")}
+                </Typography>
+              </Box>
+            </>
+          )}
+
           <Divider
             textAlign="left"
             sx={{ "&::before": { display: "none" }, mb: 1.5 }}

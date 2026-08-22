@@ -75,8 +75,6 @@ export interface SaleInvoiceBatchItemResponse {
   remainingReturnableBaseQuantity: number;
   remainingReturnableDisplayQuantity: number;
   batches: BatchAllocation[];
-
-  // حقول اختيارية تتحكم بها الواجهة الأمامية للاختيار
   checked?: boolean;
   selectedBatchId?: number;
   selectedQuantity?: number;

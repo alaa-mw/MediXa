@@ -21,7 +21,6 @@ import PurchaseInvoiceWizard from "./features/purchase_invoices/components/add_p
 import PurchaseInvoiceGrid from "./features/purchase_invoices/components/PurchaseInvoiceGrid";
 import SalesLayout from "./features/sales-and-return/pages/SalesReturnLayout";
 import { SaleInvoicesPage } from "./features/sales-and-return/pages/SaleInvoicesPage";
-import { ReturnInvoicesPage } from "./features/sales-and-return/pages/ReturnInvoicePage";
 import { DrugBatchesPage } from "./features/inventory/pages/DrugBatchesPage";
 import AddGeneralDrug from "./features/medteam_cdb/pages/AddGeneralDrug";
 import AllGeneralDrug from "./features/medteam_cdb/pages/AllGeneralDrug";
@@ -66,6 +65,7 @@ import { onMessage } from "firebase/messaging";
 import { messaging, requestPermission } from "./firebase/firebaseConfig";
 import { useEffect } from "react";
 import TokenService from "./shared/services/tokenService";
+import ReturnInvoicesPage from "./features/sales-and-return/pages/ReturnInvoicePage";
 
 function App() {
   const pharmacyPaths = ["/pharmacy"];
@@ -241,8 +241,14 @@ function App() {
                 {/* inventory */}
                 <Route path="inventory" element={<InventoryPage />} />
                 <Route path="inventory/add" element={<AddMedicinePage />} />
-                                <Route path="inventory/add/:generalDrugId" element={<AddGeneralDrugPage />} />
-<Route path="inventory/add-private" element={<AddPrivateDrugPage />} />
+                <Route
+                  path="inventory/add/:generalDrugId"
+                  element={<AddGeneralDrugPage />}
+                />
+                <Route
+                  path="inventory/add-private"
+                  element={<AddPrivateDrugPage />}
+                />
                 <Route
                   path="inventory/batches/:drugId"
                   element={<DrugBatchesPage />}

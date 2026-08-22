@@ -60,10 +60,7 @@ const NotificationCard = ({ notification }: NotificationCardProps) => {
                 mb: 1,
               }}
             >
-              <Typography
-                variant="h6"
-                sx={{ fontWeight: 700, color: "text.primary" }}
-              >
+              <Typography sx={{ fontWeight: 700, color: "text.primary" }}>
                 {notification.title}
               </Typography>
 
@@ -80,7 +77,7 @@ const NotificationCard = ({ notification }: NotificationCardProps) => {
             </Box>
 
             <Typography
-              variant="body1"
+              variant="body2"
               sx={{
                 color: "text.secondary",
                 lineHeight: 1.8,
