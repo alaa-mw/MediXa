@@ -17,6 +17,7 @@ import { useSnackbar } from "../../../../shared/providers/useSnackbar";
 import { useFetchDrugCategories, type CategoryOption } from "../../hooks/useFetchDrugCategories";
 import { useFetchDosageForms, type DosageFormOption } from "../../hooks/useFetchDosageForms";
 import { useFetchIngredients, type IngredientOption } from "../../hooks/useFetchIngredients";
+import { BarcodeScannerField } from "../../../../shared/layout/BarcodeScannerField";
 
 const AVAILABLE_UNITS = ["mg", "g", "ml", "mcg", "IU", "%"];
 
@@ -81,13 +82,18 @@ export const StepBasicInfo: React.FC = () => {
 
           {/* الباركود */}
           <Grid size={{ xs: 12, sm: 6 }}>
-            <CustomTextField
-              label="الباركود (Barcode)"
-              placeholder="1234567890123"
-              value={state.barcode}
-              onChange={(val) => handleChange("barcode", val)}
-            />
-          </Grid>
+  <BarcodeScannerField
+    label="الباركود (Barcode)"
+    placeholder="1234567890123"
+    value={state.barcode}
+    onChange={(val) => handleChange("barcode", val)}
+    autoFocus={true} // يحدد الحقل مباشرة فور فتح الصفحة
+    onScan={(scannedBarcode) => {
+      // يوضع الباركود بداخل الحقل ويعرض تنبيهاً بنجاح القراءة
+      handleChange("barcode", scannedBarcode);
+    }}
+  />
+</Grid>
 
           {/* الفئات */}
           <Grid size={{ xs: 12, sm: 6 }}>

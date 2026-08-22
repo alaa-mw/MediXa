@@ -9,7 +9,6 @@ import {
 import { CustomTextField } from "../../inventory/components/CustomTextField";
 import AddDrugFormAction from "../components/AddDrugFormAction";
 import CdbHeaderAndInfoCard from "../components/CdbHeaderAndInfoCard";
-import { useBarcodeScanner } from "../../../shared/services/useBarcodeScanner";
 import DosageFormComponent from "../components/dosage-form/DosageFormComponent";
 import ActiveIngredientForm from "../components/active_ingrediant/ActiveIngredientComponent";
 import DrugCategoryComponent from "../components/DrugCategoryComponent";
@@ -17,6 +16,7 @@ import RxToggleField from "../components/RxToggleField";
 import { usePostData } from "../../../shared/hooks/usePostData";
 import { useSnackbar } from "../../../shared/providers/useSnackbar";
 import { useAddGeneralDrugForm } from "../hook/useAddGeneralDrugForm";
+import { BarcodeScannerField } from "../../../shared/layout/BarcodeScannerField";
 
 const AddGeneralDrug = () => {
   const {
@@ -47,13 +47,6 @@ const AddGeneralDrug = () => {
     });
   };
 
-  useBarcodeScanner({
-    onScan: (scannedCode) => {
-      console.log("تم تلقي الباركود من القارئ الإلكتروني:", scannedCode);
-      handleInputChange("barcode", scannedCode);
-    },
-  });
-
   return (
     <Box sx={{ bgcolor: "#F6F7FB", minHeight: "100vh", pb: 5 }}>
       <CdbHeaderAndInfoCard total={2500} />
@@ -76,15 +69,19 @@ const AddGeneralDrug = () => {
                   />
                 </Grid>
 
+                {/* حقل الباركود المطور وقارئ الباركود الإلكتروني */}
                 <Grid size={{ xs: 12, md: 6 }}>
-                  <CustomTextField
+                  <BarcodeScannerField
                     label="الباركود"
                     placeholder="0000 0000 0000"
                     value={formData.barcode}
                     onChange={(value) => handleInputChange("barcode", value)}
+                    onScan={(scannedCode) => {
+                      handleInputChange("barcode", scannedCode);
+                    }}
                   />
                 </Grid>
-
+ 
                 <DosageFormComponent
                   handleInputChange={handleInputChange}
                   currentDosageFormId={formData.dosageFormId}
