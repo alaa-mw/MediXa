@@ -61,6 +61,7 @@ export interface PurchaseOrderCreateItem {
 }
 
 export interface PurchaseOrderCreatePayload {
+  idempotencyKey:string;
   supplierId: number;
   notes?: string;
   items: PurchaseOrderCreateItem[];

@@ -5,15 +5,19 @@
 //   Typography,
 //   TextField,
 //   MenuItem,
+//   CircularProgress,
 // } from "@mui/material";
 // import { Add, Remove } from "@mui/icons-material";
 // import { format } from "date-fns";
+// import { useEffect } from "react";
+// import type { SaleInvoiceBatchesResponse } from "../../Types/saleInvoiceItemBatches";
+// import useGetData from "../../../../shared/hooks/useGetData";
 
 // interface Props {
 //   item: any;
 //   onToggleCheck: (id: number) => void;
 //   onUpdateQuantity: (id: number, delta: number) => void;
-//   onSelectBatch: (itemId: number, batchId: number) => void; // دالة اختيار الدفعة
+//   onSelectBatch: (itemId: number, batchId: number) => void;
 // }
 
 // const CreateReturnInvoiceRow = ({
@@ -22,7 +26,53 @@
 //   onUpdateQuantity,
 //   onSelectBatch,
 // }: Props) => {
-//   const batchesList = item.batches || [];
+//   const invoiceId = item.saleInvoiceId;
+
+//   // جلب الدفعات من الـ API الجديد المستقل
+//   const {
+//     data: apiResponse,
+//     isLoading,
+//     error,
+//   } = useGetData<SaleInvoiceBatchesResponse>(
+//     invoiceId ? `/sale-invoice/${invoiceId}/batches` : "",
+//   );
+
+//   // استخراج الداتا بناءً على هيكلة FetchResponse
+//   const invoiceData = apiResponse?.data;
+//   const currentItem = invoiceData?.items?.find(
+//     (i) => i.saleInvoiceItemId === item.saleInvoiceItemId,
+//   );
+
+//   const batchesList = currentItem?.batches || [];
+
+//   // تعيين الدفعة الافتراضية الأولى تلقائياً عند توفرها وعدم اختيار دفعة مسبقاً
+//   useEffect(() => {
+//     if (batchesList.length > 0 && !item.selectedBatchId) {
+//       const defaultBatchId = batchesList[0].saleInvoiceItemBatchId;
+//       onSelectBatch(item.saleInvoiceItemId, defaultBatchId);
+//     }
+//   }, [
+//     batchesList,
+//     item.selectedBatchId,
+//     item.saleInvoiceItemId,
+//     onSelectBatch,
+//   ]);
+
+//   if (isLoading) {
+//     return (
+//       <Box sx={{ p: 2, display: "flex", justifyContent: "center" }}>
+//         <CircularProgress size={24} />
+//       </Box>
+//     );
+//   }
+
+//   if (error) {
+//     return (
+//       <Box sx={{ p: 2, color: "error.main", fontSize: "13px" }}>
+//         خطأ في تحميل الدفعات
+//       </Box>
+//     );
+//   }
 
 //   return (
 //     <Box
@@ -50,6 +100,7 @@
 //       >
 //         {item.tradeName ||
 //           item.pharmacyDrug?.drug.generalDrug?.tradeName ||
+//           currentItem?.tradeName ||
 //           "دواء"}
 //       </Box>
 
@@ -65,7 +116,7 @@
 //             color: "primary.main",
 //           }}
 //         >
-//           {item.unitType}
+//           {item.unitType || currentItem?.unitType}
 //         </Box>
 //       </Box>
 
@@ -101,7 +152,7 @@
 //         <Typography
 //           sx={{ mx: 1, fontWeight: "bold", minWidth: 20, textAlign: "center" }}
 //         >
-//           {item.selectedQuantity.toString().padStart(2, "0")}
+//           {item.selectedQuantity?.toString().padStart(2, "0") || "01"}
 //         </Typography>
 //         <IconButton
 //           size="small"
@@ -130,7 +181,7 @@
 //         }}
 //       >
 //         <Typography variant="body2" sx={{ fontSize: 15, fontWeight: "500" }}>
-//           {item.totalPrice}
+//           {item.totalPrice || currentItem?.totalPrice}
 //         </Typography>
 //         <Typography
 //           variant="body2"
@@ -152,7 +203,7 @@
 //         }}
 //       >
 //         <Typography variant="body2" sx={{ fontSize: 15, fontWeight: "500" }}>
-//           {item.netTotalPrice}
+//           {item.netTotalPrice || currentItem?.netTotalPrice}
 //         </Typography>
 //         <Typography
 //           variant="body2"
@@ -162,7 +213,7 @@
 //         </Typography>
 //       </Box>
 
-//       {/* إدارة اختيار الدفعة (تلقائي لوحدة، أو Select لوجود أكثر من دفعة) */}
+//       {/* إدارة اختيار الدفعة */}
 //       <Box
 //         sx={{
 //           display: "flex",
@@ -174,14 +225,21 @@
 //         {batchesList.length <= 1 ? (
 //           <Typography
 //             variant="body2"
-//             sx={{ fontWeight: 500, color: "#0F172A" }}
+//             sx={{ fontWeight: 500, color: "#0F172A", fontSize: "13px" }}
 //           >
-//             {batchesList[0]?.batch?.receivedDate
-//               ? format(
-//                   new Date(batchesList[0].batch.receivedDate),
-//                   "dd MMM yyyy",
-//                 )
-//               : "دفعة افتراضية"}
+//             {batchesList[0] ? (
+//               <>
+//                 {batchesList[0].batch?.expiryDate
+//                   ? format(
+//                       new Date(batchesList[0].batch.expiryDate),
+//                       "yyyy MMM dd   ",
+//                     )
+//                   : "غير متوفر"}{" "}
+//                 ( مباع: {batchesList[0].soldDisplayQuantity} )
+//               </>
+//             ) : (
+//               "لا توجد دفعات"
+//             )}
 //           </Typography>
 //         ) : (
 //           <TextField
@@ -202,14 +260,43 @@
 //             }}
 //           >
 //             {batchesList.map((b: any) => {
-//               const bId = b.saleInvoiceItemBatchId || b.batchId;
-//               const dateStr = b.batch?.receivedDate
-//                 ? format(new Date(b.batch.receivedDate), "dd MMM yyyy")
-//                 : `دفعة #${bId}`;
+//               const bId = b.saleInvoiceItemBatchId;
+//               const batchNum = b.batchId;
+//               const expiryStr = b.batch?.expiryDate
+//                 ? format(new Date(b.batch.expiryDate), "dd MMM yyyy")
+//                 : "بدون تاريخ";
+//               const soldQty = b.soldDisplayQuantity;
 //               return (
-//                 <MenuItem key={bId} value={bId} sx={{ fontSize: "13px" }}>
-//                   {dateStr} (الكمية:{" "}
-//                   {b.soldDisplayQuantity || b.soldBaseQuantity})
+//                 <MenuItem
+//                   key={bId}
+//                   value={bId}
+//                   sx={{ fontSize: "12px", py: 1 }}
+//                 >
+//                   <Box
+//                     sx={{
+//                       display: "flex",
+//                       flexDirection: "column",
+//                       gap: 0.3,
+//                       width: "100%",
+//                     }}
+//                   >
+//                     {/* السطر الأول: رقم الدفعة وتاريخ الانتهاء بشكل مختصر */}
+//                     <Box
+//                       sx={{
+//                         display: "flex",
+//                         justifyContent: "between",
+//                         gap: 1,
+//                         fontWeight: 600,
+//                       }}
+//                     >
+//                       <span>#{batchNum}</span>
+//                       <span style={{ color: "#64748B" }}>{expiryStr}</span>
+//                     </Box>
+//                     {/* السطر الثاني: الكمية المباعة */}
+//                     <Box sx={{ fontSize: "11px", color: "text.secondary" }}>
+//                       المباع: {soldQty}
+//                     </Box>
+//                   </Box>
 //                 </MenuItem>
 //               );
 //             })}
@@ -221,82 +308,21 @@
 // };
 
 // export default CreateReturnInvoiceRow;
-import {
-  Box,
-  Checkbox,
-  IconButton,
-  Typography,
-  TextField,
-  MenuItem,
-  CircularProgress,
-} from "@mui/material";
+import { Box, Checkbox, IconButton, Typography } from "@mui/material";
 import { Add, Remove } from "@mui/icons-material";
 import { format } from "date-fns";
-import { useEffect } from "react";
-import type { SaleInvoiceBatchesResponse } from "../../Types/saleInvoiceItemBatches";
-import useGetData from "../../../../shared/hooks/useGetData";
 
 interface Props {
   item: any;
-  onToggleCheck: (id: number) => void;
-  onUpdateQuantity: (id: number, delta: number) => void;
-  onSelectBatch: (itemId: number, batchId: number) => void;
+  onToggleCheck: (rowId: string) => void;
+  onUpdateQuantity: (rowId: string, delta: number) => void;
 }
 
 const CreateReturnInvoiceRow = ({
   item,
   onToggleCheck,
   onUpdateQuantity,
-  onSelectBatch,
 }: Props) => {
-  const invoiceId = item.saleInvoiceId;
-
-  // جلب الدفعات من الـ API الجديد المستقل
-  const {
-    data: apiResponse,
-    isLoading,
-    error,
-  } = useGetData<SaleInvoiceBatchesResponse>(
-    invoiceId ? `/sale-invoice/${invoiceId}/batches` : "",
-  );
-
-  // استخراج الداتا بناءً على هيكلة FetchResponse
-  const invoiceData = apiResponse?.data;
-  const currentItem = invoiceData?.items?.find(
-    (i) => i.saleInvoiceItemId === item.saleInvoiceItemId,
-  );
-
-  const batchesList = currentItem?.batches || [];
-
-  // تعيين الدفعة الافتراضية الأولى تلقائياً عند توفرها وعدم اختيار دفعة مسبقاً
-  useEffect(() => {
-    if (batchesList.length > 0 && !item.selectedBatchId) {
-      const defaultBatchId = batchesList[0].saleInvoiceItemBatchId;
-      onSelectBatch(item.saleInvoiceItemId, defaultBatchId);
-    }
-  }, [
-    batchesList,
-    item.selectedBatchId,
-    item.saleInvoiceItemId,
-    onSelectBatch,
-  ]);
-
-  if (isLoading) {
-    return (
-      <Box sx={{ p: 2, display: "flex", justifyContent: "center" }}>
-        <CircularProgress size={24} />
-      </Box>
-    );
-  }
-
-  if (error) {
-    return (
-      <Box sx={{ p: 2, color: "error.main", fontSize: "13px" }}>
-        خطأ في تحميل الدفعات
-      </Box>
-    );
-  }
-
   return (
     <Box
       sx={{
@@ -312,7 +338,7 @@ const CreateReturnInvoiceRow = ({
       <Box sx={{ display: "flex", justifyContent: "flex-start" }}>
         <Checkbox
           checked={item.checked}
-          onChange={() => onToggleCheck(item.saleInvoiceItemId)}
+          onChange={() => onToggleCheck(item.rowId)}
           sx={{ color: "#cbd5e1", "&.Mui-checked": { color: "#e11d48" } }}
         />
       </Box>
@@ -321,10 +347,7 @@ const CreateReturnInvoiceRow = ({
       <Box
         sx={{ display: "flex", justifyContent: "flex-start", fontWeight: 500 }}
       >
-        {item.tradeName ||
-          item.pharmacyDrug?.drug.generalDrug?.tradeName ||
-          currentItem?.tradeName ||
-          "دواء"}
+        {item.tradeName || "دواء"}
       </Box>
 
       {/* نوع الوحدة */}
@@ -339,7 +362,7 @@ const CreateReturnInvoiceRow = ({
             color: "primary.main",
           }}
         >
-          {item.unitType || currentItem?.unitType}
+          {item.unitType}
         </Box>
       </Box>
 
@@ -361,7 +384,7 @@ const CreateReturnInvoiceRow = ({
       >
         <IconButton
           size="small"
-          onClick={() => onUpdateQuantity(item.saleInvoiceItemId, 1)}
+          onClick={() => onUpdateQuantity(item.rowId, 1)}
           disabled={item.selectedQuantity >= item.displayQuantity}
           sx={{
             border: "1px solid #fca5a5",
@@ -379,7 +402,7 @@ const CreateReturnInvoiceRow = ({
         </Typography>
         <IconButton
           size="small"
-          onClick={() => onUpdateQuantity(item.saleInvoiceItemId, -1)}
+          onClick={() => onUpdateQuantity(item.rowId, -1)}
           disabled={item.selectedQuantity <= 1}
           sx={{
             border: "1px solid #fca5a5",
@@ -404,7 +427,7 @@ const CreateReturnInvoiceRow = ({
         }}
       >
         <Typography variant="body2" sx={{ fontSize: 15, fontWeight: "500" }}>
-          {item.totalPrice || currentItem?.totalPrice}
+          {item.totalPrice}
         </Typography>
         <Typography
           variant="body2"
@@ -426,7 +449,7 @@ const CreateReturnInvoiceRow = ({
         }}
       >
         <Typography variant="body2" sx={{ fontSize: 15, fontWeight: "500" }}>
-          {item.netTotalPrice || currentItem?.netTotalPrice}
+          {item.netTotalPrice}
         </Typography>
         <Typography
           variant="body2"
@@ -436,94 +459,39 @@ const CreateReturnInvoiceRow = ({
         </Typography>
       </Box>
 
-      {/* إدارة اختيار الدفعة */}
+      {/* عرض تفاصيل الدفعة والتاريخ لكل سطر مستقلاً */}
       <Box
         sx={{
           display: "flex",
+          flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
           px: 1,
         }}
       >
-        {batchesList.length <= 1 ? (
+        {item.batchId || item.expiryDate ? (
+          <Box sx={{ textAlign: "center" }}>
+            <Typography
+              variant="body2"
+              sx={{ fontWeight: 600, color: "#0F172A", fontSize: "13px" }}
+            >
+              دفعة #{item.batchId}
+            </Typography>
+            <Typography variant="caption" sx={{ color: "#64748B" }}>
+              انتهاء:{" "}
+              {item.expiryDate
+                ? format(new Date(item.expiryDate), "dd MMM yyyy")
+                : "غير متوفر"}{" "}
+              (مباع: {item.displayQuantity})
+            </Typography>
+          </Box>
+        ) : (
           <Typography
             variant="body2"
-            sx={{ fontWeight: 500, color: "#0F172A", fontSize: "13px" }}
+            sx={{ fontWeight: 500, color: "#94a3b8", fontSize: "13px" }}
           >
-            {batchesList[0] ? (
-              <>
-                {batchesList[0].batch?.expiryDate
-                  ? format(
-                      new Date(batchesList[0].batch.expiryDate),
-                      "yyyy MMM dd   ",
-                    )
-                  : "غير متوفر"}{" "}
-                ( مباع: {batchesList[0].soldDisplayQuantity} )
-              </>
-            ) : (
-              "لا توجد دفعات"
-            )}
+            بدون دفعة
           </Typography>
-        ) : (
-          <TextField
-            select
-            size="small"
-            fullWidth
-            value={item.selectedBatchId || ""}
-            onChange={(e) =>
-              onSelectBatch(item.saleInvoiceItemId, Number(e.target.value))
-            }
-            sx={{
-              bgcolor: "#fff",
-              borderRadius: "6px",
-              "& .MuiOutlinedInput-root": {
-                borderRadius: "6px",
-                fontSize: "13px",
-              },
-            }}
-          >
-            {batchesList.map((b: any) => {
-              const bId = b.saleInvoiceItemBatchId;
-              const batchNum = b.batchId;
-              const expiryStr = b.batch?.expiryDate
-                ? format(new Date(b.batch.expiryDate), "dd MMM yyyy")
-                : "بدون تاريخ";
-              const soldQty = b.soldDisplayQuantity;
-              return (
-                <MenuItem
-                  key={bId}
-                  value={bId}
-                  sx={{ fontSize: "12px", py: 1 }}
-                >
-                  <Box
-                    sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: 0.3,
-                      width: "100%",
-                    }}
-                  >
-                    {/* السطر الأول: رقم الدفعة وتاريخ الانتهاء بشكل مختصر */}
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "between",
-                        gap: 1,
-                        fontWeight: 600,
-                      }}
-                    >
-                      <span>#{batchNum}</span>
-                      <span style={{ color: "#64748B" }}>{expiryStr}</span>
-                    </Box>
-                    {/* السطر الثاني: الكمية المباعة */}
-                    <Box sx={{ fontSize: "11px", color: "text.secondary" }}>
-                      المباع: {soldQty}
-                    </Box>
-                  </Box>
-                </MenuItem>
-              );
-            })}
-          </TextField>
         )}
       </Box>
     </Box>

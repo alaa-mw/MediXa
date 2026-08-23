@@ -29,6 +29,7 @@ import type {
 } from "../types/purchaseOrder";
 import { RTLDatePicker } from "../../../shared/layout/RTLDatePicker";
 import { todayDate } from "../../../shared/constants/today";
+import { useIdempotency } from "../../../shared/hooks/useIdempotency";
 
 type OrderItem = {
   pharmacyDrugId: number | string;
@@ -66,6 +67,7 @@ const AddPurchaseOrder = () => {
   }));
 
   const { showSnackbar } = useSnackbar();
+  const { getKey, clearKey } = useIdempotency();
 
   const { mutate: createPurchaseOrder } = usePostData<unknown>(
     "/purchase-order/create",
@@ -138,6 +140,7 @@ const AddPurchaseOrder = () => {
     }
 
     const payload: PurchaseOrderCreatePayload = {
+      idempotencyKey:getKey(),
       supplierId: Number(form.supplierId),
       notes: form.notes,
       items: form.items.map((it) => ({
@@ -157,6 +160,7 @@ const AddPurchaseOrder = () => {
           notes: "",
           items: [],
         });
+        clearKey()
       },
       onError: (err) => {
         console.error(err);

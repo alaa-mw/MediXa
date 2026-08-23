@@ -22,6 +22,7 @@ import SearchBarDynamic from "../../../shared/layout/SearchBarDynamic";
 import { useSnackbar } from "../../../shared/providers/useSnackbar";
 import theme from "../../../shared/styles/mainTheme";
 import type { PharmacyDrugSearch } from "../../purchase_invoices/components/PurchaseInvoiceGrid";
+import { useIdempotency } from "../../../shared/hooks/useIdempotency";
 
 type Item = {
   pharmacyDrugId: number | string;
@@ -39,6 +40,7 @@ const AddCustomerOrder = () => {
   });
 
   const { showSnackbar } = useSnackbar();
+  const { getKey, clearKey } = useIdempotency();
 
   const { mutate: createOrder } = usePostData("/customer-request/create");
 
@@ -103,6 +105,7 @@ const AddCustomerOrder = () => {
     }
 
     const payload = {
+      idempotencyKey:getKey(),
       customerName: form.customerName,
       customerPhone: form.customerPhone,
       notes: form.notes,
@@ -117,6 +120,7 @@ const AddCustomerOrder = () => {
       onSuccess: () => {
         showSnackbar("تم إنشاء طلب العميل بنجاح", "success");
         setForm({ customerName: "", customerPhone: "", notes: "", items: [] });
+        clearKey()
       },
       onError: (error) => {
          const errorDetails = (error as Error & { details?: string }).details;
