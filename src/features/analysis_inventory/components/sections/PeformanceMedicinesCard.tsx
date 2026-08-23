@@ -13,15 +13,18 @@ import { useGetWithParams } from "../../../../shared/hooks/useGetWithParams";
 import type { PerformanceMedResponse } from "../../types/analysisInventory.types";
 import PeriodPopoverButton from "../PeriodPopoverButton";
 import AnalysisPanel from "./AnalysisPanel";
+import TokenService from "../../../../shared/services/tokenService";
 
 const PeformanceMedicinesCard = () => {
+   const pharmacyId = TokenService.getPharmacyId() || ""; // Replace with your actual pharmacy ID retrieval logic
+    
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { data, queryParams, setQueryParams } =
     useGetWithParams<PerformanceMedResponse>(
       "/analytics/historical/drug-performance",
       {
-        pharmacy_id: 1,
-        days: 30,
+        pharmacy_id: pharmacyId,
+        days: 365,
       },
     );
   const handlePeriodChange = (value: number) => {

@@ -9,15 +9,18 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import type { SlowMedResponse } from "../../types/analysisInventory.types";
+import TokenService from "../../../../shared/services/tokenService";
 import AnalysisPanel from "./AnalysisPanel";
 import PeriodPopoverButton from "../PeriodPopoverButton";
 import useGetWithParams from "../../../../shared/hooks/useGetWithParams";
 
 const SlowMedicinesCard = () => {
+  const pharmacyId = TokenService.getPharmacyId() || ""; // Replace with your actual pharmacy ID retrieval logic
+    
   const { data, queryParams, setQueryParams } =
     useGetWithParams<SlowMedResponse>("/analytics/historical/stagnant-drugs", {
-      pharmacy_id: 1,
-      days: 30,
+      pharmacy_id: pharmacyId,
+      days: 365,
     });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 

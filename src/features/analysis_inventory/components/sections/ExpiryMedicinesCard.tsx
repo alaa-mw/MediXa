@@ -22,7 +22,7 @@ const ExpiryMedicinesCard = () => {
     "/analytics/historical/expired-drugs",
     {
       pharmacy_id: pharmacyId,
-      days: 30,
+      days: 365,
     },
   );
 
