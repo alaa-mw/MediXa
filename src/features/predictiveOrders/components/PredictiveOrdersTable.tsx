@@ -17,15 +17,23 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import type { PredictiveOrderItem } from "../types/predictiveOrders.types";
 import useGetData from "../../../shared/hooks/useGetData";
 
-const formatStockWithBoxes = (units: number, looseUnits: number) => {
-  return ` (${units} ${looseUnits > 0 ? ` + ${looseUnits} وحدة` : "وحدة"})`;
+type PrefillOrderItem = {
+  pharmacyDrugId: number | string;
+  tradeName: string;
 };
 
+// const formatStockWithBoxes = (units: number, looseUnits: number) => {
+//   return ` (${units} ${looseUnits > 0 ? ` + ${looseUnits} وحدة` : "وحدة"})`;
+// };
+
 const PredictiveOrdersTable = () => {
-  const { data } = useGetData<PredictiveOrderItem[]>(
+  const navigate = useNavigate();
+
+  const { data, refetch } = useGetData<PredictiveOrderItem[]>(
     "/purchase-order/smart-suggestions",
   );
   const predictiveData = useMemo(() => data?.data ?? [], [data]);
@@ -49,8 +57,18 @@ const PredictiveOrdersTable = () => {
   };
 
   const handleCreatePurchaseOrder = () => {
-    // This flow will be connected to backend action later.
-    console.log("Create purchase order for:", selectedItems);
+    if (selectedItems.length === 0) return;
+
+    const prefillItems: PrefillOrderItem[] = selectedItems.map((item) => ({
+      pharmacyDrugId: item.pharmacyDrugId,
+      tradeName: item.drugName,
+    }));
+
+    navigate("/pharmacy/orders/purchase/add", {
+      state: {
+        prefillItems,
+      },
+    });
   };
 
   return (
@@ -79,25 +97,36 @@ const PredictiveOrdersTable = () => {
             variant="h6"
             sx={{ fontWeight: 800, color: "#2C2540", fontSize: "1.15rem" }}
           >
-            مقترحات الطلب الذكية
+            الأدوية المقترحة للطلب
           </Typography>
-          <Chip
-            icon={<RefreshRoundedIcon />}
-            label="تحديث: منذ 12 دقيقة"
+          <Button
             size="small"
+            startIcon={<RefreshRoundedIcon />}
+            onClick={() => refetch()}
             sx={{
+              minWidth: "auto",
+              borderRadius: 999,
+              px: 1.25,
+              py: 0.4,
               backgroundColor: "#DFF7FF",
               color: "#3A7D91",
               fontWeight: 700,
-              "& .MuiChip-icon": { color: "#3A7D91" },
+              textTransform: "none",
+              "& .MuiButton-startIcon": { color: "#3A7D91", mr: 0.5 },
+              "&:hover": {
+                backgroundColor: "#CFEFFA",
+              },
             }}
-          />
+          >
+            تحديث
+          </Button>
         </Stack>
 
         <Button
           variant="contained"
           startIcon={<AddShoppingCartRoundedIcon />}
           onClick={handleCreatePurchaseOrder}
+          disabled={selectedItems.length === 0}
           sx={{
             alignSelf: { xs: "flex-start", sm: "auto" },
             borderRadius: 2,
@@ -120,7 +149,7 @@ const PredictiveOrdersTable = () => {
               <TableCell sx={{ fontWeight: 800 }}>الاختيار</TableCell>
               <TableCell sx={{ fontWeight: 800 }}>اسم الدواء</TableCell>
               <TableCell sx={{ fontWeight: 800 }}>المخزون الحالي</TableCell>
-              <TableCell sx={{ fontWeight: 800 }}>المخزون المتوقع</TableCell> 
+              <TableCell sx={{ fontWeight: 800 }}>المخزون المتوقع</TableCell>
               <TableCell sx={{ fontWeight: 800 }}>الحد الآمن</TableCell>
               <TableCell sx={{ fontWeight: 800 }}>
                 الكمية المقترحة للشراء
@@ -169,13 +198,14 @@ const PredictiveOrdersTable = () => {
                       component="span"
                       sx={{ color: "#667085", ml: 0.5 }}
                     >
-                     {" "} علبة
+                      {" "}
+                      علبة
                     </Typography>
                     <Typography sx={{ color: "#667085", fontSize: "0.8rem" }}>
-                      {formatStockWithBoxes(
+                      {/* {formatStockWithBoxes(
                         item.currentStock,
                         item.currentLooseUnits,
-                      )}
+                      )} */}
                     </Typography>
                   </TableCell>
 
@@ -193,16 +223,15 @@ const PredictiveOrdersTable = () => {
                       component="span"
                       sx={{ color: "#667085", ml: 0.5 }}
                     >
-                     {" "} علبة
+                      {" "}
+                      علبة
                     </Typography>
                     <Typography sx={{ color: "#667085", fontSize: "0.8rem" }}>
                       {item.projectedStock < 0
-                        ? `متوقع نقص ${Math.abs(item.projectedStock) + Math.abs(item.projectedLooseUnits)} وحدة`
+                        ? `متوقع نقص ${Math.abs(item.projectedFullBoxes)} علبة`
                         : item.projectedStock > 0
-                        ? `متوقع زيادة غير كافية ${item.projectedStock + item.projectedLooseUnits} وحدة`
-                        : ` متوقع انتهاء الكمية يجب الوصول للحد الآمن`
-                      }
-                   
+                          ? `متوقع زيادة غير كافية ${Math.abs(item.projectedFullBoxes)} علبة`
+                          : ` متوقع انتهاء الكمية يجب الوصول للحد الآمن`}
                     </Typography>
                   </TableCell>
 

@@ -1,4 +1,3 @@
-
 import React from "react";
 import TextField from "@mui/material/TextField";
 
@@ -8,10 +7,11 @@ interface CustomTextFieldProps {
   onChange: (val: string) => void;
   placeholder?: string;
   type?: "text" | "number";
+  minNum?: number;
   fullWidth?: boolean;
   padding?: string;
   error?: boolean;
-  helperText?: string; 
+  helperText?: string;
 
   disabled?: boolean;
 }
@@ -22,6 +22,7 @@ export const CustomTextField: React.FC<CustomTextFieldProps> = ({
   onChange,
   placeholder,
   type = "text",
+  minNum,
   fullWidth = true,
   padding = "16px",
   error = false,
@@ -38,11 +39,14 @@ export const CustomTextField: React.FC<CustomTextFieldProps> = ({
       value={value}
       onChange={(e) => onChange(e.target.value)}
       variant="outlined"
-      error={error} 
-      helperText={helperText} 
+      slotProps={{
+        htmlInput: { min: minNum },
+      }}
+      error={error}
+      helperText={helperText}
       sx={{
         direction: "rtl",
-        
+
         "& .MuiOutlinedInput-root": {
           backgroundColor: "#f1f5f9",
           borderRadius: "14px",
@@ -76,16 +80,16 @@ export const CustomTextField: React.FC<CustomTextFieldProps> = ({
 
         "& .MuiInputLabel-outlined": {
           color: "#64748b",
-          right: "16px !important", 
+          right: "16px !important",
           left: "auto !important",
           transformOrigin: "top right",
-          transform: "translate(0, 16px) scale(1)", 
+          transform: "translate(0, 16px) scale(1)",
           zIndex: 1,
           pointerEvents: "none",
-          
+
           "&.MuiInputLabel-shrink": {
-            transform: "translate(0, -6px) scale(0.75)", 
-            backgroundColor: "#ffffff", 
+            transform: "translate(0, -6px) scale(0.75)",
+            backgroundColor: "#ffffff",
             padding: "0 6px",
           },
           "&.Mui-focused": {
@@ -93,17 +97,17 @@ export const CustomTextField: React.FC<CustomTextFieldProps> = ({
           },
           "&.Mui-error": {
             color: "#d32f2f !important",
-          }
+          },
         },
 
         "& .MuiOutlinedInput-input": {
           textAlign: "right",
           paddingRight: "16px !important",
           paddingLeft: "16px !important",
-          height: "1.4375em", 
+          height: "1.4375em",
           padding: padding,
         },
-        
+
         "& .MuiFormHelperText-root": {
           textAlign: "right",
           marginRight: 0,
@@ -111,7 +115,7 @@ export const CustomTextField: React.FC<CustomTextFieldProps> = ({
           fontWeight: 600,
           fontSize: "12px",
           color: "#d32f2f",
-        }
+        },
       }}
     />
   );

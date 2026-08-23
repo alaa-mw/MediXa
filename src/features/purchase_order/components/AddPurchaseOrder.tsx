@@ -14,6 +14,7 @@ import {
   Typography,
 } from "@mui/material";
 import React, { useState } from "react";
+import { useLocation } from "react-router-dom";
 import { useGetWithParams } from "../../../shared/hooks/useGetWithParams";
 import { usePostData } from "../../../shared/hooks/usePostData";
 import BarcodeMyDrugs from "../../../shared/layout/BarcodeMyDrugs";
@@ -27,6 +28,7 @@ import type {
   Supplier,
 } from "../types/purchaseOrder";
 import { RTLDatePicker } from "../../../shared/layout/RTLDatePicker";
+import { todayDate } from "../../../shared/constants/today";
 import { useIdempotency } from "../../../shared/hooks/useIdempotency";
 
 type OrderItem = {
@@ -36,14 +38,33 @@ type OrderItem = {
   notes?: string;
 };
 
+type AddPurchaseOrderLocationState = {
+  prefillItems?: Array<Pick<OrderItem, "pharmacyDrugId" | "tradeName">>;
+};
+
 const AddPurchaseOrder = () => {
-  const [form, setForm] = useState({
+  const location = useLocation();
+
+  const routeState = location.state as AddPurchaseOrderLocationState | null;
+  const prefillItems = (routeState?.prefillItems ?? []).filter(
+    (item, index, array) =>
+      array.findIndex(
+        (x) => String(x.pharmacyDrugId) === String(item.pharmacyDrugId),
+      ) === index,
+  );
+
+  const [form, setForm] = useState(() => ({
     supplierId: "",
     expectedReceiptDate: "",
     supplierName: "",
     notes: "",
-    items: [] as OrderItem[],
-  });
+    items: prefillItems.map((item) => ({
+      pharmacyDrugId: item.pharmacyDrugId,
+      tradeName: item.tradeName,
+      orderedQuantityBoxes: 1,
+      notes: "",
+    })) as OrderItem[],
+  }));
 
   const { showSnackbar } = useSnackbar();
   const { getKey, clearKey } = useIdempotency();
@@ -61,10 +82,10 @@ const AddPurchaseOrder = () => {
     {
       searchQuery: "",
     },
-    {
-      shouldFetch: (params) =>
-        String(params.searchQuery ?? "").trim().length >= 3,
-    },
+    // {
+    //   shouldFetch: (params) =>
+    //     String(params.searchQuery ?? "").trim().length >= 1,
+    // },
   );
 
   const {
@@ -203,7 +224,7 @@ const AddPurchaseOrder = () => {
                   </Box>
 
                   <SearchBarDynamic<Supplier>
-                    placeholder="ابحث عن مورد (3 أحرف على الأقل)"
+                    placeholder="ابحث عن مورد"
                     onChange={(term) =>
                       setSuppliersQueryParams({
                         ...suppliersQueryParams,
@@ -251,6 +272,7 @@ const AddPurchaseOrder = () => {
                     onChange={(value) =>
                       setForm((s) => ({ ...s, expectedReceiptDate: value }))
                     }
+                    minDate={todayDate}
                   />
                 </Grid>
               </Grid>
@@ -410,6 +432,7 @@ const AddPurchaseOrder = () => {
                 onClick={() =>
                   setForm({
                     supplierId: "",
+                    expectedReceiptDate: "",
                     supplierName: "",
                     notes: "",
                     items: [],

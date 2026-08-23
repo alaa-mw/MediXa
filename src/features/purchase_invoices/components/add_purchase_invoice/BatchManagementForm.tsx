@@ -21,15 +21,15 @@ import type { RootState } from "../../../../shared/store";
 import type { PurchaseInvoiceItemRequest } from "../../types/purchaseInvoiceStore";
 import DrugSearch from "./DrugSearch";
 import BatchItemCard from "./BatchItemCard";
-import type { PharmacyDrug, PharmacyDrugResult } from "../../types/searchDrug";
+import type { PharmacyDrugResult } from "../../types/searchDrug";
 
 export default function BatchManagementForm() {
   const dispatch = useDispatch();
 
   const items = useSelector((state: RootState) => state.purchaseInvoice.items);
-  const invoiceNumber = useSelector(
-    (state: RootState) => state.purchaseInvoice.invoiceNumber,
-  );
+  // const invoiceNumber = useSelector(
+  //   (state: RootState) => state.purchaseInvoice.invoiceNumber,
+  // );
 
   // ============ معالجات العناصر (Items) ============
 
@@ -44,6 +44,7 @@ export default function BatchManagementForm() {
       netUnitPrice: 0,
       batches: [
         {
+          batchNumber: "",
           initialQuantity: 1,
           expiryDate: new Date().toISOString().split("T")[0],
         },
@@ -83,6 +84,7 @@ export default function BatchManagementForm() {
   // إضافة دفعة جديدة
   const handleAddBatch = (itemIndex: number) => {
     const newBatch = {
+      batchNumber: "",
       initialQuantity: 1,
       expiryDate: new Date().toISOString().split("T")[0],
     };
@@ -90,6 +92,28 @@ export default function BatchManagementForm() {
       addBatch({
         itemIndex,
         batch: newBatch,
+      }),
+    );
+  };
+
+  const handleBatchNumberChange = (
+    itemIndex: number,
+    batchIndex: number,
+    value: string,
+  ) => {
+     const item = items[itemIndex];
+    if (!item) return;
+
+    const updatedBatch = {
+      ...item.batches[batchIndex],
+      batchNumber: value,
+    };
+
+    dispatch(
+      updateBatch({
+        itemIndex,
+        batchIndex,
+        updatedBatch,
       }),
     );
   };
@@ -185,6 +209,7 @@ export default function BatchManagementForm() {
             onNetUnitPriceChange={handleNetUnitPriceChange}
             onRemoveItem={handleRemoveItem}
             onAddBatch={handleAddBatch}
+            onBatchNumberChange={handleBatchNumberChange}
             onBatchQuantityChange={handleBatchQuantityChange}
             onBatchExpiryChange={handleBatchExpiryChange}
             onRemoveBatch={handleRemoveBatch}

@@ -51,7 +51,6 @@ import AnalysisInventoryPage from "./features/analysis_inventory/components/Anal
 import AssistantPage from "./features/ai_assistant/AIAssistantPage";
 import PredictiveOrdersPage from "./features/predictiveOrders/PredictiveOrdersPage";
 import { OwnerSelectPharmacy } from "./features/auth/components/ownerSelectPharmacy";
-import Test from "./features/online_renew_subsrciption/page/temp";
 import { PaymentSuccessPage } from "./features/online_renew_subsrciption/page/SuccessPaymentPage";
 import { PaymentCancelPage } from "./features/online_renew_subsrciption/page/CanclePaymentPage";
 import OwnerRenewSubscriptionPage from "./features/online_renew_subsrciption/page/OwnerPlaneCard";

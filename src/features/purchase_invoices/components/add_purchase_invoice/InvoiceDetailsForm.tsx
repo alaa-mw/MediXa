@@ -46,7 +46,7 @@ export default function InvoiceDetailsForm() {
 
   useEffect(() => {
     dispatch(printState());
-  }, [purchaseInvoice]);
+  }, [dispatch, purchaseInvoice]);
 
   return (
     <Box sx={{ maxWidth: 800, height: "auto", mx: "auto" }}>

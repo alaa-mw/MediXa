@@ -1,0 +1,1 @@
+export const todayDate = new Date().toISOString().split("T")[0];

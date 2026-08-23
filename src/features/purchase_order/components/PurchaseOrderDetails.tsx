@@ -154,7 +154,7 @@ const PurchaseOrderDetailsPage = () => {
             />
           </Box>
         </Card>
-
+{/* expectedReceiptDate */}
         <Card
           sx={{
             p: 2.5,

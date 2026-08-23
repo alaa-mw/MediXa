@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Box, Button, Paper, Typography } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import PersonIcon from "@mui/icons-material/Person";
@@ -6,10 +6,15 @@ import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
 import AssignmentTurnedInIcon from "@mui/icons-material/AssignmentTurnedIn";
 import usePostData from "../../../../shared/hooks/usePostData";
 import { useDispatch, useSelector } from "react-redux";
-// import type { RootState } from "../../store";
-import { resetForm, selectRequestPayload } from "../../store/purchaseInvoiceSlice";
+import type { RootState } from "../../../../shared/store";
+import {
+  resetForm,
+  selectRequestPayload,
+  updateField,
+} from "../../store/purchaseInvoiceSlice";
 import { useSnackbar } from "../../../../shared/providers/useSnackbar";
 import { useNavigate } from "react-router-dom";
+import { useIdempotency } from "../../../../shared/hooks/useIdempotency";
 
 interface Props {
   activeStep: number;
@@ -51,27 +56,44 @@ const PurchaseInvoiceStepper = ({
 
   const { showSnackbar } = useSnackbar();
   const navigate = useNavigate();
-  
-  // const purchaseInvoice = useSelector(
-  //   (state: RootState) => state.purchaseInvoice,
-  // );
-  
+
+  const purchaseInvoice = useSelector(
+    (state: RootState) => state.purchaseInvoice,
+  );
+
   const payload = useSelector(selectRequestPayload);
   const dispatch = useDispatch();
-  
-  const {mutate:createPurchaseInvoice} = usePostData("/supplier-invoice/create");
+  const { getKey, clearKey } = useIdempotency();
+
+  const { mutate: createPurchaseInvoice } = usePostData(
+    "/supplier-invoice/create",
+  );
+
+  useEffect(() => {
+    // Initialize once per invoice flow so submit always has an idempotency key.
+    if (!purchaseInvoice.idempotencyKey) {
+      dispatch(
+        updateField({
+          field: "idempotencyKey",
+          value: getKey(),
+        }),
+      );
+    }
+  }, [dispatch, getKey, purchaseInvoice.idempotencyKey]);
 
   const handleSubmit = () => {
     createPurchaseInvoice(payload, {
       onSuccess: (data) => {
-        console.log("Purchase invoice created successfully:", data);
         showSnackbar("تم إنشاء الفاتورة بنجاح", "success");
+        clearKey();
         dispatch(resetForm());
-        navigate("/pharmacy/invoices/purchase"); 
+        navigate("/pharmacy/invoices/purchase");
       },
-      onError: (error) => {
-        console.error("Error creating purchase invoice:", error);
-        showSnackbar("حدث خطأ أثناء إنشاء الفاتورة", "error");
+       onError: (error) => {
+        const errorDetails = (error as Error & { details?: string }).details;
+        if (errorDetails)
+          showSnackbar(error.message + ": " + errorDetails, "error");
+        else showSnackbar(error.message, "error");
       },
     });
   };
@@ -85,7 +107,15 @@ const PurchaseInvoiceStepper = ({
         bgcolor: "#F4F9FB",
       }}
     >
-      <Box sx={{height: "14vh", minWidth: "65vw", mx: "auto", mb: 4, position: "relative" }}>
+      <Box
+        sx={{
+          height: "14vh",
+          minWidth: "65vw",
+          mx: "auto",
+          mb: 4,
+          position: "relative",
+        }}
+      >
         <Box
           sx={{
             position: "absolute",
