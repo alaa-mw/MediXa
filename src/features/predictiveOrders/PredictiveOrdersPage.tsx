@@ -24,7 +24,7 @@ const PredictiveOrdersPage = () => {
               // fontSize: { xs: "1.5rem", md: "2rem" },
             }}
           >
-            إدارة المشتريات الذكية
+            إدارة المشتريات المقترحة
           </Typography>
           <Typography
             sx={{

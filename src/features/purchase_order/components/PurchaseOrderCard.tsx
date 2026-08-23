@@ -1,15 +1,18 @@
 import CalendarTodayRounded from "@mui/icons-material/CalendarTodayRounded";
+import DownloadRounded from "@mui/icons-material/DownloadRounded";
 import LocalShippingRounded from "@mui/icons-material/LocalShippingRounded";
 import VisibilityRounded from "@mui/icons-material/VisibilityRounded";
 import {
-    Box,
-    Button,
-    Card,
-    CardContent,
-    Chip,
-    Stack,
-    Typography,
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Chip,
+  Stack,
+  Typography,
 } from "@mui/material";
+import { useSnackbar } from "../../../shared/providers/useSnackbar";
+import { useGetFile } from "../../../shared/hooks/useGetFile";
 import type { PurchaseOrder } from "../types/purchaseOrder";
 import getPurchaseOrderStatusLabel from "../utils/getPurchaseOrderStatusLabel";
 
@@ -31,6 +34,39 @@ const PurchaseOrderCard = ({
   data: PurchaseOrder;
   onView?: (id: string) => void;
 }) => {
+  const { showSnackbar } = useSnackbar();
+
+  const { mutate: exportExcel, isPending: isExporting } = useGetFile<Blob>(
+    `/purchase-order/${String(data.purchaseOrderId)}/export-excel`,
+  );
+
+  const handleExportExcel = () => {
+    exportExcel(undefined, {
+      onSuccess: (response) => {
+        const blob =
+          response instanceof Blob
+            ? response
+            : new Blob([response as unknown as BlobPart], {
+                type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+              });
+
+        const fileUrl = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = fileUrl;
+        link.download = `purchase-order-${String(data.purchaseOrderId)}.xlsx`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(fileUrl);
+
+        showSnackbar("تم تصدير ملف الإكسل بنجاح، واعتبار الطلب قيد الاستلام", "success");
+      },
+      onError: () => {
+        showSnackbar("حدث خطأ أثناء تصدير ملف الإكسل", "error");
+      },
+    });
+  };
+
   return (
     <Card
       sx={{
@@ -132,21 +168,43 @@ const PurchaseOrderCard = ({
             </Box>
           </Stack>
 
-          <Button
-            fullWidth
-            variant="contained"
-            color="secondary"
-            startIcon={<VisibilityRounded />}
-            sx={{
-              height: 44,
-              borderRadius: 2.5,
-              fontWeight: 700,
-              textTransform: "none",
-            }}
-            onClick={() => onView?.(`details/${String(data.purchaseOrderId)}`)}
-          >
-            عرض الطلب
-          </Button>
+          <Stack sx={{ flexDirection: "row", gap: 1 }}>
+          
+
+            <Button
+              fullWidth
+              variant="contained"
+              color="secondary"
+              startIcon={<VisibilityRounded />}
+              sx={{
+                height: 44,
+                borderRadius: 2.5,
+                fontWeight: 700,
+                textTransform: "none",
+                
+              }}
+              onClick={() =>
+                onView?.(`details/${String(data.purchaseOrderId)}`)
+              }
+            >
+              عرض الطلب
+            </Button>
+              <Button
+              fullWidth
+              variant="outlined"
+              startIcon={<DownloadRounded />}
+              onClick={handleExportExcel}
+              disabled={isExporting}
+              sx={{
+                height: 44,
+                borderRadius: 2.5,
+                fontWeight: 700,
+                textTransform: "none",
+              }}
+            >
+              {isExporting ? "جاري التصدير..." : "تصدير "}
+            </Button>
+          </Stack>
         </Stack>
       </CardContent>
     </Card>

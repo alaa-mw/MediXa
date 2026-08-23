@@ -1,12 +1,12 @@
-import React, { useEffect, useState, useRef } from "react";
+import React from "react";
 import { DeleteOutlined } from "@mui/icons-material";
 import AddIcon from "@mui/icons-material/Add";
 import LocalPharmacyIcon from "@mui/icons-material/LocalPharmacy";
 import {
   Box,
-  Button,
   IconButton,
   Paper,
+  Tooltip,
   Typography,
   alpha,
 } from "@mui/material";
@@ -23,6 +23,11 @@ type Props = {
   onNetUnitPriceChange: (itemIndex: number, value: number) => void;
   onRemoveItem: (itemIndex: number) => void;
   onAddBatch: (itemIndex: number) => void;
+  onBatchNumberChange: (
+    itemIndex: number,
+    batchIndex: number,
+    value: string,
+  ) => void;
   onBatchQuantityChange: (
     itemIndex: number,
     batchIndex: number,
@@ -43,6 +48,7 @@ export default function BatchItemCard({
   onNetUnitPriceChange,
   onRemoveItem,
   onAddBatch,
+  onBatchNumberChange,
   onBatchQuantityChange,
   onBatchExpiryChange,
   onRemoveBatch,
@@ -74,18 +80,22 @@ export default function BatchItemCard({
         </Box>
 
         <Box sx={{ display: "flex", width: "50%", gap: 1 }}>
-          <CustomCounterField
-            // label="الكمية الاجمالية"
+          <CustomTextField
+            type="number"
+            label="اجمالي الكمية"
             value={item.quantity}
             onChange={(value) => {
-              onQuantityChange(index, value);
+              onQuantityChange(index, parseFloat(value));
             }}
-            height="38px"
+            minNum={0}
+            padding="8px"
           />
           <CustomTextField
+            type="number"
             label="سعر الوحدة"
-            value={item.netUnitPrice}
+            value={item.netUnitPrice || 0}
             onChange={(value) => onNetUnitPriceChange(index, parseFloat(value))}
+            minNum={0}
             padding="8px"
           />
 
@@ -99,7 +109,7 @@ export default function BatchItemCard({
         sx={{
           display: "grid",
           alignItems: "center",
-          gridTemplateColumns: "2.5fr 2.5fr  1fr ",
+          gridTemplateColumns: "0.7fr 1.5fr 2.5fr 2.5fr  1fr",
           bgcolor: alpha(theme.palette.primary.main, 0.2),
           p: 1.5,
           borderRadius: 2,
@@ -109,20 +119,27 @@ export default function BatchItemCard({
           mb: 1,
         }}
       >
+        <Box></Box>
+        <Box>رقم التشغيلة</Box>
         <Box>الكمية (علبة)</Box>
         <Box>تاريخ الانتهاء</Box>
         <Box>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon sx={{ ml: 1, mr: 0 }} />}
-            onClick={() => onAddBatch(index)}
-            sx={{
-              borderRadius: 5,
-              fontSize: "0.7rem",
-            }}
-          >
-            إضافة دفعة
-          </Button>
+          <Tooltip title="إضافة دفعة" arrow>
+            <IconButton
+              color="primary"
+              onClick={() => onAddBatch(index)}
+              aria-label="إضافة دفعة"
+              sx={{
+                borderRadius: 2,
+                bgcolor: alpha(theme.palette.primary.main, 1),
+                "&:hover": {
+                  bgcolor: alpha(theme.palette.primary.main, 0.6),
+                },
+              }}
+            >
+              <AddIcon sx={{ fontSize: 20, color:"white" }} />
+            </IconButton>
+          </Tooltip>
         </Box>
       </Box>
 
@@ -131,7 +148,7 @@ export default function BatchItemCard({
           key={idx}
           sx={{
             display: "grid",
-            gridTemplateColumns: "2.5fr 2.5fr  1fr",
+            gridTemplateColumns: "0.7fr 1.5fr 2.5fr 2.5fr  1fr",
             alignItems: "center",
             mb: 1,
             textAlign: "center",
@@ -139,10 +156,29 @@ export default function BatchItemCard({
         >
           <Box sx={{ px: 1 }}>
             <Box sx={{ bgcolor: "#F1F5F9", py: 1, borderRadius: 2 }}>
+              <Typography sx={{ fontWeight: 700, color: "#2D3A4D" }}>
+                # {idx + 1}
+              </Typography>
+            </Box>
+          </Box>
+          <Box sx={{ px: 1 }}>
+            <Box sx={{ bgcolor: "#F1F5F9", py: 1, borderRadius: 2 }}>
+              <CustomTextField
+                type="text"
+                label=""
+                value={row.batchNumber || ""}
+                onChange={(value) => onBatchNumberChange(index, idx, value)}
+                padding="0px"
+              />
+            </Box>
+          </Box>
+          <Box sx={{ px: 1 }}>
+            <Box sx={{ bgcolor: "#F1F5F9", py: 1, borderRadius: 2 }}>
               <CustomCounterField
                 value={row.initialQuantity}
                 onChange={(value) => onBatchQuantityChange(index, idx, value)}
-                height="32px"
+                height="24px"
+                min={1}
               />
             </Box>
           </Box>
@@ -153,12 +189,13 @@ export default function BatchItemCard({
                 py: 1,
                 borderRadius: 2,
                 fontWeight: 700,
+                padding: "4px",
               }}
             >
               <RTLDatePicker
                 value={row.expiryDate}
                 onChange={(date) => onBatchExpiryChange(index, idx, date)}
-                padding="0px 8px"
+                padding="0px 12px"
               />
             </Box>
           </Box>

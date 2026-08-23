@@ -2,7 +2,6 @@ import LocalShippingRoundedIcon from "@mui/icons-material/LocalShippingRounded";
 import WarningAmberRoundedIcon from "@mui/icons-material/WarningAmberRounded";
 import {
   Box,
-  Button,
   Paper,
   Stack,
   Table,
@@ -79,7 +78,7 @@ const IncomingOrdersTable = () => {
           </Typography>
         </Stack>
 
-        <Button
+        {/* <Button
           variant="outlined"
           size="small"
           sx={{
@@ -91,7 +90,7 @@ const IncomingOrdersTable = () => {
           }}
         >
           عرض جميع الشحنات
-        </Button>
+        </Button> */}
       </Stack>
 
       <TableContainer>

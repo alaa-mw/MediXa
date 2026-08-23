@@ -46,6 +46,15 @@ class APIClient<T> {
       url: `${this.buildUrl(queryParams)}/${id}`,
     });
 
+  getBlob = (data?: unknown) =>
+  this.request<T>({
+    method: "GET",
+    url: this.endpoint,
+    responseType: "blob",
+    data,
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+
   post = (data?: unknown) =>
     this.request<T>({
       method: "POST",
@@ -70,15 +79,7 @@ class APIClient<T> {
       headers: { Authorization: undefined },
     });
 
-  postBolob = (data?: unknown) =>
-    this.request<T>({
-      method: "POST",
-      url: this.endpoint,
-      responseType: "blob",
-      data,
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-
+  
   deleteById = (id: string) =>
     this.request<T>({ method: "DELETE", url: `${this.endpoint}/${id}` });
 

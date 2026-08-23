@@ -207,6 +207,7 @@ const CustomerOrderCard = ({
             <IconButton
               aria-label="cancel"
               onClick={handleCancelOrder}
+              disabled={data.status === "CANCELLED"}
               sx={{
                 height: 44,
                 width: 44,

@@ -3,17 +3,17 @@ import APIClient from "../api/api-client";
 import type { FetchResponse } from "../api/api-types";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const usePostFile = <TData>(endpoint: string, data?: unknown) => {
+export const useGetFile = <TData>(endpoint: string, data?: unknown) => {
   const apiClient = new APIClient<TData>(endpoint);
   return useMutation<FetchResponse<TData>, Error, typeof data>({
     mutationFn: (bodyData?) => {
       console.log("mutate", bodyData);
-      return apiClient.postBolob(bodyData);
+      return apiClient.getBlob(bodyData);
     },
   });
 };
 
-export default usePostFile;
+export default useGetFile;
 
 /*
   is specified just for blob data, it uses the postBolob method in the APIClient 

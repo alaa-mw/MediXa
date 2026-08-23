@@ -2,6 +2,7 @@ import type { PaymentStatus, SupplierInvoiceStatus } from "./enums";
 
 // 1. REQUEST BODY - What gets sent to the API
 export interface PurchaseInvoiceRequest {
+  idempotencyKey: string;
   status: SupplierInvoiceStatus;
   supplierId: number;
   invoiceNumber: string;
@@ -9,6 +10,10 @@ export interface PurchaseInvoiceRequest {
   discount: number;
   notes: string;
   items: PurchaseInvoiceItemRequest[];
+  paymentStatus: PaymentStatus;
+  paidAmount: number;
+  payableAmount?: number | null;
+  remainingAmount?: number | null;
 }
 
 export interface PurchaseInvoiceItemRequest {
@@ -20,6 +25,7 @@ export interface PurchaseInvoiceItemRequest {
 }
 
 export interface PurchaseInvoiceBatchRequest {
+  batchNumber: string;
   initialQuantity: number;
   expiryDate: string;
 }
@@ -33,14 +39,12 @@ export interface SupplierInfo {
 
 // 3. COMPLETE SLICE STATE - Combines both
 export interface SliceState extends PurchaseInvoiceRequest {
-
   supplier: SupplierInfo;
-  paymentStatus: PaymentStatus;
-  
+
   // Async states
   loading: boolean;
   error: string | null;
-  
+
   // Optional: track if form has been modified
   isDirty?: boolean;
   // Optional: validation errors

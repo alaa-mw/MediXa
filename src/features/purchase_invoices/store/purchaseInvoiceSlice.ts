@@ -11,15 +11,19 @@ import type {
 } from "../types/purchaseInvoiceStore";
 import type { PurchaseInvoiceDetails } from "../types/purchaseInvoice";
 import type { PaymentStatus, SupplierInvoiceStatus } from "../types/enums";
+import { todayDate } from "../../../shared/constants/today";
 
 const initialState: SliceState = {
   // Request fields (go to API)
+  idempotencyKey: "",
   status: "PENDING",
   supplierId: -1,
   invoiceNumber: "INV-",
-  invoiceDate: "2026-01-01",
+  invoiceDate: todayDate,
   discount: 0,
   notes: "",
+  paymentStatus: "PENDING",
+  paidAmount: 0,
   items: [
     // {
     //   pharmacyDrugId: "3",
@@ -27,11 +31,14 @@ const initialState: SliceState = {
     //   quantity: 20,
     //   netUnitPrice: 15000,
     //   batches: [
-    //     { initialQuantity: 10, expiryDate: "2026-01-01" },
-    //     { initialQuantity: 10, expiryDate: "2026-01-01" },
+    //     { batchNumber: "", initialQuantity: 10, expiryDate: "2026-01-01" },
+    //     { batchNumber: "", initialQuantity: 10, expiryDate: "2026-01-01" },
     //   ],
     // },
   ],
+
+  payableAmount: null,
+  remainingAmount: null,
 
   // UI only fields
   supplier: {
@@ -39,7 +46,6 @@ const initialState: SliceState = {
     pharmacyId: -1,
     supplierName: "",
   },
-  paymentStatus: "PENDING",
 
   // Async state
   loading: false,
@@ -93,7 +99,7 @@ const purchaseInvoiceSlice = createSlice({
       if (index >= 0 && index < state.items.length) {
         state.items[index].quantity = quantity;
       }
-      // ensureItemQuantityAtLeastBatches(state, index);
+      ensureItemQuantityAtLeastBatches(state, index);
     },
     updateItemNetUnitPrice: (
       state,
@@ -188,6 +194,15 @@ const purchaseInvoiceSlice = createSlice({
       state.invoiceDate = details.invoiceDate || state.invoiceDate;
       state.discount = Number(details.discount) || 0;
       state.notes = details.notes || "";
+      // financials
+      state.payableAmount = details.payableAmount
+        ? Number(details.payableAmount)
+        // : details.totalPrice
+        //   ? Number(details.totalPrice)
+        : null;
+      state.remainingAmount = details.remainingAmount
+        ? Number(details.remainingAmount)
+        : null;
 
       // Items mapping: adapt server shape to request shape
       state.items = (details.items || []).map((it) => {
@@ -197,6 +212,7 @@ const purchaseInvoiceSlice = createSlice({
           quantity: it.quantity,
           netUnitPrice: Number(it.netUnitPrice),
           batches: (it.batches || []).map((b) => ({
+            batchNumber: b.batchNumber ?? "",
             initialQuantity: b.initialQuantity,
             expiryDate: b.expiryDate,
           })),
@@ -231,7 +247,7 @@ export const selectRequestPayload = (state: {
   const items = (request.items || []).map(({ drugName, ...rest }) => rest);
 
   return {
-    ...request,
+    ...request, // rest of state need for the request
     items,
   } as PurchaseInvoiceRequest;
 };
@@ -280,4 +296,3 @@ export const {
 } = purchaseInvoiceSlice.actions;
 
 export default purchaseInvoiceSlice.reducer;
-

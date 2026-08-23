@@ -70,7 +70,7 @@ export const sideBarLabels: Record<
       icon: ShoppingBagIcon,
     },
     {
-      title: "المشتريات الذكية",
+      title: "المشتريات المقترحة",
       path: "/predictive-orders",
       icon: AutoGraphIcon,
     },
