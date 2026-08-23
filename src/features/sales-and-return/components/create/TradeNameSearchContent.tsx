@@ -171,7 +171,7 @@ export const TradeNameSearchContent = ({
                 sx={{ "&::before": { display: "none" }, mb: 1.5 }}
               >
                 <Chip
-                  label="did you mean ?"
+                  label="أسماء أدوية مشابهة !"
                   size="small"
                   sx={{ bgcolor: "#f1f5f9", color: "#64748b", fontWeight: 600 }}
                 />

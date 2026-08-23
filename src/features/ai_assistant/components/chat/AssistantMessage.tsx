@@ -48,7 +48,7 @@ const AssistantMessage = ({ message, sources, isLoading }: Props) => {
             <Typography component="div" sx={{ lineHeight: 2 }}>
               {message}
             </Typography>
-            {sources && <SourcesAccordion sources={sources} />}
+            {/* {sources && <SourcesAccordion sources={sources} />} */}
           </>
         )}
       </Card>

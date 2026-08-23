@@ -27,11 +27,11 @@ export const sideBarLabels: Record<
       path: "/reports",
       icon: BarChartIcon,
     },
-    {
-      title: "نشرة الأسعار",
-      path: "/price-list",
-      icon: PaymentsIcon,
-    },
+    // {
+    //   title: "نشرة الأسعار",
+    //   path: "/price-list",
+    //   icon: PaymentsIcon,
+    // },
     {
       title: "اشتراكي",
       path: "/subscription-schedule",
