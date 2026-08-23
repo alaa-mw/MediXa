@@ -38,6 +38,7 @@ const AuthGateway= () => {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
+        justifyContent:"center",
         mb: 4,
       }}
     >

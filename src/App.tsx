@@ -194,7 +194,7 @@ function App() {
           >
             {pharmacyPaths.map((path) => (
               <Route path={path} key={path} element={<DashboardTemplate />}>
-                <Route index element={<>hello</>} />
+                <Route index element={<Navigate to="sales"/>} />
                 <Route path="notifications" element={<NotificationsPage />} />
                 <Route path="sales" element={<SalesLayout />}>
                   <Route index element={<Navigate to="sales" replace />} />

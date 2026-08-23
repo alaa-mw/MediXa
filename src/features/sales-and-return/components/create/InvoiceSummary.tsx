@@ -36,7 +36,7 @@ export const InvoiceSummary: React.FC = () => {
       changePaidAmount,
       changeNotes,
       submitInvoice,
-      clearInvoice
+      clearInvoice,
     },
   } = useSaleInvoice();
 
@@ -55,6 +55,14 @@ export const InvoiceSummary: React.FC = () => {
     paidAmount: "",
     patientName: "",
   });
+
+  const handleStatusChange = (statusValue: any) => {
+    setFieldErrors((prev) => ({ ...prev, paidAmount: "" }));
+    changePaymentStatus(statusValue);
+    if (statusValue !== "PARTIAL") {
+      changePaidAmount(0);
+    }
+  };
 
   const handleSubmit = (e?: React.MouseEvent) => {
     if (e) e.preventDefault();
@@ -131,12 +139,11 @@ export const InvoiceSummary: React.FC = () => {
 
   return (
     <Grid size={{ xs: 12, lg: 4 }} sx={{ height: "100%" }}>
-      {/* Container رئيسي ممتد وموحد */}
       <Paper
         elevation={0}
         sx={{
           height: "100%",
-          maxHeight: "100%", // ضمان الاحتواء داخل الشاشة
+          maxHeight: "100%",
           display: "flex",
           flexDirection: "column",
           borderRadius: 4,
@@ -147,19 +154,14 @@ export const InvoiceSummary: React.FC = () => {
           overflow: "hidden",
         }}
       >
-        {/* ===================== [ الجزء 1: ثابت في الأعلى ] ===================== */}
         <Box sx={{ flexShrink: 0 }}>
-          {/* عنوان ملخص الفاتورة النهائي */}
           <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
             <ReceiptOutlinedIcon sx={{ color: "#316A75", fontSize: 22 }} />
-            <Typography
-              sx={{ fontWeight: 800, fontSize: 16, color: "#0F172A" }}
-            >
+            <Typography sx={{ fontWeight: 800, fontSize: 16, color: "#0F172A" }}>
               ملخص الفاتورة النهائي
             </Typography>
           </Box>
 
-          {/* البطاقة الداكنة لملخص الأرقام */}
           <Paper
             elevation={0}
             sx={{
@@ -171,7 +173,6 @@ export const InvoiceSummary: React.FC = () => {
             }}
           >
             <Stack spacing={1.8}>
-              {/* إجمالي الأصناف */}
               <Box
                 sx={{
                   display: "flex",
@@ -190,7 +191,6 @@ export const InvoiceSummary: React.FC = () => {
                 </Typography>
               </Box>
 
-              {/* خصم خاص */}
               <Box
                 sx={{
                   display: "flex",
@@ -221,7 +221,6 @@ export const InvoiceSummary: React.FC = () => {
 
               <Divider sx={{ bgcolor: "rgba(255,255,255,0.1)", my: 0.5 }} />
 
-              {/* الصافي المطلوب دفعه */}
               <Box
                 sx={{
                   display: "flex",
@@ -254,7 +253,6 @@ export const InvoiceSummary: React.FC = () => {
           </Paper>
         </Box>
 
-        {/* ===================== [ الجزء 2: قابل للسكرول ] ===================== */}
         <Box
           sx={{
             flexGrow: 1,
@@ -270,7 +268,6 @@ export const InvoiceSummary: React.FC = () => {
             },
           }}
         >
-          {/* حالة الدفع */}
           <Box>
             <Typography
               sx={{
@@ -293,10 +290,7 @@ export const InvoiceSummary: React.FC = () => {
                   <Chip
                     key={status.value}
                     label={status.label}
-                    onClick={() => {
-                      setFieldErrors((prev) => ({ ...prev, paidAmount: "" }));
-                      changePaymentStatus(status.value as any);
-                    }}
+                    onClick={() => handleStatusChange(status.value)}
                     icon={
                       isSelected ? (
                         <CheckCircleRoundedIcon
@@ -325,7 +319,6 @@ export const InvoiceSummary: React.FC = () => {
             </Box>
           </Box>
 
-          {/* حقل المبلغ المدفوع جزئياً */}
           {paymentStatus === "PARTIAL" && (
             <CustomTextField
               label="المبلغ المدفوع جزئياً *"
@@ -341,8 +334,6 @@ export const InvoiceSummary: React.FC = () => {
             />
           )}
 
-
-          {/* lملاحظات الفاتورة*/}
           <CustomTextField
             label="ملاحظات الفاتورة (اختياري)"
             placeholder="أضف أي ملاحظات إضافية..."
@@ -350,8 +341,6 @@ export const InvoiceSummary: React.FC = () => {
             onChange={(val) => changeNotes(val)}
           />
 
-
-          {/*معلومات المريض*/}
           {shouldShowPatientCard && (
             <PatientInfoCard
               patient={patient}
@@ -365,20 +354,30 @@ export const InvoiceSummary: React.FC = () => {
           )}
         </Box>
 
-        {/* ===================== [ الجزء 3: ثابت في الأسفل ] ===================== */}
-        {/* <Box sx={{ flexShrink: 0, pt: 2, borderTop: "1px solid #F1F5F9" }}>
+        <Box
+          sx={{
+            flexShrink: 0,
+            pt: 2,
+            borderTop: "1px solid #F1F5F9",
+            display: "flex",
+            gap: 1.5,
+            alignItems: "center",
+          }}
+        >
           <Button
             type="button"
-            fullWidth
             variant="contained"
             disabled={items.length === 0 || isSubmitting}
             onClick={handleSubmit}
             sx={{
-              bgcolor: "primary.main",
+              flex: 1,
               py: 1.4,
               fontSize: 15,
               fontWeight: 800,
               borderRadius: 3,
+              whiteSpace: "nowrap",
+              minWidth: 0,
+              bgcolor: "primary.main",
               boxShadow: "0 4px 12px rgba(49, 106, 117, 0.25)",
             }}
           >
@@ -389,73 +388,38 @@ export const InvoiceSummary: React.FC = () => {
             )}
           </Button>
 
-        </Box> */}
-        <Box
-  sx={{
-    flexShrink: 0,
-    pt: 2,
-    borderTop: "1px solid #F1F5F9",
-    display: "flex", 
-    gap: 1.5, 
-    alignItems: "center",
-  }}
->
-  <Button
-    type="button"
-    variant="contained"
-    disabled={items.length === 0 || isSubmitting}
-    onClick={handleSubmit}
-    sx={{
-      flex: 1, 
-      py: 1.4,
-      fontSize: 15,
-      fontWeight: 800,
-      borderRadius: 3,
-      whiteSpace: "nowrap", 
-      minWidth: 0, 
-      bgcolor: "primary.main",
-      boxShadow: "0 4px 12px rgba(49, 106, 117, 0.25)",
-    }}
-  >
-    {isSubmitting ? (
-      <CircularProgress size={24} color="inherit" />
-    ) : (
-      "إنشاء الفاتورة"
-    )}
-  </Button>
-  {/* 1️⃣ زر إلغاء الفاتورة */}
-  <Button
-    type="button"
-    variant="outlined"
-    color="error"
-    disabled={items.length === 0 || isSubmitting}
-    onClick={() => {
-      clearInvoice();
-    }}
-    sx={{
-      flex: 1, 
-      py: 1.4,
-      fontSize: 15,
-      fontWeight: 800,
-      borderRadius: 3,
-      whiteSpace: "nowrap", 
-      minWidth: 0,
-      borderColor: "#FCA5A5",
-      bgcolor: "#FEF2F2",
-      color: "#DC2626",
-      "&.Mui-disabled": {
-        bgcolor: "#F8FAFC",
-        borderColor: "#E2E8F0",
-        color: "#94A3B8",
-      },
-    }}
-  >
-    إلغاء الفاتورة
-  </Button>  
-</Box>
+          <Button
+            type="button"
+            variant="outlined"
+            color="error"
+            disabled={items.length === 0 || isSubmitting}
+            onClick={() => {
+              clearInvoice();
+              setFieldErrors({ discount: "", paidAmount: "", patientName: "" });
+            }}
+            sx={{
+              flex: 1,
+              py: 1.4,
+              fontSize: 15,
+              fontWeight: 800,
+              borderRadius: 3,
+              whiteSpace: "nowrap",
+              minWidth: 0,
+              borderColor: "#FCA5A5",
+              bgcolor: "#FEF2F2",
+              color: "#DC2626",
+              "&.Mui-disabled": {
+                bgcolor: "#F8FAFC",
+                borderColor: "#E2E8F0",
+                color: "#94A3B8",
+              },
+            }}
+          >
+            إلغاء الفاتورة
+          </Button>
+        </Box>
       </Paper>
 
-      {/* التنبيهات */}
       <Snackbar
         open={feedback.open}
         autoHideDuration={5000}

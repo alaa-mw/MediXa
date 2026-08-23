@@ -1,7 +1,6 @@
 import type { SaleInvoiceSliceState } from "../store/createSaleInvoiceSlice";
 import type { CreateSaleInvoiceDto } from "../types/saleInvoiceCreate";
 
-
 export const mapSaleInvoiceStateToRequest = (
   state: SaleInvoiceSliceState,
   idempotencyKey: string,
@@ -11,6 +10,7 @@ export const mapSaleInvoiceStateToRequest = (
     idempotencyKey,
     invoiceDate: new Date().toISOString(),
     paymentStatus: state.paymentStatus,
+    paidAmount: state.paymentStatus === "PARTIAL" ? Number(state.paidAmount) || 0 : undefined,
     saleType: state.saleType,
     discount: Number(state.discount) || 0,
     notes: state.notes?.trim() || undefined,

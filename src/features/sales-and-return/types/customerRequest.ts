@@ -95,6 +95,8 @@ export interface CheckoutItemPayload {
 export interface CustomerRequestCheckoutPayload {
   idempotencyKey: string;
   paymentStatus: PaymentStatus;
+      paidAmount?: number;
+
   discount: number;
   notes?: string;
   items: CheckoutItemPayload[];

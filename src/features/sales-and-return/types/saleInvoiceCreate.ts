@@ -94,6 +94,7 @@ export interface CreateSaleInvoiceDto {
   paymentStatus: PaymentStatus;
   saleType: SaleType;
   discount: number;
+    paidAmount?: number;
   notes?: string;
   patient?: PatientInfo;
   items: CreateSaleInvoiceItemDto[];

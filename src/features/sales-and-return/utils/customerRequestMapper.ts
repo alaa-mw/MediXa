@@ -59,6 +59,7 @@ export const mapCustomerRequestStateToCheckoutPayload= (
 ): CustomerRequestCheckoutPayload => {
   return {
     idempotencyKey,
+        paidAmount: state.paymentStatus === "PARTIAL" ? Number(state.paidAmount) || 0 : undefined,
     paymentStatus: state.paymentStatus,
     discount: state.discount,
     notes: state.notes || undefined,
