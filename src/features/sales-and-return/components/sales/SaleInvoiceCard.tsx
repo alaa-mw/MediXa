@@ -269,9 +269,10 @@ import {
   styled,
   CircularProgress,
 } from "@mui/material";
+
 import PersonOutlineIcon from "@mui/icons-material/PersonOutlined";
+
 import type { SaleInvoiceData } from "../../types/saleInvoice";
-import { useQueryClient } from "@tanstack/react-query";
 import usePatchData from "../../../../shared/hooks/usePatchData";
 import { useSnackbar } from "../../../../shared/providers/useSnackbar";
 
@@ -306,37 +307,34 @@ const StatusDot = styled(Box)<{ dotColor: string }>(({ dotColor }) => ({
 interface SaleInvoiceCardProps {
   invoice: SaleInvoiceData;
   onDetailsClick: (id: number) => void;
+  onPaymentSuccess: () => void;
 }
 
 export const SaleInvoiceCard: React.FC<SaleInvoiceCardProps> = ({
   invoice,
   onDetailsClick,
+  onPaymentSuccess,
 }) => {
-  const queryClient = useQueryClient();
   const { showSnackbar } = useSnackbar();
 
-  // Mutation لإتمام الدفع
   const { mutate: completePayment, isPending: isPaying } = usePatchData(
     `/sale-invoice/${invoice.saleInvoiceId}/payment`
   );
 
   const handleCompletePayment = () => {
     completePayment(
-      { paymentStatus: "PAID" },
+      {
+        paymentStatus: "PAID",
+      },
       {
         onSuccess: () => {
-          // إظهار رسالة النجاح
           showSnackbar(
             `تم إتمام دفع الفاتورة رقم #${invoice.pharmacyInvoiceId} بنجاح!`,
             "success"
           );
 
-          // إعادة جلب الفواتير من الـ backend
-          // للحصول على paymentStatus + paidAmount + remainingAmount الجديدة
-          queryClient.refetchQueries({
-            queryKey: ["sale-invoices"],
-            exact: false,
-          });
+          // إعادة جلب البيانات من الـ hook الأب
+          onPaymentSuccess();
         },
 
         onError: (err: any) => {
@@ -347,7 +345,9 @@ export const SaleInvoiceCard: React.FC<SaleInvoiceCardProps> = ({
             "حدث خطأ أثناء إتمام عملية الدفع.";
 
           showSnackbar(
-            Array.isArray(errorMsg) ? errorMsg.join(" | ") : errorMsg,
+            Array.isArray(errorMsg)
+              ? errorMsg.join(" | ")
+              : errorMsg,
             "error"
           );
         },
@@ -386,7 +386,6 @@ export const SaleInvoiceCard: React.FC<SaleInvoiceCardProps> = ({
     minute: "2-digit",
   });
 
-  // القيم المالية تأتي الآن مباشرة من الـ backend
   const total = Number(invoice.totalAmount);
   const paidAmount = invoice.paidAmount;
   const remainingAmount = invoice.remainingAmount;
@@ -399,7 +398,8 @@ export const SaleInvoiceCard: React.FC<SaleInvoiceCardProps> = ({
 
   return (
     <PremiumCard elevation={0}>
-      {/* 1. الرأس: رقم الفاتورة والتاريخ */}
+
+      {/* Header */}
       <Box
         sx={{
           display: "flex",
@@ -442,7 +442,7 @@ export const SaleInvoiceCard: React.FC<SaleInvoiceCardProps> = ({
         </Typography>
       </Box>
 
-      {/* 2. المنتصف: اسم المريض والأيقونة */}
+      {/* Patient */}
       <Box
         sx={{
           display: "flex",
@@ -459,8 +459,12 @@ export const SaleInvoiceCard: React.FC<SaleInvoiceCardProps> = ({
             width: "50px",
             height: "50px",
             borderRadius: "50%",
-            backgroundColor: hasPatient ? "#b8e0fa40" : "#f5f5f5",
-            color: hasPatient ? "#506680" : "#bfbfbf",
+            backgroundColor: hasPatient
+              ? "#b8e0fa40"
+              : "#f5f5f5",
+            color: hasPatient
+              ? "#506680"
+              : "#bfbfbf",
           }}
         >
           <PersonOutlineIcon sx={{ fontSize: 24 }} />
@@ -470,9 +474,10 @@ export const SaleInvoiceCard: React.FC<SaleInvoiceCardProps> = ({
           variant="body2"
           sx={{
             fontWeight: 700,
-            color: hasPatient ? "#262626" : "#bfbfbf",
+            color: hasPatient
+              ? "#262626"
+              : "#bfbfbf",
             fontSize: "1.15rem",
-            fontStyle: "normal",
           }}
         >
           {hasPatient
@@ -481,7 +486,7 @@ export const SaleInvoiceCard: React.FC<SaleInvoiceCardProps> = ({
         </Typography>
       </Box>
 
-      {/* 3. الأسفل: المبالغ المالية */}
+      {/* Financials */}
       <Box
         sx={{
           mt: "auto",
@@ -496,13 +501,12 @@ export const SaleInvoiceCard: React.FC<SaleInvoiceCardProps> = ({
             gap: 1.2,
           }}
         >
-          {/* إجمالي الفاتورة */}
+          {/* Total */}
           <Box
             sx={{
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
-              width: "100%",
             }}
           >
             <Typography
@@ -531,7 +535,6 @@ export const SaleInvoiceCard: React.FC<SaleInvoiceCardProps> = ({
                   fontSize: "0.75rem",
                   fontWeight: 500,
                   color: "#8c8c8c",
-                  mr: 0.5,
                 }}
               >
                 ل.س
@@ -539,13 +542,12 @@ export const SaleInvoiceCard: React.FC<SaleInvoiceCardProps> = ({
             </Typography>
           </Box>
 
-          {/* المدفوع */}
+          {/* Paid */}
           <Box
             sx={{
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
-              width: "100%",
             }}
           >
             <Typography
@@ -574,7 +576,6 @@ export const SaleInvoiceCard: React.FC<SaleInvoiceCardProps> = ({
                   fontSize: "0.72rem",
                   fontWeight: 400,
                   color: "#8c8c8c",
-                  mr: 0.3,
                 }}
               >
                 ل.س
@@ -582,13 +583,12 @@ export const SaleInvoiceCard: React.FC<SaleInvoiceCardProps> = ({
             </Typography>
           </Box>
 
-          {/* المتبقي */}
+          {/* Remaining */}
           <Box
             sx={{
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
-              width: "100%",
             }}
           >
             <Typography
@@ -617,7 +617,6 @@ export const SaleInvoiceCard: React.FC<SaleInvoiceCardProps> = ({
                   fontSize: "0.72rem",
                   fontWeight: 400,
                   color: "#8c8c8c",
-                  mr: 0.3,
                 }}
               >
                 ل.س
@@ -627,7 +626,7 @@ export const SaleInvoiceCard: React.FC<SaleInvoiceCardProps> = ({
         </Box>
       </Box>
 
-      {/* 4. زر العمليات */}
+      {/* Actions */}
       <Box
         sx={{
           width: "100%",
@@ -638,7 +637,9 @@ export const SaleInvoiceCard: React.FC<SaleInvoiceCardProps> = ({
         <Button
           variant="contained"
           disableElevation
-          onClick={() => onDetailsClick(invoice.saleInvoiceId)}
+          onClick={() =>
+            onDetailsClick(invoice.saleInvoiceId)
+          }
           fullWidth
           sx={{
             backgroundColor: "secondary.main",
@@ -648,13 +649,12 @@ export const SaleInvoiceCard: React.FC<SaleInvoiceCardProps> = ({
             textTransform: "none",
             borderRadius: "10px",
             py: "10px",
-            transition: "all 0.2s ease",
           }}
         >
           عرض التفاصيل
         </Button>
 
-        {/* إكمال الدفع للفواتير غير المدفوعة بالكامل */}
+        {/* يظهر فقط إذا لم تكن الفاتورة PAID */}
         {isPartialOrPending && (
           <Button
             variant="outlined"
@@ -678,7 +678,9 @@ export const SaleInvoiceCard: React.FC<SaleInvoiceCardProps> = ({
             {isPaying ? (
               <CircularProgress
                 size={18}
-                sx={{ color: "#10b981" }}
+                sx={{
+                  color: "#10b981",
+                }}
               />
             ) : (
               <>
@@ -693,6 +695,7 @@ export const SaleInvoiceCard: React.FC<SaleInvoiceCardProps> = ({
                 >
                   ✓
                 </Box>
+
                 إتمام الدفع
               </>
             )}
