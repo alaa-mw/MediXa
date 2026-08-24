@@ -239,7 +239,7 @@ export const selectRequestPayload = (state: {
 }) => {
   // 1. استخراج البيانات من الـ State
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { supplier, status, paymentStatus, loading, error, ...request } =
+  const { supplier, status, loading, error,payableAmount,remainingAmount, ...request } =
     state.purchaseInvoice;
 
   // Remove `drugName` from each item before sending request
