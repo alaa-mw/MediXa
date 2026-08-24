@@ -57,6 +57,7 @@ import OwnerRenewSubscriptionPage from "./features/online_renew_subsrciption/pag
 import OwnerPharmacySubscriptionSchedule from "./features/online_renew_subsrciption/page/OwnerPharmaSubs";
 import PriceListPage from "./features/pharmacy_price_list/pages/PriceListPage";
 import FloatingAssistantLauncher from "./features/ai_assistant/components/FloatingAssistantLauncher";
+import FloatingCreateSaleButton from "./shared/components/FloatingCreateSaleButton";
 import AddGeneralDrugPage from "./features/inventory/pages/AddGeneralDrugPage";
 import AddPrivateDrugPage from "./features/inventory/pages/AddPrivateDrugPage";
 import NotificationsPage from "./features/notifications/pages/NotificationsPage";
@@ -96,7 +97,7 @@ function App() {
           <Route path="/private-login" element={<UserLogin />} />
           <Route path="/auth" element={<AuthGateway />} />
           <Route path="/owner-register" element={<UserRegister ownerMode />} />
-          <Route path="/owner-login" element={<UserLogin />} />
+          <Route path="/owner-login" element={<UserLogin ownerMode />} />
           <Route path="/select-pharmacy" element={<OwnerSelectPharmacy />} />
           <Route path="/pharmacy-register" element={<PharmacyRegister />} />
           <Route path="/pharmacy-login" element={<PharmacyLogin />} />
@@ -194,7 +195,7 @@ function App() {
           >
             {pharmacyPaths.map((path) => (
               <Route path={path} key={path} element={<DashboardTemplate />}>
-                <Route index element={<Navigate to="sales"/>} />
+                <Route index element={<Navigate to="sales" />} />
                 <Route path="notifications" element={<NotificationsPage />} />
                 <Route path="sales" element={<SalesLayout />}>
                   <Route index element={<Navigate to="sales" replace />} />
@@ -302,6 +303,7 @@ function App() {
           </Route>
         </Routes>
         {role === "PHARMACY" && <FloatingAssistantLauncher />}
+        {role === "PHARMACY" && <FloatingCreateSaleButton />}
       </ThemeProvider>
     </>
   );

@@ -20,7 +20,11 @@ import { useNavigate } from "react-router-dom";
 import { useSnackbar } from "../../../shared/providers/useSnackbar";
 import { getFcmTokenAsString } from "../../../firebase/firebaseConfig";
 
-const UserLogin = () => {
+interface UserLoginProps {
+  ownerMode?: boolean;
+}
+
+const UserLogin = ({ ownerMode = false }: UserLoginProps) => {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const { showSnackbar } = useSnackbar();
@@ -230,7 +234,7 @@ const UserLogin = () => {
         >
           ليس لديك حساب؟{" "}
           <a
-            href="/private-register"
+            href={ownerMode ? "/owner-register" : "/private-register"}
             style={{
               color: theme.palette.primary.main,
             }}
