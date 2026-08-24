@@ -57,7 +57,9 @@ export const fetchAndAddDrug = createAsyncThunk(
             responseData.drugName ||
             `صنف #${payload.pharmacyDrugId}`,
         dosageFormName: payload.drugInfo?.dosageFormName,
-        requiresPrescription: payload.drugInfo?.requiresPrescription || false,
+        // requiresPrescription: payload.drugInfo?.requiresPrescription || false,
+        requiresPrescription:
+  responseData.isRx ?? payload.drugInfo?.requiresPrescription ?? false,
         availableSaleUnits: saleUnits,
         selectedUnit: defaultUnit,
         displayQuantity: defaultUnit.availableDisplayQuantity > 0 ? 1 : 0,

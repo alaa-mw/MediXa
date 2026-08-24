@@ -20,6 +20,7 @@ export interface DosageForm {
 export interface DrugStock {
   availableBaseQuantity: number;
   availableFullBoxes: number;
+  avilableIndividualUnits:number;
   isAvailable: boolean;
 }
 

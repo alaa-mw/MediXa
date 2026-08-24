@@ -50,13 +50,20 @@ export const generalDrugSlice = createSlice({
   name: "generalDrug",
   initialState,
   reducers: {
-    setGeneralDrugInfo: (
-      state,
-      action: PayloadAction<{ id: number; name: string }>
-    ) => {
-      state.generalDrugId = action.payload.id;
-      state.generalDrugName = action.payload.name;
-    },
+setGeneralDrugInfo: (
+  state,
+  action: PayloadAction<{
+    id: number;
+    name: string;
+    netPrice: number;
+    consumerPrice: number;
+  }>
+) => {
+  state.generalDrugId = action.payload.id;
+  state.generalDrugName = action.payload.name;
+  state.netPrice = action.payload.netPrice;
+  state.consumerPrice = action.payload.consumerPrice;
+},
     setActiveStep: (state, action: PayloadAction<number>) => {
       state.activeStep = action.payload;
     },
