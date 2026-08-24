@@ -50,27 +50,43 @@ export const AddedDrugsList: React.FC = () => {
 
   // اسم الدواء والمتاح منه
   const renderDrugInfo = (item: InvoiceItem) => (
-    <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, minWidth: 0 }}>
-      <Box
-        sx={{
-          p: 1,
-          bgcolor: "white",
-          borderRadius: 2,
-          border: "1px solid #E2E8F0",
-          display: "flex",
-        }}
-      >
-        <MedicationOutlinedIcon sx={{ color: "#316A75" }} />
-      </Box>
-      <Box sx={{ minWidth: 0 }}>
-        <Typography noWrap sx={{ fontWeight: 700, fontSize: 15 }}>
-          {item.tradeName}
-        </Typography>
-        <Typography variant="caption" sx={{ color: "#64748B", fontSize: 13 }}>
-          المتاح: {item.selectedUnit.availableDisplayQuantity}
-        </Typography>
-      </Box>
-    </Box>
+    <Box sx={{ minWidth: 0 }}>
+  <Typography noWrap sx={{ fontWeight: 700, fontSize: 15 }}>
+    {item.tradeName}
+  </Typography>
+
+  {item.requiresPrescription && (
+    <Chip
+      label="RX • وصفة طبية"
+      size="small"
+      sx={{
+        mt: 0.5,
+        height: 22,
+        borderRadius: 1.5,
+        fontSize: 11,
+        fontWeight: 700,
+        bgcolor: "#FFF7ED",
+        color: "#C2410C",
+        border: "1px solid #FED7AA",
+        "& .MuiChip-label": {
+          px: 1,
+        },
+      }}
+    />
+  )}
+
+  <Typography
+    variant="caption"
+    sx={{
+      color: "#64748B",
+      fontSize: 13,
+      display: "block",
+      mt: 0.3,
+    }}
+  >
+    المتاح: {item.selectedUnit.availableDisplayQuantity}
+  </Typography>
+</Box>
   );
 
   const renderUnitSelector = (item: InvoiceItem) => {

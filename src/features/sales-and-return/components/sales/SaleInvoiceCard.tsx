@@ -1,11 +1,14 @@
 
-// // src/components/SaleInvoiceCard.tsx
+
+
 // import React from "react";
-// import { Box, Typography, Button, Paper, styled } from "@mui/material";
+// import { Box, Typography, Button, Paper, styled, CircularProgress } from "@mui/material";
 // import PersonOutlineIcon from "@mui/icons-material/PersonOutlined";
 // import type { SaleInvoiceData } from "../../types/saleInvoice";
+// import { useQueryClient } from "@tanstack/react-query";
+// import usePatchData from "../../../../shared/hooks/usePatchData";
+// import { useSnackbar } from "../../../../shared/providers/useSnackbar";
 
-// {/*ستايل الكارد  */}
 // const PremiumCard = styled(Paper)(({ theme }) => ({
 //   backgroundColor: "#ffffff",
 //   borderRadius: "16px",
@@ -15,7 +18,7 @@
 //   transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
 //   display: "flex",
 //   flexDirection: "column",
-//   gap: "16px", 
+//   gap: "16px",
 //   height: "100%",
 //   "&:hover": {
 //     transform: "translateY(-2px)",
@@ -24,7 +27,6 @@
 //   },
 // }));
 
-// {/*ستايل النقطة التي توضح حالة الفاتورة */}
 // const StatusDot = styled(Box)<{ dotColor: string }>(({ dotColor }) => ({
 //   width: "12px",
 //   height: "12px",
@@ -40,8 +42,44 @@
 // }
 
 // export const SaleInvoiceCard: React.FC<SaleInvoiceCardProps> = ({ invoice, onDetailsClick }) => {
+//   const queryClient = useQueryClient();
+//   const { showSnackbar } = useSnackbar();
 
-//   {/*إعطاء لون للنقطة التي تعبر عن حالة الفاتورة */}
+//   // إعداد الـ Mutation للدفع المباشر باستخدام PATCH
+//   const { mutate: completePayment, isPending: isPaying } = usePatchData(
+//     `/sale-invoice/${invoice.saleInvoiceId}/payment`
+//   );
+
+//   const handleCompletePayment = () => {
+//     completePayment(
+//       { paymentStatus: "PAID" },
+//       {
+//         onSuccess: () => {
+//           // 1. تحديث الكاش محلياً ليتغير الزر فوراً
+//           invoice.paymentStatus = "PAID";
+
+//           // 2. إظهار السناك بار للنجاح
+//           showSnackbar(`تم إتمام دفع الفاتورة رقم #${invoice.pharmacyInvoiceId} بنجاح!`, "success");
+
+//           // 3. إعادة إجبار الاستعلام على الجلب المباشر من السيرفر
+//           queryClient.refetchQueries({
+//             queryKey: ["sale-invoices"],
+//             exact: false,
+//           });
+//         },
+//         onError: (err: any) => {
+//           console.error("فشل إكمال عملية الدفع:", err);
+//           const errorMsg =
+//             err?.response?.data?.message || "حدث خطأ أثناء إتمام عملية الدفع.";
+//           showSnackbar(
+//             Array.isArray(errorMsg) ? errorMsg.join(" | ") : errorMsg,
+//             "error"
+//           );
+//         },
+//       }
+//     );
+//   };
+
 //   const getStatusColor = (): string => {
 //     switch (invoice.paymentStatus) {
 //       case "PENDING":
@@ -61,24 +99,25 @@
 //   const formattedDate = invoiceDate.toLocaleDateString("ar-SY", { day: "numeric", month: "numeric", year: "numeric" });
 //   const formattedTime = invoiceDate.toLocaleTimeString("ar-SY", { hour: "2-digit", minute: "2-digit" });
 
-//   const total = parseFloat(invoice.totalAmount);
-  
+//   // const total = parseFloat(invoice.totalAmount);
 
-//   //ارجاع قيمة كل من المدفوع و الجزئي و المتبقي 
-//   const getFinancials = () => {
-//     if (invoice.paymentStatus === "PAID") {
-//       return { paid: total, remaining: 0 };
-//     }
-//     if (invoice.paymentStatus === "PENDING") {
-//       return { paid: 0, remaining: total };
-//     }
-//     const paid = invoice.subtotal ? parseFloat(invoice.subtotal) : 0;
-//     return { paid: paid, remaining: Math.max(0, total - paid) };
-//   };
-//   const { paid: paidAmount, remaining: remainingAmount } = getFinancials();
+//   // const getFinancials = () => {
+//   //   if (invoice.paymentStatus === "PAID") {
+//   //     return { paid: total, remaining: 0 };
+//   //   }
+//   //   if (invoice.paymentStatus === "PENDING") {
+//   //     return { paid: 0, remaining: total };
+//   //   }
+//   //   const paid = invoice.subtotal ? parseFloat(invoice.subtotal) : 0;
+//   //   return { paid: paid, remaining: Math.max(0, total - paid) };
+//   // };
+//   // const { paid: paidAmount, remaining: remainingAmount } = getFinancials();
+//   const total = Number(invoice.totalAmount);
+// const paidAmount = invoice.paidAmount;
+// const remainingAmount = invoice.remainingAmount;
 
-// //التأكد من أن المريض موجود
 //   const hasPatient = !!invoice.pharmacyInvoice.patient?.fullName;
+//   const isPartialOrPending = invoice.paymentStatus === "PARTIAL" || invoice.paymentStatus === "PENDING";
 
 //   return (
 //     <PremiumCard elevation={0}>
@@ -102,7 +141,6 @@
 //             display: "flex",
 //             alignItems: "center",
 //             justifyContent: "center",
-//             // تم تكبير أبعاد الدائرة التي تحوي الأيقونة
 //             width: "50px",
 //             height: "50px",
 //             borderRadius: "50%",
@@ -110,7 +148,6 @@
 //             color: hasPatient ? "#506680" : "#bfbfbf",
 //           }}
 //         >
-//           {/* تم تكبير حجم الأيقونة الداخلي */}
 //           <PersonOutlineIcon sx={{ fontSize: 24 }} />
 //         </Box>
 //         <Typography 
@@ -118,8 +155,8 @@
 //           sx={{ 
 //             fontWeight: 700, 
 //             color: hasPatient ? "#262626" : "#bfbfbf", 
-//             fontSize: "1.15rem", // تم تكبير حجم الخط لاسم المريض
-//             fontStyle: "normal" // إلغاء الخط المائل تماماً ليظهر مستقيماً في كل الحالات
+//             fontSize: "1.15rem",
+//             fontStyle: "normal"
 //           }}
 //         >
 //           {hasPatient ? invoice.pharmacyInvoice.patient?.fullName : "غير محدد"}
@@ -129,8 +166,6 @@
 //       {/* 3. الأسفل: المبالغ المالية */}
 //       <Box sx={{ mt: "auto", pt: 2, borderTop: "1px dashed #f0f0f0" }}>
 //         <Box sx={{ display: "flex", flexDirection: "column", gap: 1.2 }}>
-          
-//           {/* سطر إجمالي الفاتورة */}
 //           <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
 //             <Typography variant="caption" sx={{ color: "#8c8c8c", fontSize: "0.82rem", fontWeight: 500 }}>
 //               إجمالي الفاتورة
@@ -143,7 +178,6 @@
 //             </Typography>
 //           </Box>
 
-//           {/* سطر المدفوع */}
 //           <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
 //             <Typography variant="caption" sx={{ color: "#8c8c8c", fontSize: "0.82rem", fontWeight: 500 }}>
 //               المدفوع
@@ -156,7 +190,6 @@
 //             </Typography>
 //           </Box>
 
-//           {/* سطر المتبقي */}
 //           <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
 //             <Typography variant="caption" sx={{ color: "#8c8c8c", fontSize: "0.82rem", fontWeight: 500 }}>
 //               المتبقي
@@ -172,7 +205,7 @@
 //       </Box>
 
 //       {/* 4. زر العمليات */}
-//       <Box sx={{ width: "100%" }}>
+//       <Box sx={{ width: "100%", display: "flex", gap: 1 }}>
 //         <Button
 //           variant="contained"
 //           disableElevation
@@ -191,6 +224,36 @@
 //         >
 //           عرض التفاصيل
 //         </Button>
+
+//         {/* عرض زر "إكمال الدفع" فقط عند وجود مبلغ غير مدفوع بالكامل */}
+//         {isPartialOrPending && (
+//           <Button
+//             variant="outlined"
+//             onClick={handleCompletePayment}
+//             disabled={isPaying}
+//             fullWidth
+//             sx={{
+//               backgroundColor: "#fff",
+//               color: "#1f1f1f",
+//               borderColor: "#d9d9d9",
+//               fontWeight: 700,
+//               borderRadius: "10px",
+//               py: "10px",
+//               "&:hover": { borderColor: "#1f1f1f", backgroundColor: "#fff" },
+//             }}
+//           >
+//             {isPaying ? (
+//               <CircularProgress size={18} sx={{ color: "#10b981" }} />
+//             ) : (
+//               <>
+//                 <Box component="span" sx={{ color: "#10b981", ml: 0.8, mr: 0.8, fontWeight: 900 }}>
+//                   ✓
+//                 </Box>
+//                 إتمام الدفع
+//               </>
+//             )}
+//           </Button>
+//         )}
 //       </Box>
 //     </PremiumCard>
 //   );
@@ -198,10 +261,18 @@
 
 
 import React from "react";
-import { Box, Typography, Button, Paper, styled, CircularProgress } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Button,
+  Paper,
+  styled,
+  CircularProgress,
+} from "@mui/material";
+
 import PersonOutlineIcon from "@mui/icons-material/PersonOutlined";
+
 import type { SaleInvoiceData } from "../../types/saleInvoice";
-import { useQueryClient } from "@tanstack/react-query";
 import usePatchData from "../../../../shared/hooks/usePatchData";
 import { useSnackbar } from "../../../../shared/providers/useSnackbar";
 
@@ -216,6 +287,7 @@ const PremiumCard = styled(Paper)(({ theme }) => ({
   flexDirection: "column",
   gap: "16px",
   height: "100%",
+
   "&:hover": {
     transform: "translateY(-2px)",
     boxShadow: "0px 12px 32px rgba(0, 0, 0, 0.03)",
@@ -235,40 +307,47 @@ const StatusDot = styled(Box)<{ dotColor: string }>(({ dotColor }) => ({
 interface SaleInvoiceCardProps {
   invoice: SaleInvoiceData;
   onDetailsClick: (id: number) => void;
+  onPaymentSuccess: () => void;
 }
 
-export const SaleInvoiceCard: React.FC<SaleInvoiceCardProps> = ({ invoice, onDetailsClick }) => {
-  const queryClient = useQueryClient();
+export const SaleInvoiceCard: React.FC<SaleInvoiceCardProps> = ({
+  invoice,
+  onDetailsClick,
+  onPaymentSuccess,
+}) => {
   const { showSnackbar } = useSnackbar();
 
-  // إعداد الـ Mutation للدفع المباشر باستخدام PATCH
   const { mutate: completePayment, isPending: isPaying } = usePatchData(
     `/sale-invoice/${invoice.saleInvoiceId}/payment`
   );
 
   const handleCompletePayment = () => {
     completePayment(
-      { paymentStatus: "PAID" },
+      {
+        paymentStatus: "PAID",
+      },
       {
         onSuccess: () => {
-          // 1. تحديث الكاش محلياً ليتغير الزر فوراً
-          invoice.paymentStatus = "PAID";
+          showSnackbar(
+            `تم إتمام دفع الفاتورة رقم #${invoice.pharmacyInvoiceId} بنجاح!`,
+            "success"
+          );
 
-          // 2. إظهار السناك بار للنجاح
-          showSnackbar(`تم إتمام دفع الفاتورة رقم #${invoice.pharmacyInvoiceId} بنجاح!`, "success");
-
-          // 3. إعادة إجبار الاستعلام على الجلب المباشر من السيرفر
-          queryClient.refetchQueries({
-            queryKey: ["sale-invoices"],
-            exact: false,
-          });
+          // إعادة جلب البيانات من الـ hook الأب
+          onPaymentSuccess();
         },
+
         onError: (err: any) => {
           console.error("فشل إكمال عملية الدفع:", err);
+
           const errorMsg =
-            err?.response?.data?.message || "حدث خطأ أثناء إتمام عملية الدفع.";
+            err?.response?.data?.message ||
+            "حدث خطأ أثناء إتمام عملية الدفع.";
+
           showSnackbar(
-            Array.isArray(errorMsg) ? errorMsg.join(" | ") : errorMsg,
+            Array.isArray(errorMsg)
+              ? errorMsg.join(" | ")
+              : errorMsg,
             "error"
           );
         },
@@ -280,10 +359,13 @@ export const SaleInvoiceCard: React.FC<SaleInvoiceCardProps> = ({ invoice, onDet
     switch (invoice.paymentStatus) {
       case "PENDING":
         return "#f59e0b";
+
       case "PARTIAL":
         return "#06b6d4";
+
       case "PAID":
         return "#10b981";
+
       default:
         return "#3b82f6";
     }
@@ -292,43 +374,83 @@ export const SaleInvoiceCard: React.FC<SaleInvoiceCardProps> = ({ invoice, onDet
   const statusColor = getStatusColor();
 
   const invoiceDate = new Date(invoice.createdAt);
-  const formattedDate = invoiceDate.toLocaleDateString("ar-SY", { day: "numeric", month: "numeric", year: "numeric" });
-  const formattedTime = invoiceDate.toLocaleTimeString("ar-SY", { hour: "2-digit", minute: "2-digit" });
 
-  const total = parseFloat(invoice.totalAmount);
+  const formattedDate = invoiceDate.toLocaleDateString("ar-SY", {
+    day: "numeric",
+    month: "numeric",
+    year: "numeric",
+  });
 
-  const getFinancials = () => {
-    if (invoice.paymentStatus === "PAID") {
-      return { paid: total, remaining: 0 };
-    }
-    if (invoice.paymentStatus === "PENDING") {
-      return { paid: 0, remaining: total };
-    }
-    const paid = invoice.subtotal ? parseFloat(invoice.subtotal) : 0;
-    return { paid: paid, remaining: Math.max(0, total - paid) };
-  };
-  const { paid: paidAmount, remaining: remainingAmount } = getFinancials();
+  const formattedTime = invoiceDate.toLocaleTimeString("ar-SY", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+  const total = Number(invoice.totalAmount);
+  const paidAmount = invoice.paidAmount;
+  const remainingAmount = invoice.remainingAmount;
 
   const hasPatient = !!invoice.pharmacyInvoice.patient?.fullName;
-  const isPartialOrPending = invoice.paymentStatus === "PARTIAL" || invoice.paymentStatus === "PENDING";
+
+  const isPartialOrPending =
+    invoice.paymentStatus === "PARTIAL" ||
+    invoice.paymentStatus === "PENDING";
 
   return (
     <PremiumCard elevation={0}>
-      {/* 1. الرأس: رقم الفاتورة والتاريخ */}
-      <Box sx={{ display: "flex", flexDirection: "column", gap: 0.6, width: "100%" }}>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+
+      {/* Header */}
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 0.6,
+          width: "100%",
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 1.5,
+          }}
+        >
           <StatusDot dotColor={statusColor} />
-          <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "#1f1f1f", fontSize: "1.05rem" }}>
+
+          <Typography
+            variant="subtitle2"
+            sx={{
+              fontWeight: 700,
+              color: "#1f1f1f",
+              fontSize: "1.05rem",
+            }}
+          >
             #INV-{invoice.pharmacyInvoiceId}
           </Typography>
         </Box>
-        <Typography variant="caption" sx={{ color: "#595959", fontSize: "0.82rem", fontWeight: 600, pr: 3.5 }}>
+
+        <Typography
+          variant="caption"
+          sx={{
+            color: "#595959",
+            fontSize: "0.82rem",
+            fontWeight: 600,
+            pr: 3.5,
+          }}
+        >
           {formattedDate} • {formattedTime}
         </Typography>
       </Box>
 
-      {/* 2. المنتصف: اسم المريض والأيقونة */}
-      <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, width: "100%" }}>
+      {/* Patient */}
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: 1.5,
+          width: "100%",
+        }}
+      >
         <Box
           sx={{
             display: "flex",
@@ -337,59 +459,166 @@ export const SaleInvoiceCard: React.FC<SaleInvoiceCardProps> = ({ invoice, onDet
             width: "50px",
             height: "50px",
             borderRadius: "50%",
-            backgroundColor: hasPatient ? "#b8e0fa40" : "#f5f5f5",
-            color: hasPatient ? "#506680" : "#bfbfbf",
+            backgroundColor: hasPatient
+              ? "#b8e0fa40"
+              : "#f5f5f5",
+            color: hasPatient
+              ? "#506680"
+              : "#bfbfbf",
           }}
         >
           <PersonOutlineIcon sx={{ fontSize: 24 }} />
         </Box>
-        <Typography 
-          variant="body2" 
-          sx={{ 
-            fontWeight: 700, 
-            color: hasPatient ? "#262626" : "#bfbfbf", 
+
+        <Typography
+          variant="body2"
+          sx={{
+            fontWeight: 700,
+            color: hasPatient
+              ? "#262626"
+              : "#bfbfbf",
             fontSize: "1.15rem",
-            fontStyle: "normal"
           }}
         >
-          {hasPatient ? invoice.pharmacyInvoice.patient?.fullName : "غير محدد"}
+          {hasPatient
+            ? invoice.pharmacyInvoice.patient?.fullName
+            : "غير محدد"}
         </Typography>
       </Box>
 
-      {/* 3. الأسفل: المبالغ المالية */}
-      <Box sx={{ mt: "auto", pt: 2, borderTop: "1px dashed #f0f0f0" }}>
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 1.2 }}>
-          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
-            <Typography variant="caption" sx={{ color: "#8c8c8c", fontSize: "0.82rem", fontWeight: 500 }}>
+      {/* Financials */}
+      <Box
+        sx={{
+          mt: "auto",
+          pt: 2,
+          borderTop: "1px dashed #f0f0f0",
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 1.2,
+          }}
+        >
+          {/* Total */}
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Typography
+              variant="caption"
+              sx={{
+                color: "#8c8c8c",
+                fontSize: "0.82rem",
+                fontWeight: 500,
+              }}
+            >
               إجمالي الفاتورة
             </Typography>
-            <Typography variant="body2" sx={{ fontSize: "1.12rem", fontWeight: 600, color: "#1f1f1f" }}>
+
+            <Typography
+              variant="body2"
+              sx={{
+                fontSize: "1.12rem",
+                fontWeight: 600,
+                color: "#1f1f1f",
+              }}
+            >
               {total.toLocaleString()}{" "}
-              <Box component="span" sx={{ fontSize: "0.75rem", fontWeight: 500, color: "#8c8c8c", mr: 0.5 }}>
+              <Box
+                component="span"
+                sx={{
+                  fontSize: "0.75rem",
+                  fontWeight: 500,
+                  color: "#8c8c8c",
+                }}
+              >
                 ل.س
               </Box>
             </Typography>
           </Box>
 
-          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
-            <Typography variant="caption" sx={{ color: "#8c8c8c", fontSize: "0.82rem", fontWeight: 500 }}>
+          {/* Paid */}
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Typography
+              variant="caption"
+              sx={{
+                color: "#8c8c8c",
+                fontSize: "0.82rem",
+                fontWeight: 500,
+              }}
+            >
               المدفوع
             </Typography>
-            <Typography variant="body2" sx={{ fontWeight: 600, color: "#434343", fontSize: "1rem" }}>
+
+            <Typography
+              variant="body2"
+              sx={{
+                fontWeight: 600,
+                color: "#434343",
+                fontSize: "1rem",
+              }}
+            >
               {paidAmount.toLocaleString()}{" "}
-              <Box component="span" sx={{ fontSize: "0.72rem", fontWeight: 400, color: "#8c8c8c", mr: 0.3 }}>
+              <Box
+                component="span"
+                sx={{
+                  fontSize: "0.72rem",
+                  fontWeight: 400,
+                  color: "#8c8c8c",
+                }}
+              >
                 ل.س
               </Box>
             </Typography>
           </Box>
 
-          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
-            <Typography variant="caption" sx={{ color: "#8c8c8c", fontSize: "0.82rem", fontWeight: 500 }}>
+          {/* Remaining */}
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Typography
+              variant="caption"
+              sx={{
+                color: "#8c8c8c",
+                fontSize: "0.82rem",
+                fontWeight: 500,
+              }}
+            >
               المتبقي
             </Typography>
-            <Typography variant="body2" sx={{ fontWeight: 700, color: statusColor, fontSize: "1rem" }}>
+
+            <Typography
+              variant="body2"
+              sx={{
+                fontWeight: 700,
+                color: statusColor,
+                fontSize: "1rem",
+              }}
+            >
               {remainingAmount.toLocaleString()}{" "}
-              <Box component="span" sx={{ fontSize: "0.72rem", fontWeight: 400, color: "#8c8c8c", mr: 0.3 }}>
+              <Box
+                component="span"
+                sx={{
+                  fontSize: "0.72rem",
+                  fontWeight: 400,
+                  color: "#8c8c8c",
+                }}
+              >
                 ل.س
               </Box>
             </Typography>
@@ -397,12 +626,20 @@ export const SaleInvoiceCard: React.FC<SaleInvoiceCardProps> = ({ invoice, onDet
         </Box>
       </Box>
 
-      {/* 4. زر العمليات */}
-      <Box sx={{ width: "100%", display: "flex", gap: 1 }}>
+      {/* Actions */}
+      <Box
+        sx={{
+          width: "100%",
+          display: "flex",
+          gap: 1,
+        }}
+      >
         <Button
           variant="contained"
           disableElevation
-          onClick={() => onDetailsClick(invoice.saleInvoiceId)}
+          onClick={() =>
+            onDetailsClick(invoice.saleInvoiceId)
+          }
           fullWidth
           sx={{
             backgroundColor: "secondary.main",
@@ -412,13 +649,12 @@ export const SaleInvoiceCard: React.FC<SaleInvoiceCardProps> = ({ invoice, onDet
             textTransform: "none",
             borderRadius: "10px",
             py: "10px",
-            transition: "all 0.2s ease",
           }}
         >
           عرض التفاصيل
         </Button>
 
-        {/* عرض زر "إكمال الدفع" فقط عند وجود مبلغ غير مدفوع بالكامل */}
+        {/* يظهر فقط إذا لم تكن الفاتورة PAID */}
         {isPartialOrPending && (
           <Button
             variant="outlined"
@@ -432,16 +668,34 @@ export const SaleInvoiceCard: React.FC<SaleInvoiceCardProps> = ({ invoice, onDet
               fontWeight: 700,
               borderRadius: "10px",
               py: "10px",
-              "&:hover": { borderColor: "#1f1f1f", backgroundColor: "#fff" },
+
+              "&:hover": {
+                borderColor: "#1f1f1f",
+                backgroundColor: "#fff",
+              },
             }}
           >
             {isPaying ? (
-              <CircularProgress size={18} sx={{ color: "#10b981" }} />
+              <CircularProgress
+                size={18}
+                sx={{
+                  color: "#10b981",
+                }}
+              />
             ) : (
               <>
-                <Box component="span" sx={{ color: "#10b981", ml: 0.8, mr: 0.8, fontWeight: 900 }}>
+                <Box
+                  component="span"
+                  sx={{
+                    color: "#10b981",
+                    ml: 0.8,
+                    mr: 0.8,
+                    fontWeight: 900,
+                  }}
+                >
                   ✓
                 </Box>
+
                 إتمام الدفع
               </>
             )}

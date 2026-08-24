@@ -17,6 +17,7 @@ export interface SaleUnitsApiResponse {
   pharmacyDrugId: number;
   drugName: string;
   baseUnit: string;
+    isRx: boolean;
   unitsPerBox: number;
   sellPart: boolean;
   availableBaseQuantity: number;

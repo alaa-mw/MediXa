@@ -164,7 +164,7 @@ export const AlternativeDrugCard = ({
             variant="body1"
             sx={{ fontWeight: 800, color: stockColor, fontSize: "1.1rem" }}
           >
-            {drug.stock?.availableBaseQuantity || 0}
+            {drug.stock?.availableFullBoxes || 0}
           </Typography>
         </Box>
         <Typography

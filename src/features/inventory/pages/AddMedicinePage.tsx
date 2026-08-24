@@ -267,11 +267,17 @@ export const AddMedicinePage: React.FC = () => {
   const hasPerformedSearch = searchTerm.length > 0;
 
   // التوجيه المباشر لصفحة تفاصيل الدواء العام بالـ ID
-  const handleNavigateToGeneralDrug = (drug: CentralDrugData) => {
-    if (drug && drug.generalDrugId) {
-      navigate(`/pharmacy/inventory/add/${drug.generalDrugId}`);
-    }
-  };
+ const handleNavigateToGeneralDrug = (drug: CentralDrugData) => {
+  if (drug?.generalDrugId) {
+    navigate(`/pharmacy/inventory/add/${drug.generalDrugId}`, {
+      state: {
+        drugName: drug.tradeName,
+        netPrice: Number(drug.netPrice),
+        consumerPrice: Number(drug.consumerPrice),
+      },
+    });
+  }
+};
 
   // التوجيه لصفحة إضافة الدواء الخاص يدوياً مع تمرير الباركود
   const handleNavigateToAddPrivateDrug = (barcode?: string) => {

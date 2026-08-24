@@ -29,16 +29,28 @@ export default function AddGeneralDrugPage() {
 
   const { mutate: addPharmacyDrug, isPending } = usePostData("/pharmacy-drugs/from-general");
 
-  useEffect(() => {
-    const drugId = Number(params.generalDrugId) || 1;
-    const drugName = location.state?.drugName || `دواء عام #${drugId}`;
+useEffect(() => {
+  const drugId = Number(params.generalDrugId) || 1;
 
-    dispatch(setGeneralDrugInfo({ id: drugId, name: drugName }));
+  const drugName =
+    location.state?.drugName || `دواء عام #${drugId}`;
 
-    return () => {
-      dispatch(resetForm());
-    };
-  }, [dispatch, params.generalDrugId, location.state]);
+  const netPrice = Number(location.state?.netPrice ?? 0);
+  const consumerPrice = Number(location.state?.consumerPrice ?? 0);
+
+  dispatch(
+    setGeneralDrugInfo({
+      id: drugId,
+      name: drugName,
+      netPrice,
+      consumerPrice,
+    })
+  );
+
+  return () => {
+    dispatch(resetForm());
+  };
+}, [dispatch, params.generalDrugId, location.state]);
 
   const handleNext = () => dispatch(setActiveStep(activeStep + 1));
   const handleBack = () => dispatch(setActiveStep(activeStep - 1));

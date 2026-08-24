@@ -92,16 +92,45 @@ export interface SaleInvoiceItem {
 }
 
 // الكائن الأساسي للفاتورة داخل مصفوفة الـ data
+// export interface SaleInvoiceData {
+//   saleInvoiceId: number;
+//   pharmacyInvoiceId: number;
+//   paymentStatus: PaymentStatus;
+//   saleType: SaleType;
+//   subtotal: string;
+//   discount: string;
+//   totalAmount: string;
+
+//   paidAmount: string;
+//   returnedAmount: string;
+//   payableAmount: string;
+//   remainingAmount: string;
+
+//   createdAt: string;
+//   updatedAt: string;
+//   pharmacyInvoice: PharmacyInvoice;
+//   items: SaleInvoiceItem[];
+// }
 export interface SaleInvoiceData {
   saleInvoiceId: number;
   pharmacyInvoiceId: number;
+  customerRequestId: number | null;
+
   paymentStatus: PaymentStatus;
   saleType: SaleType;
+
   subtotal: string;
   discount: string;
   totalAmount: string;
+
+  paidAmount: number;
+  returnedAmount: number;
+  payableAmount: number;
+  remainingAmount: number;
+
   createdAt: string;
   updatedAt: string;
+
   pharmacyInvoice: PharmacyInvoice;
   items: SaleInvoiceItem[];
 }
